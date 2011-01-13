@@ -1,4 +1,4 @@
-# Uncrustify 0.56
+# Uncrustify 0.56+git
 #
 # General options
 #
@@ -37,7 +37,7 @@ indent_with_tabs                         Number
   2=indent and align with tabs, using spaces when not on a tabstop
 
 indent_cmt_with_tabs                     { False, True }
-  Comments that are not a brace level are indented with tabs on a tabstop.
+  Comments that are not at brace level are indented with tabs on a tabstop.
   Requires indent_with_tabs=2. If false, will use spaces.
 
 indent_align_string                      { False, True }
@@ -432,6 +432,10 @@ sp_fparen_brace                          { Ignore, Add, Remove, Force }
 
 sp_func_call_paren                       { Ignore, Add, Remove, Force }
   Add or remove space between function name and '(' on function calls
+
+sp_func_call_paren_empty                 { Ignore, Add, Remove, Force }
+  Add or remove space between function name and '()' on function calls without parameters.
+  If set to 'ignore' (the default), sp_func_call_paren is used.
 
 sp_func_call_user_paren                  { Ignore, Add, Remove, Force }
   Add or remove space between the user function name and '(' on function calls
@@ -910,23 +914,44 @@ nl_func_proto_type_name                  { Ignore, Add, Remove, Force }
 nl_func_paren                            { Ignore, Add, Remove, Force }
   Add or remove newline between a function name and the opening '('
 
+nl_func_def_paren                        { Ignore, Add, Remove, Force }
+  Add or remove newline between a function name and the opening '(' in the definition
+
 nl_func_decl_start                       { Ignore, Add, Remove, Force }
   Add or remove newline after '(' in a function declaration
+
+nl_func_def_start                        { Ignore, Add, Remove, Force }
+  Add or remove newline after '(' in a function definition
 
 nl_func_decl_start_single                { Ignore, Add, Remove, Force }
   Overrides nl_func_decl_start when there is only one parameter.
 
+nl_func_def_start_single                 { Ignore, Add, Remove, Force }
+  Overrides nl_func_def_start when there is only one parameter.
+
 nl_func_decl_args                        { Ignore, Add, Remove, Force }
   Add or remove newline after each ',' in a function declaration
+
+nl_func_def_args                         { Ignore, Add, Remove, Force }
+  Add or remove newline after each ',' in a function definition
 
 nl_func_decl_end                         { Ignore, Add, Remove, Force }
   Add or remove newline before the ')' in a function declaration
 
+nl_func_def_end                          { Ignore, Add, Remove, Force }
+  Add or remove newline before the ')' in a function definition
+
 nl_func_decl_end_single                  { Ignore, Add, Remove, Force }
   Overrides nl_func_decl_end when there is only one parameter.
 
+nl_func_def_end_single                   { Ignore, Add, Remove, Force }
+  Overrides nl_func_def_end when there is only one parameter.
+
 nl_func_decl_empty                       { Ignore, Add, Remove, Force }
   Add or remove newline between '()' in a function declaration.
+
+nl_func_def_empty                        { Ignore, Add, Remove, Force }
+  Add or remove newline between '()' in a function definition.
 
 nl_fdef_brace                            { Ignore, Add, Remove, Force }
   Add or remove newline between function signature and '{'
@@ -1214,12 +1239,123 @@ mod_remove_empty_return                  { False, True }
 cmt_width                                Number
   Try to wrap comments at cmt_width columns
 
+cmt_inline_width                         Number
+  Try to wrap in-line comments at cmt_inline_width columns (equal to cmt_width by default)
+
 cmt_reflow_mode                          Number
   Set the comment reflow mode (default: 0)
   0: no reflowing (apart from the line wrapping due to cmt_width)
   1: no touching at all
   2: full reflow
   
+
+cmt_reflow_mode_cpp                      Number
+  Set the comment reflow mode (default: 1) for C++ comments
+  0: no reflowing (apart from the line wrapping due to cmt_width)
+  1: no touching at all
+  2: full reflow
+  
+
+cmt_reflow_orphans                       Number
+  minimum number of words to keep on a first (any!) line
+
+cmt_reflow_widows                        Number
+  minimum number of words to keep on a last line
+
+cmt_reflow_minimum_words_per_line        Number
+  minimum number of words per comment line (prevent semi-
+  vertical stretched line wrapping for comments positioned
+  towards the right edge --> allow those to overshoot the
+  configured right column edge.
+  0: disables this
+  
+
+cmt_reflow_overshoot                     Number
+  number of characters that comment line may overshoot
+  to prevent widows
+
+cmt_reflow_bullets                       String
+  characters that start a bullet in a bullet list, use
+  any numeric for all numerics, etc.
+
+cmt_reflow_bullet_terminators            String
+  bullet point are a series of bullet characters,
+  terminated by one of these.
+
+cmt_reflow_EOL_markers                   String
+  characters that signal end of line within a paragraph, so
+  that next line is not folded up, when next line starts
+  with an SOL marker. Our way to do a HTML <br>.
+
+cmt_reflow_SOL_markers                   String
+  characters that signal start of a new line within a
+  paragraph, so that this line is not folded up, when
+  previous line ends with an EOL marker
+
+cmt_reflow_no_line_reflow_markers_at_SOL String
+  when any of these is found at SOL, this _line_ will not
+  be reflown.
+
+cmt_reflow_no_par_reflow_markers_at_SOL  String
+  when any of these is found at SOL, this _paragraph_ will
+  not be reflown.
+
+cmt_reflow_no_cmt_reflow_markers_at_SOL  String
+  when any of these is found at SOL, this _comment_ will
+  not be reflown.
+
+cmt_reflow_graphics_markers              String
+  any sequence of these >= threshold characters will signal
+  this paragraph to be ASCII graphics.
+
+cmt_reflow_graphics_threshold            Number
+  the related threshold to detect 'ASCII art' and stop
+  uncrustify from reflowing this paragraph
+
+cmt_reflow_box_markers                   String
+  any sequence of these >= threshold characters indicates
+  a (non?reflowable) box comment
+
+cmt_reflow_box_threshold                 Number
+  the related threshold to detect a (non?reflowable) box comment
+
+cmt_reflow_intermission_indent_threshold Number
+  the related threshold to detect an intermission, i.e. a
+  separate piece of text which stands out from the
+  surrounding text
+
+cmt_reflow_box                           { False, True }
+  whether or not to reflow box comments
+
+cmt_reflow_no_reflow_start_tag           String
+  when this is found at SOL, do not reflow until end tag
+  is found; multiple tags can be specified, separated by ','
+
+cmt_reflow_no_reflow_end_tag             String
+  when this is found at SOL, do not reflow until end tag
+  is found; multiple tags can be specified, separated
+  by ','. End tags must occur in the same order as the
+  open tags.
+
+cmt_reflow_doxygen                       { False, True }
+  recognize doxygen/javadoc documentation markers and keep
+  line breaks when they occur at SOL
+
+cmt_lead_markers                         String
+  comment lines starting with any of these have a
+  'lead'/prefix to align to; usually this is '*', but
+  '*#\|+' is the default set for uncrustify
+
+cmt_reflow_change_cpp_to_c               { False, True }
+  Whether to change cpp-comments into c-comments on
+  reflow when the C++ comment ends up spanning across
+  multiple lines (this includes grouped multiple C++
+  comments)
+
+cmt_reflow_change_c_to_cpp               { False, True }
+  Whether to change c-comments into cpp-comments on
+  reflow (this includes grouped multiple C
+  comments)
 
 cmt_indent_multi                         { False, True }
   If false, disable all multi-line comment changes, including cmt_width. keyword substitution, and leading chars.

@@ -15,7 +15,7 @@
 #include <cstring>
 #include <cerrno>
 #include "unc_ctype.h"
-#include <cassert>
+//#include <cassert>
 
 static void check_unknown_brace_close(chunk_t *semi, chunk_t *brace_close);
 

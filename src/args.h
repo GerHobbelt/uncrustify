@@ -11,6 +11,7 @@
  * @author  Ben Gardner
  * @license GPL v2+
  */
+
 #ifndef ARGS_H_INCLUDED
 #define ARGS_H_INCLUDED
 
@@ -109,7 +110,7 @@ public:
     * @param num_args   The number of items in args
     * @return           The number of arguments parsed (always <= num_args)
     */
-   static int SplitLine(char *text, char *args[], int num_args);
+   static int SplitLine(char *text, const char *args[], int num_args);
 };
 
 #endif   /* ARGS_H_INCLUDED */

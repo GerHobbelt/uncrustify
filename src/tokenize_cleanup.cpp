@@ -8,6 +8,7 @@
  * @author  Ben Gardner
  * @license GPL v2+
  */
+
 #include "uncrustify_types.h"
 #include "prototypes.h"
 #include "chunk_list.h"
@@ -97,9 +98,14 @@ void tokenize_cleanup(void)
          pc->type = CT_TSQUARE;
          pc->str  = "[]";
          pc->len  = 2;
+#if 0
          chunk_del(next);
          pc->orig_col_end += 1;
-         next              = chunk_get_next_ncnl(pc);
+#else
+         pc->orig_col_end = next->orig_col_end;
+         chunk_del(next);
+#endif
+         next = chunk_get_next_ncnl(pc);
       }
 
       if ((pc->type == CT_DOT) && ((cpd.lang_flags & LANG_ALLC) != 0))
@@ -311,8 +317,13 @@ void tokenize_cleanup(void)
                next->str  = "()";
                next->len  = 2;
                next->type = CT_OPERATOR_VAL;
+#if 0
                chunk_del(tmp);
                next->orig_col_end += 1;
+#else
+               next->orig_col_end = tmp->orig_col_end;
+               chunk_del(tmp);
+#endif
             }
          }
          else if ((next->type == CT_ANGLE_CLOSE) &&
@@ -432,7 +443,7 @@ void tokenize_cleanup(void)
                {
                   break;
                }
-               if ((tmp->len > 0) && isalpha(*tmp->str))
+               if ((tmp->len > 0) && unc_isalpha(*tmp->str))
                {
                   tmp->type = CT_SQL_WORD;
                }

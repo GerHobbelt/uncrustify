@@ -9,6 +9,8 @@
 #ifndef CHAR_TABLE_H_INCLUDED
 #define CHAR_TABLE_H_INCLUDED
 
+#include "base_types.h"
+
 
 /**
  * bit0-7 = paired char
@@ -25,19 +27,19 @@ struct CharTable
       KW2 = 0x0200,
    };
 
-   static inline int Get(char ch)
+   static_inline int Get(char ch)
    {
       return(chars[(int)ch & 0x7f]);
    }
 
 
-   static inline bool IsKw1(char ch)
+   static_inline bool IsKw1(char ch)
    {
       return((Get(ch) & KW1) != 0);
    }
 
 
-   static inline bool IsKw2(char ch)
+   static_inline bool IsKw2(char ch)
    {
       return((Get(ch) & KW2) != 0);
    }

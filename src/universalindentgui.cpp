@@ -3,7 +3,16 @@
  * Exports the config file for UniversalIndentGUI
  */
 #include "prototypes.h"
+
+#undef PACKAGE
+#undef PACKAGE_BUGREPORT
+#undef PACKAGE_NAME
+#undef PACKAGE_STRING
+#undef PACKAGE_TARNAME
+#undef PACKAGE_URL
+#undef PACKAGE_VERSION
 #include "uncrustify_version.h"
+
 #include "unc_ctype.h"
 #include <stdio.h>
 
@@ -94,7 +103,7 @@ void print_universal_indent_cfg(FILE *pfile)
             }
             else if (was_space)
             {
-               *character = unc_toupper(*character);
+               *character = (char)unc_toupper(*character);
                was_space  = false;
             }
          }
@@ -153,6 +162,13 @@ void print_universal_indent_cfg(FILE *pfile)
             fprintf(pfile, "Enabled=false\n");
             switch (option->type)
             {
+            case AT_TRISTATE_BOOL:
+               fprintf(pfile, "EditorType=multiple\n");
+				fprintf(pfile, "Choices=\"%s=false|%s=true|%s=nochange\"\n", option->name, option->name, option->name);
+				fprintf(pfile, "ChoicesReadable=\"no|yes|keep as-is\"\n");
+				fprintf(pfile, "ValueDefault=%d\n", (int)cpd.settings[option->id].t);
+               break;
+
             case AT_BOOL:
                // [align_keep_tabs]
                // Category=3

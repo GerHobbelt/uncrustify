@@ -266,3 +266,6 @@
 66602 custom_types_ssl.cfg	c/custom_types_ssl.c
 66603 ger.cfg			c/pp_concat_asn1.h
 
+# a series of tests for the new comment reformatter
+99901 ger.cfg			c/cmt-not-a-boxed-cmt.h
+

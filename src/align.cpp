@@ -26,7 +26,7 @@ static void align_func_proto(int span);
 static void align_oc_msg_spec(int span);
 static void align_typedefs(int span);
 static void align_left_shift(void);
-static void align_oc_msg_colons();
+static void align_oc_msg_colons(void);
 static void align_oc_msg_colon(chunk_t *so);
 static void align_oc_decl_colon(void);
 
@@ -180,8 +180,8 @@ static void align_add(ChunkStack& cs, chunk_t *pc, int& max_col, int min_pad, bo
          }
       }
       LOG_FMT(LALADD, "%s: pc->col=%d max_col=%d min_pad=%d min_col=%d multi:%s prev->col=%d prev->len=%d %s\n",
-              __func__, pc->column, max_col, min_pad, min_col, (prev->type == CT_COMMENT_MULTI) ? "Y" : "N",
-              (prev->type == CT_COMMENT_MULTI) ? prev->orig_col_end : prev->column, prev->len, get_token_name(prev->type));
+              __func__, pc->column, max_col, min_pad, min_col, (prev->type == CT_COMMENT_MULTI ? "Y" : "N"),
+              (prev->type == CT_COMMENT_MULTI ? prev->orig_col_end : prev->column), prev->len, get_token_name(prev->type));
    }
 
    if (cs.Empty())
@@ -1249,7 +1249,7 @@ static CmtAlignType get_comment_align_type(chunk_t *cmt)
  * The series ends when more than align_right_cmt_span newlines are found.
  *
  * Interesting info:
- *  - least pysically allowed column
+ *  - least physically allowed column
  *  - intended column
  *  - least original cmt column
  *
@@ -1327,6 +1327,9 @@ chunk_t *align_trailing_comments(chunk_t *start)
            min_orig, intended_col, min_col, col);
    align_stack(cs, col, (intended_col != 0), LALTC);
 
+#if 0
+log_set_mask(&old_log);
+#endif
    return(chunk_get_next(pc));
 }
 
@@ -1844,7 +1847,7 @@ static void align_oc_msg_colon(chunk_t *so)
 /**
  * Aligns OC messages
  */
-static void align_oc_msg_colons()
+static void align_oc_msg_colons(void)
 {
    chunk_t *pc;
 

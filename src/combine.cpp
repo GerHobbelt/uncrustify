@@ -15,7 +15,7 @@
 #include <cstring>
 #include <cerrno>
 #include "unc_ctype.h"
-#include <cassert>
+//#include <cassert>
 
 static void fix_fcn_def_params(chunk_t *pc);
 static void fix_typedef(chunk_t *pc);
@@ -1960,7 +1960,7 @@ static void fix_fcn_def_params(chunk_t *start)
       start = chunk_get_next_ncnl(start);
    }
 
-   assert((start->len == 1) && (*start->str == '('));
+   UNC_ASSERT((start->len == 1) && (*start->str == '('));
 
    ChunkStack cs;
 

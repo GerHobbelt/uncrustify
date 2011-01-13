@@ -8,6 +8,14 @@
 #define DEFINE_PCF_NAMES
 #define DEFINE_CHAR_TABLE
 
+
+#undef PACKAGE
+#undef PACKAGE_BUGREPORT
+#undef PACKAGE_NAME
+#undef PACKAGE_STRING
+#undef PACKAGE_TARNAME
+#undef PACKAGE_URL
+#undef PACKAGE_VERSION
 #include "uncrustify_version.h"
 #include "uncrustify_types.h"
 #include "char_table.h"
@@ -32,9 +40,16 @@
 #ifdef HAVE_STRINGS_H
 #include <strings.h>  /* strcasecmp() */
 #endif
+#if defined(TIME_WITH_SYS_TIME)
+#include <time.h>
+#include <sys/time.h>
+#else
+#include <time.h>
+#endif
+
 
 /* Global data */
-struct cp_data cpd;
+struct cp_data cpd = {0};
 
 
 static int language_from_tag(const char *tag);
@@ -129,16 +144,18 @@ static void usage_exit(const char *msg, const char *argv0, int code)
            "If no input files are specified, the input is read from stdin\n"
            "If reading from stdin, you should specify the language using -l\n"
            "\n"
-           "If -F is used or files are specified on the command line, the output filename is\n"
-           "'prefix/filename' + suffix\n"
+           "If -F is used or files are specified on the command line, the output filename\n"
+           "is 'prefix/filename' + suffix\n"
            "\n"
            "When reading from stdin or doing a single file via the '-f' option,\n"
            "the output is dumped to stdout, unless redirected with -o FILE.\n"
            "\n"
            "Errors are always dumped to stderr\n"
            "\n"
-           "The '-f' and '-o' options may not be used with '-F', '--replace' or '--no-backup'.\n"
-           "The '--prefix' and '--suffix' options may not be used with '--replace' or '--no-backup'.\n"
+           "The '-f' and '-o' options may not be used with '-F', '--replace' or\n"
+		   "'--no-backup'.\n"
+           "The '--prefix' and '--suffix' options may not be used with '--replace' or\n"
+		   "'--no-backup'.\n"
            "\n"
            "Basic Options:\n"
            " -c CFG       : use the config file CFG\n"
@@ -149,8 +166,9 @@ static void usage_exit(const char *msg, const char *argv0, int code)
            " --suffix SFX : Append SFX to the output filename. The default is '.uncrustify'\n"
            " --prefix PFX : Prepend PFX to the output filename path.\n"
            " --replace    : replace source files (creates a backup)\n"
-           " --no-backup  : replace files, no backup. Useful if files are under source control\n"
-#ifdef HAVE_UTIME_H
+           " --no-backup  : replace files, no backup. Useful if files are under source\n"
+		   "                control\n"
+#if defined(HAVE_UTIME)
            " --mtime      : preserve mtime on replaced files\n"
 #endif
            " -l           : language override: C, CPP, D, CS, JAVA, PAWN, OC, OC+\n"
@@ -165,7 +183,8 @@ static void usage_exit(const char *msg, const char *argv0, int code)
            " --update-config          : Output a new config file. Use with -o FILE\n"
            " --update-config-with-doc : Output a new config file. Use with -o FILE\n"
            " --universalindent        : Output a config file for Universal Indent GUI\n"
-           " --detect                 : detects the config from a source file. Use with '-f FILE'\n"
+           " --detect                 : detects the config from a source file. Use with\n"
+		   "                            '-f FILE'\n"
            "                            Detection is fairly limited.\n"
            "\n"
            "Debug Options:\n"
@@ -222,6 +241,253 @@ static void redir_stdout(const char *output_file)
 }
 
 
+
+
+
+#if defined(WIN32) || defined(_WIN32) || defined(_WIN64) || defined(WIN64)
+
+#if defined(_DEBUG)
+
+_CrtMemState bfc_memdbg_state_snapshot1;
+int trigger_memdump = 0;
+int trigger_debugger = 0;
+int dump_linecounter = 0;
+
+/*
+* Define our own reporting function.
+* We'll hook it into the debug reporting
+* process later using _CrtSetReportHook.
+*/
+static int
+bfc_dbg_report_function(int report_type, char *usermsg, int *retval)
+{
+	/*
+	* By setting retVal to zero, we are instructing _CrtDbgReport
+	* to continue with normal execution after generating the report.
+	* If we wanted _CrtDbgReport to start the debugger, we would set
+	* retVal to one.
+	*/
+	*retval = !!trigger_debugger;
+
+	/*
+	* When the report type is for an ASSERT,
+	* we'll report some information, but we also
+	* want _CrtDbgReport to get called -
+	* so we'll return TRUE.
+	*
+	* When the report type is a WARNing or ERROR,
+	* we'll take care of all of the reporting. We don't
+	* want _CrtDbgReport to get called -
+	* so we'll return FALSE.
+	*/
+	switch (report_type)
+	{
+	default:
+	case _CRT_WARN:
+	case _CRT_ERROR:
+	case _CRT_ERRCNT:
+		fwrite(usermsg, 1, strlen(usermsg), stderr);
+		fflush(stderr);
+		OutputDebugStringA(usermsg);
+		dump_linecounter++;
+		if (dump_linecounter % 10000 == 50)
+		{
+			fprintf(stderr, "press ENTER to continue dumping... ");
+			fflush(stderr);
+			(void)getc(stdin);
+		}
+		return 0;
+
+	case _CRT_ASSERT:
+		fwrite(usermsg, 1, strlen(usermsg), stderr);
+		fflush(stderr);
+		OutputDebugStringA(usermsg);
+		break;
+	}
+	return 1;
+}
+
+static void
+bfc_report_mem_analysis(void)
+{
+	_CrtMemState msNow;
+
+	if (!_CrtCheckMemory())
+	{
+		fprintf(stderr, ">>>Failed to validate memory heap<<<\n");
+	}
+
+	/* only dump leaks when there are in fact leaks */
+	_CrtMemCheckpoint(&msNow);
+
+	if (msNow.lCounts[_CLIENT_BLOCK] != 0
+		|| msNow.lCounts[_NORMAL_BLOCK] != 0
+		|| (_crtDbgFlag & _CRTDBG_CHECK_CRT_DF
+		&& msNow.lCounts[_CRT_BLOCK] != 0)
+		)
+	{
+		/* difference detected: dump objects since start. */
+		_RPT0(_CRT_WARN, "============== Detected memory leaks! ====================\n");
+
+		_CrtMemState diff;
+		if (_CrtMemDifference(&diff, &bfc_memdbg_state_snapshot1, &msNow))
+		{
+			//_CrtMemDumpAllObjectsSince(&bfc_memdbg_state_snapshot1);
+
+			_CrtMemDumpStatistics(&diff);
+		}
+	}
+}
+
+#else
+
+/* Win32/64 release build */
+
+#endif
+
+void report_assertion_failed(const char *expr, const char *function, const char *filepath, int lineno, assert_extended_reporter *rprtr)
+{
+	const char *msg = (rprtr ? rprtr->c_msg() : "");
+
+	if (1 != _CrtDbgReport(_CRT_ASSERT, filepath, lineno, function, "'%s' %s\n", expr, msg))
+	{
+		_CrtDbgBreak();
+	}
+	exit(EXIT_FAILURE);
+}
+
+#else
+
+
+void report_assertion_failed(const char *expr, const char *function, const char *filepath, int lineno, assert_extended_reporter *rprtr)
+{
+	const char *msg = (rprtr ? rprtr->c_msg() : "");
+	if (!msg[0])
+		msg = NULL;
+
+	if (function && filepath && msg)
+	{
+		fprintf(stderr, "Assertion failed: '%s' (%s) at %s, line %d in %s\n", expr, msg, function, lineno, filepath);
+		exit(EXIT_FAILURE);
+	}
+	if (filepath && msg)
+	{
+		fprintf(stderr, "Assertion failed: '%s' (%s) at line %d in %s\n", expr, msg, lineno, filepath);
+		exit(EXIT_FAILURE);
+	}
+	if (function && filepath && !msg)
+	{
+		fprintf(stderr, "Assertion failed: '%s' at %s, line %d in %s\n", expr, function, lineno, filepath);
+		exit(EXIT_FAILURE);
+	}
+	if (filepath && !msg)
+	{
+		fprintf(stderr, "Assertion failed: '%s' at line %d in %s\n", expr, lineno, filepath);
+		exit(EXIT_FAILURE);
+	}
+	fprintf(stderr, "Assertion failed: '%s' %s\n", expr, msg);
+	exit(EXIT_FAILURE);
+}
+
+#endif
+
+
+assert_extended_reporter::assert_extended_reporter()
+{
+	msgbuf = buf;
+	buf[0] = 0;
+	buflen = sizeof(buf);
+}
+assert_extended_reporter::assert_extended_reporter(long int val)
+{
+	msgbuf = buf;
+	buf[0] = 0;
+	buflen = sizeof(buf);
+
+	int suggested_buflen = buflen;
+	print(suggested_buflen, "value: %ld", val);
+}
+assert_extended_reporter::assert_extended_reporter(unsigned long int val)
+{
+	msgbuf = buf;
+	buf[0] = 0;
+	buflen = sizeof(buf);
+
+	int suggested_buflen = buflen;
+	print(suggested_buflen, "value: %lu", val);
+}
+assert_extended_reporter::assert_extended_reporter(const char *msg, ...)
+{
+	msgbuf = buf;
+	buf[0] = 0;
+	buflen = sizeof(buf);
+
+	for (int suggested_buflen = buflen; ; suggested_buflen *= 2)
+	{
+		va_list a;
+
+		va_start(a, msg);
+		int rv = vprint(suggested_buflen, msg, a);
+		va_end(a);
+		if (rv >= 0)
+			break;
+	}
+}
+assert_extended_reporter::~assert_extended_reporter()
+{
+	msgbuf = buf;
+	buf[0] = 0;
+	buflen = 0;
+}
+int assert_extended_reporter::print(int suggested_buflen, const char *msg, ...)
+{
+	va_list a;
+
+	va_start(a, msg);
+	int rv = this->vprint(suggested_buflen, msg, a);
+	va_end(a);
+	return rv;
+}
+int assert_extended_reporter::vprint(int suggested_buflen, const char *msg, va_list args)
+{
+	if (suggested_buflen > buflen)
+	{
+		if (buf == msgbuf)
+		{
+			msgbuf = (char *)malloc(suggested_buflen);
+		}
+		else
+		{
+			msgbuf = (char *)realloc((void *)msgbuf, suggested_buflen);
+		}
+		if (!msgbuf)
+			throw "Out of Memory!";
+		buflen = suggested_buflen;
+	}
+	else
+	{
+		suggested_buflen = buflen;
+	}
+
+	int rv = vsnprintf(msgbuf, suggested_buflen - 1, msg, args);
+ 	msgbuf[suggested_buflen - 1] = 0;
+
+	if ((int)strlen(msgbuf) >= suggested_buflen - 2)
+		rv = -1;
+	return rv;
+}
+
+
+
+
+
+static void clear_everything(void)
+{
+   clear_keyword_file();
+   clear_defines();
+   clear_options();
+}
+
 int main(int argc, char *argv[])
 {
    char       *data        = NULL;
@@ -234,6 +500,151 @@ int main(int argc, char *argv[])
    log_mask_t mask;
    int        idx;
    const char *p_arg;
+
+#if defined(DEBUG) || defined(_DEBUG)
+   printf("argc = %d\n", argc);
+   for (idx = 0; idx < argc; idx++)
+   {
+	   printf("argv[%d] = '%s'\n", idx, argv[idx]);
+   }
+
+{
+   char buf[2048];
+   if (!getcwd(buf, sizeof(buf)))
+   {
+	   perror("failed to obtain current working directory: ");
+   }
+   printf("PWD = '%s'\n", buf);
+}
+#endif
+
+#if defined(WIN32) && 01
+#if 0
+   char *new_argv[] =
+   {
+	   argv[0],
+		"--update-config-with-doc",
+		"-c",
+		"..\\..\\hamsterdb\\uncrustify.v2.cfg",
+		"-o",
+		"..\\..\\hamsterdb\\uncrustify.v2.cfg",
+		NULL
+   };
+#elif 0
+   char *new_argv[] =
+   {
+	   argv[0],
+		"-c",
+		"..\\..\\hamsterdb\\uncrustify.v2.cfg",
+		"-f",
+		"..\\..\\hamsterdb\\uncrustify_in.c",
+		"-o",
+		"..\\..\\hamsterdb\\uncrustify_out.c",
+		NULL
+   };
+#elif 0
+/*
+20302 cpp_to_c-1.cfg           c/nl-cont.c
+20303 cpp_to_c-1.cfg           c/nl-cont2.c
+*/
+   char *new_argv[] =
+   {
+	   argv[0],
+		"-c",
+		"..\\tests\\config\\cpp_to_c-1.cfg",
+		"-f",
+		"..\\tests\\input\\c\\nl-cont.c",
+		"-o",
+		"..\\tests\\results\\c\\20302-nl-cont.c",
+		NULL
+   };
+#elif 01
+   char *new_argv[] =
+   {
+	   argv[0],
+		"-c",
+		"..\\tests\\config\\d.cfg",
+		"-f",
+		"..\\tests\\input\\d\\HashMap.d",
+		"-o",
+		"..\\tests\\results\\d\\40000-HashMap.d",
+		NULL
+   };
+#endif
+   argc = sizeof(new_argv)/sizeof(new_argv[0]);
+   argv = new_argv;
+   argc--;
+#endif
+
+#if defined(WIN32) || defined(_WIN32) || defined(_WIN64) || defined(WIN64)
+
+   /*
+   * Hook in our client-defined reporting function.
+   * Every time a _CrtDbgReport is called to generate
+   * a debug report, our function will get called first.
+   */
+   _CrtSetReportHook2(_CRT_RPTHOOK_INSTALL, bfc_dbg_report_function);
+
+   /*
+   * Define the report destination(s) for each type of report
+   * we are going to generate.  In this case, we are going to
+   * generate a report for every report type: _CRT_WARN,
+   * _CRT_ERROR, and _CRT_ASSERT.
+   * The destination(s) is defined by specifying the report mode(s)
+   * and report file for each report type.
+   */
+   _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
+   _CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDERR);
+   _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
+   _CrtSetReportFile(_CRT_ERROR, _CRTDBG_FILE_STDERR);
+   _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
+   _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
+
+#if !defined(NDEBUG) && !defined(HAM_LEAN_AND_MEAN_FOR_PROFILING)
+
+   // Store a memory checkpoint in the s1 memory-state structure
+   _CrtMemCheckpoint(&bfc_memdbg_state_snapshot1);
+
+   atexit(bfc_report_mem_analysis);
+
+   // Get the current bits
+   int i = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
+
+   i &= 0x0000FFFF
+	   & ~(_CRTDBG_ALLOC_MEM_DF
+	   | _CRTDBG_DELAY_FREE_MEM_DF
+	   | _CRTDBG_LEAK_CHECK_DF
+	   | _CRTDBG_CHECK_ALWAYS_DF);
+
+   i |= _CRTDBG_ALLOC_MEM_DF;
+
+   // Set the debug-heap flag so that freed blocks are kept on the
+   // linked list, to catch any inadvertent use of freed memory
+#if 0
+   i |= _CRTDBG_DELAY_FREE_MEM_DF;
+#endif
+
+   // Set the debug-heap flag so that memory leaks are reported when
+   // the process terminates. Then, exit.
+   i |= _CRTDBG_LEAK_CHECK_DF;
+
+   // Clear the upper 16 bits and OR in the desired frequency
+#if 01
+   i = (i & 0x0000FFFF) | _CRTDBG_CHECK_EVERY_1024_DF;
+#else
+   i |= _CRTDBG_CHECK_ALWAYS_DF;
+#endif
+
+   // Set the new bits
+   _CrtSetDbgFlag(i);
+
+   // set a malloc marker we can use it in the leak dump at the end of
+   // the program:
+   (void)_calloc_dbg(1, 1, _CLIENT_BLOCK, __FILE__, __LINE__);
+#endif
+#endif
+
+   atexit(clear_everything);
 
    /* If ran without options... check keyword sort and show the usage info */
    if (argc == 1)
@@ -259,8 +670,8 @@ int main(int argc, char *argv[])
 
    if (arg.Present("--show-config"))
    {
-      print_options(stdout, true);
-      return(0);
+      print_options(stdout, !arg.Present("-q"));
+      return EXIT_SUCCESS;
    }
 
 #ifdef WIN32
@@ -286,7 +697,7 @@ int main(int argc, char *argv[])
    if ((p_arg = arg.Param("--decode")) != NULL)
    {
       log_pcf_flags(LSYS, strtoul(p_arg, NULL, 16));
-      exit(EXIT_SUCCESS);
+      return EXIT_SUCCESS;
    }
 
    /* Get the config file name */
@@ -296,9 +707,9 @@ int main(int argc, char *argv[])
       /* Handled later */
    }
 
-#ifndef WIN32
+#if !defined(WIN32) || 01
    /* Try to file a config at an alternate location */
-   char buf[512];
+   char buf[1024];
    if (cfg_file == NULL)
    {
       cfg_file = getenv("UNCRUSTIFY_CONFIG");
@@ -504,7 +915,7 @@ int main(int argc, char *argv[])
     */
    if (cfg_file == NULL)
    {
-#ifdef WIN32
+#if defined(WIN32) && 0
       usage_exit("Specify the config file: -c file", argv[0], 58);
 #else
       usage_exit("Specify the config file with '-c file' or set UNCRUSTIFY_CONFIG",
@@ -520,7 +931,7 @@ int main(int argc, char *argv[])
    {
       redir_stdout(output_file);
       save_option_file(stdout, update_config_wd);
-      return(0);
+      return(EXIT_SUCCESS);
    }
 
    /* Check for unused args (ignore them) */
@@ -610,7 +1021,7 @@ int main(int argc, char *argv[])
    clear_keyword_file();
    clear_defines();
 
-   return((cpd.error_count != 0) ? 1 : 0);
+   return((cpd.error_count != 0) ? EXIT_FAILURE : EXIT_SUCCESS);
 }
 
 
@@ -630,7 +1041,7 @@ static void process_source_list(const char *source_list,
 
    char linebuf[256];
    int  argc;
-   char *args[3];
+   const char *args[3];
    int  line = 0;
    int  idx;
 
@@ -676,7 +1087,7 @@ static char *read_stdin(int& out_len)
       return(NULL);
    }
 
-   while ((len = fread(&data[data_len], 1, data_size - data_len, stdin)) > 0)
+   while ((len = (int)fread(&data[data_len], 1, data_size - data_len, stdin)) > 0)
    {
       data_len += len;
       if (data_len == data_size)
@@ -692,7 +1103,7 @@ static char *read_stdin(int& out_len)
       }
    }
 
-   assert(data_len < data_size);
+   UNC_ASSERT(data_len < data_size);
    /* Make sure the buffer is terminated */
    data[data_len] = 0;
 
@@ -725,7 +1136,12 @@ static void make_folders(const char *filename)
              (strcmp(&outname[last_idx], "..") != 0))
          {
             //fprintf(stderr, "%s: %s\n", __func__, outname);
-            mkdir(outname, 0750);
+            int rv = mkdir(outname, 0750);
+			if (rv && errno != EEXIST)
+			{
+				fprintf(stderr, "failed to create directory '%s': ", outname);
+				perror("");
+			}
          }
          outname[idx] = PATH_SEP;
       }
@@ -756,7 +1172,7 @@ static int load_mem_file(const char *filename, file_mem& fm)
       return(-1);
    }
 
-#ifdef HAVE_UTIME_H
+#if defined(HAVE_STRUCT_UTIMBUF_ACTIME)
    /* Save off mtime */
    fm.utb.modtime = my_stat.st_mtime;
 #endif
@@ -1062,15 +1478,8 @@ static void do_source_file(const char *filename_in,
          }
          else
          {
-#ifdef WIN32
-            /* windows can't rename a file if the target exists, so delete it
-             * first. This may cause data loss if the tmp file gets deleted
-             * or can't be renamed.
-             */
-            (void)unlink(filename_out);
-#endif
             /* Change - rename filename_tmp to filename_out */
-            if (rename(filename_tmp, filename_out) != 0)
+            if (unc_rename(filename_tmp, filename_out) != 0)
             {
                LOG_FMT(LERR, "%s: Unable to rename '%s' to '%s'\n",
                        __func__, filename_tmp, filename_out);
@@ -1081,12 +1490,12 @@ static void do_source_file(const char *filename_in,
          filename_tmp = NULL;
       }
 
-#ifdef HAVE_UTIME_H
+#if defined(HAVE_STRUCT_UTIMBUF_ACTIME) && defined(HAVE_UTIME)
       if (keep_mtime)
       {
          /* update mtime -- don't care if it fails */
          fm.utb.actime = time(NULL);
-         (void)utime(filename_in, &fm.utb);
+         utime(filename_in, &fm.utb);
       }
 #endif
    }
@@ -1538,8 +1947,8 @@ c_token_t find_token_name(const char *text)
 
 static bool ends_with(const char *filename, const char *tag)
 {
-   int len1 = strlen(filename);
-   int len2 = strlen(tag);
+   int len1 = (int)strlen(filename);
+   int len2 = (int)strlen(tag);
 
    if ((len2 <= len1) && (strcmp(&filename[len1 - len2], tag) == 0))
    {
@@ -1578,6 +1987,8 @@ struct file_lang languages[] =
    { ".mm",   "OC+",  LANG_OC | LANG_CPP },
    { ".sqc",  "",     LANG_C             }, // embedded SQL
    { ".es",   "ECMA", LANG_ECMA          },
+   { ".js",   "ECMA", LANG_ECMA          },
+   { ".php",  "",     LANG_PHP           },
 };
 
 /**
@@ -1687,7 +2098,7 @@ void log_pcf_flags(log_sev_t sev, UINT64 flags)
       {
          if (tolog != NULL)
          {
-            log_str(sev, tolog, strlen(tolog));
+            log_str(sev, tolog, (int)strlen(tolog));
             log_str(sev, ",", 1);
          }
          tolog = pcf_names[i];
@@ -1696,7 +2107,7 @@ void log_pcf_flags(log_sev_t sev, UINT64 flags)
 
    if (tolog != NULL)
    {
-      log_str(sev, tolog, strlen(tolog));
+      log_str(sev, tolog, (int)strlen(tolog));
    }
 
    log_str(sev, "]\n", 2);

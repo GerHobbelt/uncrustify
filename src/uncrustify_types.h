@@ -6,6 +6,7 @@
  * @author  Ben Gardner
  * @license GPL v2+
  */
+
 #ifndef UNCRUSTIFY_TYPES_H_INCLUDED
 #define UNCRUSTIFY_TYPES_H_INCLUDED
 
@@ -16,9 +17,11 @@
 #include "log_levels.h"
 #include "logger.h"
 #include <cstdio>
-#include <assert.h>
-#ifdef HAVE_UTIME_H
+//#include <cassert>
+#if defined(HAVE_UTIME_H)
 #include <utime.h>
+#elif defined(HAVE_SYS_UTIME_H)
+#include <sys/utime.h>
 #endif
 
 #define UNCRUSTIFY_OFF_TEXT    " *INDENT-OFF*"
@@ -226,6 +229,7 @@ enum
    LANG_VALA = 0x0040,     /*<< Like C# */
    LANG_PAWN = 0x0080,
    LANG_ECMA = 0x0100,
+   LANG_PHP  = 0x0200,
 
    LANG_ALLC = 0x017f,
    LANG_ALL  = 0x0fff,
@@ -294,7 +298,7 @@ struct file_mem
 {
    char           *data;
    int            length;
-#ifdef HAVE_UTIME_H
+#if defined(HAVE_STRUCT_UTIMBUF_ACTIME)
    struct utimbuf utb;
 #endif
 };
@@ -303,7 +307,7 @@ struct cp_data
 {
    FILE               *fout;
 
-   UINT32             error_count;
+   unsigned int       error_count;
    const char         *filename;
 
    file_mem           file_hdr;   /* for cmt_insert_file_header */
@@ -315,15 +319,15 @@ struct cp_data
    bool               lang_forced;
 
    bool               unc_off;
-   UINT32             line_number;
-   UINT16             column;  /* column for parsing */
-   UINT16             spaces;  /* space count on output */
+   unsigned int       line_number;
+   unsigned int       column;  /* column for parsing */
+   unsigned int       spaces;  /* space count on output */
 
    bool               frag;
-   UINT16             frag_cols;
+   unsigned int       frag_cols;
 
    /* stuff to auto-detect line endings */
-   UINT32             le_counts[LE_AUTO];
+   unsigned int       le_counts[LE_AUTO];
    char               newline[5];
 
    bool               consumed;

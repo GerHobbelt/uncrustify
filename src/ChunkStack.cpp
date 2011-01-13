@@ -5,6 +5,7 @@
  * @author  Ben Gardner
  * @license GPL v2+
  */
+
 #include "ChunkStack.h"
 #include <cstdio>
 #include <cstdlib>
@@ -110,7 +111,7 @@ void ChunkStack::Resize(int newsize)
    {
       m_size = newsize;
       m_cse  = (Entry *)realloc(m_cse, m_size * sizeof(ChunkStack::Entry));
-      assert(m_cse != NULL);
+      UNC_ASSERT(m_cse != NULL);
       /*TODO: check for out-of-memory? */
    }
 }
@@ -125,7 +126,7 @@ void ChunkStack::Zap(int idx)
 {
    if ((idx < m_len) && (idx >= 0))
    {
-      assert(m_cse != NULL);
+      UNC_ASSERT(m_cse != NULL);
       m_cse[idx].m_pc = NULL;
    }
 }
@@ -142,7 +143,7 @@ void ChunkStack::Collapse()
 
    for (int idx = 0; idx < oldlen; idx++)
    {
-      assert(m_cse != NULL);
+      UNC_ASSERT(m_cse != NULL);
       if (m_cse[idx].m_pc != NULL)
       {
          m_cse[m_len].m_pc     = m_cse[idx].m_pc;

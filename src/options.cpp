@@ -8,7 +8,16 @@
 #include "uncrustify_types.h"
 #include "args.h"
 #include "prototypes.h"
+
+#undef PACKAGE
+#undef PACKAGE_BUGREPORT
+#undef PACKAGE_NAME
+#undef PACKAGE_STRING
+#undef PACKAGE_TARNAME
+#undef PACKAGE_URL
+#undef PACKAGE_VERSION
 #include "uncrustify_version.h"
+
 #include <cstring>
 #ifdef HAVE_STRINGS_H
 #include <strings.h>  /* strcasecmp() */
@@ -48,13 +57,13 @@ void unc_begin_group(uncrustify_groups id, const char *short_desc,
 }
 
 
-void unc_add_option(const char *name, uncrustify_options id, argtype_e type,
+static void unc_add_option(const char *name, uncrustify_options id, argtype_e type,
                     const char *short_desc, const char *long_desc,
                     int min_val, int max_val)
 {
    group_map[current_group].options.push_back(id);
 
-   option_map_value value;
+   option_map_value value = {0};
 
    value.id         = id;
    value.group_id   = current_group;
@@ -62,11 +71,12 @@ void unc_add_option(const char *name, uncrustify_options id, argtype_e type,
    value.name       = name;
    value.short_desc = short_desc;
    value.long_desc  = long_desc;
-   value.min_val    = 0;
 
    /* Calculate the max/min values */
    switch (type)
    {
+   case AT_TRISTATE_BOOL:
+      value.min_val = -1;
    case AT_BOOL:
       value.max_val = 1;
       break;
@@ -99,7 +109,7 @@ void unc_add_option(const char *name, uncrustify_options id, argtype_e type,
 
    option_name_map[name] = value;
 
-   int name_len = strlen(name);
+   int name_len = (int)strlen(name);
    if (name_len > cpd.max_option_name_len)
    {
       cpd.max_option_name_len = name_len;
@@ -472,7 +482,7 @@ void register_options(void)
                   "1=indent with tabs to brace level, align with spaces\n"
                   "2=indent and align with tabs, using spaces when not on a tabstop", "", 0, 2);
    unc_add_option("indent_cmt_with_tabs", UO_indent_cmt_with_tabs, AT_BOOL,
-                  "Comments that are not a brace level are indented with tabs on a tabstop.\n"
+                  "Comments that are not at brace level are indented with tabs on a tabstop.\n"
                   "Requires indent_with_tabs=2. If false, will use spaces.");
    unc_add_option("indent_align_string", UO_indent_align_string, AT_BOOL,
                   "Whether to indent strings broken by '\\' so that they line up");
@@ -985,12 +995,105 @@ void register_options(void)
    unc_begin_group(UG_comment, "Comment modifications");
    unc_add_option("cmt_width", UO_cmt_width, AT_NUM,
                   "Try to wrap comments at cmt_width columns", "", 16, 256);
+   unc_add_option("cmt_inline_width", UO_cmt_inline_width, AT_NUM,
+                  "Try to wrap in-line comments at cmt_inline_width columns (equal to cmt_width by default)", "", 16, 256);
    unc_add_option("cmt_reflow_mode", UO_cmt_reflow_mode, AT_NUM,
                   "Set the comment reflow mode (default: 0)\n"
                   "0: no reflowing (apart from the line wrapping due to cmt_width)\n"
                   "1: no touching at all\n"
                   "2: full reflow\n", "", 0, 2);
-   unc_add_option("cmt_indent_multi", UO_cmt_indent_multi, AT_BOOL,
+   unc_add_option("cmt_reflow_mode_cpp", UO_cmt_reflow_mode_cpp, AT_NUM,
+                  "Set the comment reflow mode (default: 1) for C++ comments\n"
+                  "0: no reflowing (apart from the line wrapping due to cmt_width)\n"
+                  "1: no touching at all\n"
+                  "2: full reflow\n", "", 0, 2);
+
+	unc_add_option("cmt_reflow_orphans", UO_cmt_reflow_orphans, AT_NUM,
+					"minimum number of words to keep on a first (any!) line",
+					"", 0, 5000);
+	unc_add_option("cmt_reflow_widows", UO_cmt_reflow_widows, AT_NUM,
+					"minimum number of words to keep on a last line",
+					"", 0, 5000);
+	unc_add_option("cmt_reflow_minimum_words_per_line", UO_cmt_reflow_minimum_words_per_line, AT_NUM,
+					"minimum number of words per comment line (prevent semi-\n"
+					"vertical stretched line wrapping for comments positioned\n"
+					"towards the right edge --> allow those to overshoot the\n"
+					"configured right column edge.\n"
+					"0: disables this\n",
+					"", 0, 5000);
+	unc_add_option("cmt_reflow_overshoot", UO_cmt_reflow_overshoot, AT_NUM,
+					"number of characters that comment line may overshoot\n"
+					"to prevent widows",
+					"", 0, 5000);
+	unc_add_option("cmt_reflow_bullets", UO_cmt_reflow_bullets, AT_STRING,
+					"characters that start a bullet in a bullet list, use\n"
+					"any numeric for all numerics, etc.");
+	unc_add_option("cmt_reflow_bullet_terminators", UO_cmt_reflow_bullet_terminators, AT_STRING,
+					"bullet point are a series of bullet characters,\n"
+					"terminated by one of these.");
+	unc_add_option("cmt_reflow_EOL_markers", UO_cmt_reflow_EOL_markers, AT_STRING,
+					"characters that signal end of line within a paragraph, so\n"
+					"that next line is not folded up, when next line starts\n"
+					"with an SOL marker. Our way to do a HTML <br>.");
+	unc_add_option("cmt_reflow_SOL_markers", UO_cmt_reflow_SOL_markers, AT_STRING,
+					"characters that signal start of a new line within a\n"
+					"paragraph, so that this line is not folded up, when\n"
+					"previous line ends with an EOL marker");
+	unc_add_option("cmt_reflow_no_line_reflow_markers_at_SOL", UO_cmt_reflow_no_line_reflow_markers_at_SOL, AT_STRING,
+					"when any of these is found at SOL, this _line_ will not\n"
+					"be reflown.");
+	unc_add_option("cmt_reflow_no_par_reflow_markers_at_SOL", UO_cmt_reflow_no_par_reflow_markers_at_SOL, AT_STRING,
+					"when any of these is found at SOL, this _paragraph_ will\n"
+					"not be reflown.");
+	unc_add_option("cmt_reflow_no_cmt_reflow_markers_at_SOL", UO_cmt_reflow_no_cmt_reflow_markers_at_SOL, AT_STRING,
+					"when any of these is found at SOL, this _comment_ will\n"
+					"not be reflown.");
+	unc_add_option("cmt_reflow_graphics_markers", UO_cmt_reflow_graphics_markers, AT_STRING,
+					"any sequence of these >= threshold characters will signal\n"
+					"this paragraph to be ASCII graphics.");
+	unc_add_option("cmt_reflow_graphics_threshold", UO_cmt_reflow_graphics_threshold, AT_NUM,
+					"the related threshold to detect 'ASCII art' and stop\n"
+					"uncrustify from reflowing this paragraph",
+					"", 0, 5000);
+	unc_add_option("cmt_reflow_box_markers", UO_cmt_reflow_box_markers, AT_STRING,
+					"any sequence of these >= threshold characters indicates\n"
+					"a (non?reflowable) box comment");
+	unc_add_option("cmt_reflow_box_threshold", UO_cmt_reflow_box_threshold, AT_NUM,
+					"the related threshold to detect a (non?reflowable) box comment",
+					"", 0, 5000);
+	unc_add_option("cmt_reflow_intermission_indent_threshold", UO_cmt_reflow_intermission_indent_threshold, AT_NUM,
+					"the related threshold to detect an intermission, i.e. a\n"
+					"separate piece of text which stands out from the\n"
+					"surrounding text",
+					"", 0, 5000);
+	unc_add_option("cmt_reflow_box", UO_cmt_reflow_box, AT_BOOL,
+					"whether or not to reflow box comments");
+	unc_add_option("cmt_reflow_no_reflow_start_tag", UO_cmt_reflow_no_reflow_start_tag, AT_STRING,
+					"when this is found at SOL, do not reflow until end tag\n"
+					"is found; multiple tags can be specified, separated by ','");
+	unc_add_option("cmt_reflow_no_reflow_end_tag", UO_cmt_reflow_no_reflow_end_tag, AT_STRING,
+					"when this is found at SOL, do not reflow until end tag\n"
+					"is found; multiple tags can be specified, separated\n"
+					"by ','. End tags must occur in the same order as the\n"
+					"open tags.");
+	unc_add_option("cmt_reflow_doxygen", UO_cmt_reflow_doxygen, AT_BOOL,
+					"recognize doxygen/javadoc documentation markers and keep\n"
+					"line breaks when they occur at SOL");
+	unc_add_option("cmt_lead_markers", UO_cmt_lead_markers, AT_STRING,
+					"comment lines starting with any of these have a\n"
+					"'lead'/prefix to align to; usually this is '*', but\n"
+					"'*#\\|+' is the default set for uncrustify");
+	unc_add_option("cmt_reflow_change_cpp_to_c", UO_cmt_reflow_change_cpp_to_c, AT_BOOL,
+					"Whether to change cpp-comments into c-comments on\n"
+					"reflow when the C++ comment ends up spanning across\n"
+					"multiple lines (this includes grouped multiple C++\n"
+					"comments)");
+	unc_add_option("cmt_reflow_change_c_to_cpp", UO_cmt_reflow_change_c_to_cpp, AT_BOOL,
+					"Whether to change c-comments into cpp-comments on\n"
+					"reflow (this includes grouped multiple C\n"
+					"comments)");
+
+	unc_add_option("cmt_indent_multi", UO_cmt_indent_multi, AT_BOOL,
                   "If false, disable all multi-line comment changes, including cmt_width. keyword substitution, and leading chars.\n"
                   "Default is true.");
    unc_add_option("cmt_c_group", UO_cmt_c_group, AT_BOOL,
@@ -1007,7 +1110,7 @@ void register_options(void)
                   "Whether to put a newline before the closing '*/' of the combined cpp-comment");
    unc_add_option("cmt_cpp_to_c", UO_cmt_cpp_to_c, AT_BOOL,
                   "Whether to change cpp-comments into c-comments");
-   unc_add_option("cmt_star_cont", UO_cmt_star_cont, AT_BOOL,
+   unc_add_option("cmt_star_cont", UO_cmt_star_cont, AT_TRISTATE_BOOL,
                   "Whether to put a star on subsequent comment lines");
    unc_add_option("cmt_sp_before_star_cont", UO_cmt_sp_before_star_cont, AT_NUM,
                   "The number of spaces to insert at the start of subsequent comment lines");
@@ -1152,8 +1255,9 @@ static void convert_value(const option_map_value *entry, const char *val, op_val
    bool btrue;
    int  mult;
 
-   if (entry->type == AT_LINE)
+   switch (entry->type)
    {
+   case AT_LINE:
       if (strcasecmp(val, "CRLF") == 0)
       {
          dest->le = LE_CRLF;
@@ -1177,10 +1281,9 @@ static void convert_value(const option_map_value *entry, const char *val, op_val
       }
       dest->le = LE_AUTO;
       return;
-   }
 
-   if (entry->type == AT_POS)
-   {
+
+   case AT_POS:
       if (strcasecmp(val, "LEAD") == 0)
       {
          dest->tp = TP_LEAD;
@@ -1220,10 +1323,8 @@ static void convert_value(const option_map_value *entry, const char *val, op_val
       }
       dest->tp = TP_IGNORE;
       return;
-   }
 
-   if (entry->type == AT_NUM)
-   {
+   case AT_NUM:
       if (unc_isdigit(*val) ||
           (unc_isdigit(val[1]) && ((*val == '-') || (*val == '+'))))
       {
@@ -1240,7 +1341,8 @@ static void convert_value(const option_map_value *entry, const char *val, op_val
             val++;
          }
 
-         if (((tmp = unc_find_option(val)) != NULL) && (tmp->type == entry->type))
+		 tmp = unc_find_option(val);
+         if ((tmp != NULL) && (tmp->type == entry->type))
          {
             dest->n = cpd.settings[tmp->id].n * mult;
             return;
@@ -1251,10 +1353,71 @@ static void convert_value(const option_map_value *entry, const char *val, op_val
       cpd.error_count++;
       dest->n = 0;
       return;
-   }
 
-   if (entry->type == AT_BOOL)
-   {
+   case AT_TRISTATE_BOOL:
+      if ((strcasecmp(val, "nochange") == 0) ||
+          (strcasecmp(val, "nc") == 0) ||
+          (strcmp(val, "-1") == 0))
+      {
+         dest->t = TB_NOCHANGE;
+         return;
+      }
+
+      if ((strcasecmp(val, "true") == 0) ||
+          (strcasecmp(val, "t") == 0) ||
+          (strcmp(val, "1") == 0))
+      {
+         dest->t = TB_TRUE;
+         return;
+      }
+
+      if ((strcasecmp(val, "false") == 0) ||
+          (strcasecmp(val, "f") == 0) ||
+          (strcmp(val, "0") == 0))
+      {
+         dest->t = TB_FALSE;
+         return;
+      }
+
+      btrue = true;
+      if ((*val == '-') || (*val == '~'))
+      {
+         btrue = false;
+         val++;
+      }
+
+	  tmp = unc_find_option(val);
+      if ((tmp != NULL) && (tmp->type == entry->type))
+      {
+		  switch (cpd.settings[tmp->id].t)
+		  {
+		  case TB_TRUE:
+			  dest->t = (btrue ? TB_TRUE : TB_FALSE);
+			  break;
+
+		  case TB_FALSE:
+			  dest->t = (!btrue ? TB_TRUE : TB_FALSE);
+			  break;
+
+		  case TB_NOCHANGE:
+			  dest->t = TB_NOCHANGE;
+			  break;
+		  }
+         return;
+      }
+      if ((tmp != NULL) && (tmp->type == AT_BOOL))
+      {
+		  btrue = (cpd.settings[tmp->id].b ? btrue : !btrue);
+		  dest->t = (btrue ? TB_TRUE : TB_FALSE);
+         return;
+      }
+      LOG_FMT(LWARN, "%s:%d Expected 'NoChange', 'True' or 'False' for %s, got %s\n",
+              cpd.filename, cpd.line_number, entry->name, val);
+      cpd.error_count++;
+      dest->t = TB_NOCHANGE;
+      return;
+
+   case AT_BOOL:
       if ((strcasecmp(val, "true") == 0) ||
           (strcasecmp(val, "t") == 0) ||
           (strcmp(val, "1") == 0))
@@ -1278,9 +1441,28 @@ static void convert_value(const option_map_value *entry, const char *val, op_val
          val++;
       }
 
-      if (((tmp = unc_find_option(val)) != NULL) && (tmp->type == entry->type))
+	  tmp = unc_find_option(val);
+      if ((tmp != NULL) && (tmp->type == entry->type))
       {
          dest->b = cpd.settings[tmp->id].b ? btrue : !btrue;
+         return;
+      }
+      if ((tmp != NULL) && (tmp->type == AT_TRISTATE_BOOL))
+      {
+		  switch (cpd.settings[tmp->id].t)
+		  {
+		  case TB_TRUE:
+			  dest->b = btrue;
+			  break;
+
+		  case TB_FALSE:
+			  dest->b = !btrue;
+			  break;
+
+		  case TB_NOCHANGE:
+			  dest->b ^= !btrue;
+			  break;
+		  }
          return;
       }
       LOG_FMT(LWARN, "%s:%d Expected 'True' or 'False' for %s, got %s\n",
@@ -1288,45 +1470,53 @@ static void convert_value(const option_map_value *entry, const char *val, op_val
       cpd.error_count++;
       dest->b = false;
       return;
-   }
 
-   if (entry->type == AT_STRING)
-   {
+   case AT_STRING:
+      if (dest->str)
+	  {
+		  free((void *)dest->str);
+	  }
+	  UNC_ASSERT(val);
       dest->str = strdup(val);
       return;
-   }
 
-   /* Must be AT_IARF */
+   default:
+	   /* Must be AT_IARF */
+	   UNC_ASSERT(!"Unknown entry type");
 
-   if ((strcasecmp(val, "add") == 0) || (strcasecmp(val, "a") == 0))
-   {
-      dest->a = AV_ADD;
-      return;
+   case AT_IARF:
+	   if ((strcasecmp(val, "add") == 0) || (strcasecmp(val, "a") == 0))
+	   {
+		  dest->a = AV_ADD;
+		  return;
+	   }
+	   if ((strcasecmp(val, "remove") == 0) || (strcasecmp(val, "r") == 0))
+	   {
+		  dest->a = AV_REMOVE;
+		  return;
+	   }
+	   if ((strcasecmp(val, "force") == 0) || (strcasecmp(val, "f") == 0))
+	   {
+		  dest->a = AV_FORCE;
+		  return;
+	   }
+	   if ((strcasecmp(val, "ignore") == 0) || (strcasecmp(val, "i") == 0))
+	   {
+		  dest->a = AV_IGNORE;
+		  return;
+	   }
+	   tmp = unc_find_option(val);
+	   if ((tmp != NULL) && (tmp->type == entry->type))
+	   {
+		  dest->a = cpd.settings[tmp->id].a;
+		  return;
+	   }
+	   LOG_FMT(LWARN, "%s:%d Expected 'Add', 'Remove', 'Force', or 'Ignore' for %s, got %s\n",
+			   cpd.filename, cpd.line_number, entry->name, val);
+	   cpd.error_count++;
+	   dest->a = AV_IGNORE;
+	   return;
    }
-   if ((strcasecmp(val, "remove") == 0) || (strcasecmp(val, "r") == 0))
-   {
-      dest->a = AV_REMOVE;
-      return;
-   }
-   if ((strcasecmp(val, "force") == 0) || (strcasecmp(val, "f") == 0))
-   {
-      dest->a = AV_FORCE;
-      return;
-   }
-   if ((strcasecmp(val, "ignore") == 0) || (strcasecmp(val, "i") == 0))
-   {
-      dest->a = AV_IGNORE;
-      return;
-   }
-   if (((tmp = unc_find_option(val)) != NULL) && (tmp->type == entry->type))
-   {
-      dest->a = cpd.settings[tmp->id].a;
-      return;
-   }
-   LOG_FMT(LWARN, "%s:%d Expected 'Add', 'Remove', 'Force', or 'Ignore' for %s, got %s\n",
-           cpd.filename, cpd.line_number, entry->name, val);
-   cpd.error_count++;
-   dest->a = AV_IGNORE;
 }
 
 
@@ -1348,8 +1538,8 @@ int load_option_file(const char *filename)
    FILE *pfile;
    char buffer[256];
    char *ptr;
-   int  id;
-   char *args[32];
+   //int  id;
+   const char *args[32];
    int  argc;
    int  idx;
 
@@ -1461,6 +1651,8 @@ int load_option_file(const char *filename)
       }
       else
       {
+		 int id; /* [i_a] otherwise warning about other id var in nested block up there */
+
          /* must be a regular option = value */
          if ((id = set_option_value(args[0], args[1])) < 0)
          {
@@ -1522,8 +1714,8 @@ int save_option_file(FILE *pfile, bool withDoc)
          first      = false;
          val_string = op_val_to_string(option->type, cpd.settings[option->id]);
          val_str    = val_string.c_str();
-         val_len    = strlen(val_str);
-         name_len   = strlen(option->name);
+         val_len    = (int)strlen(val_str);
+         name_len   = (int)strlen(option->name);
 
          fprintf(pfile, "%s %*.s= ",
                  option->name, cpd.max_option_name_len - name_len, " ");
@@ -1653,30 +1845,36 @@ void print_options(FILE *pfile, bool verbose)
       "String",
    };
 
-   option_name_map_it it;
-
-   /* Find the max width of the names */
-   for (it = option_name_map.begin(); it != option_name_map.end(); it++)
    {
-      cur_width = strlen(it->second.name);
-      if (cur_width > max_width)
-      {
-         max_width = cur_width;
-      }
+	   /* [i_a] prevent analysis warning about second 'it' in subscope further down */
+	   option_name_map_it it;
+
+	   /* Find the max width of the names */
+	   for (it = option_name_map.begin(); it != option_name_map.end(); it++)
+	   {
+		  cur_width = (int)strlen(it->second.name);
+		  if (cur_width > max_width)
+		  {
+			 max_width = cur_width;
+		  }
+	   }
+	   max_width++;
    }
-   max_width++;
 
    fprintf(pfile, "# Uncrustify %s\n", UNCRUSTIFY_VERSION);
 
    /* Print the all out */
    for (group_map_it jt = group_map.begin(); jt != group_map.end(); jt++)
    {
-      fprintf(pfile, "#\n# %s\n#\n\n", jt->second.short_desc);
+	   if (verbose)
+	   {
+			fprintf(pfile, "#\n# %s\n#\n\n", jt->second.short_desc);
+	   }
 
       for (option_list_it it = jt->second.options.begin(); it != jt->second.options.end(); it++)
       {
          const option_map_value *option = get_option_name(*it);
-         cur_width = strlen(option->name);
+         cur_width = (int)strlen(option->name);
          fprintf(pfile, "%s%*c%s\n",
                  option->name,
                  max_width - cur_width, ' ',
@@ -1700,6 +1898,27 @@ void print_options(FILE *pfile, bool verbose)
          fputs("\n\n", pfile);
       }
    }
+}
+
+
+/**
+ Release the memory allocated on the heap for the options.
+*/
+void clear_options(void)
+{
+	/* Print the options by group */
+	for (option_name_map_it it = option_name_map.begin();
+		it != option_name_map.end();
+		it++)
+	{
+		if (it->second.type == AT_STRING)
+		{
+			if (cpd.settings[it->second.id].str)
+			{
+				free((void *)cpd.settings[it->second.id].str);
+			}
+		}
+	}
 }
 
 
@@ -1742,6 +1961,33 @@ void set_option_defaults(void)
    cpd.settings[UO_sp_pp_stringify].a      = AV_ADD;
    cpd.settings[UO_sp_angle_shift].a       = AV_ADD;
    cpd.settings[UO_tok_split_gte].b        = true;
+
+   cpd.settings[UO_cmt_star_cont].t = TB_NOCHANGE;
+	cpd.settings[UO_cmt_width].n = -1;
+	cpd.settings[UO_cmt_inline_width].n = -1;
+	cpd.settings[UO_cmt_reflow_mode].n = 2;
+	cpd.settings[UO_cmt_reflow_mode_cpp].n = 1;
+	cpd.settings[UO_cmt_reflow_orphans].n = 4;
+	cpd.settings[UO_cmt_reflow_widows].n = 3;
+	cpd.settings[UO_cmt_reflow_minimum_words_per_line].n = 5;
+	cpd.settings[UO_cmt_reflow_overshoot].n = 5;
+	cpd.settings[UO_cmt_reflow_bullets].str = strdup("*#-+;0");
+	cpd.settings[UO_cmt_reflow_bullet_terminators].str = strdup(" )].:");
+	cpd.settings[UO_cmt_reflow_EOL_markers].str = strdup(".?!");
+	cpd.settings[UO_cmt_reflow_SOL_markers].str = strdup("A\\@");
+	cpd.settings[UO_cmt_reflow_no_line_reflow_markers_at_SOL].str = strdup("!");
+	cpd.settings[UO_cmt_reflow_no_par_reflow_markers_at_SOL].str = strdup("`");
+	cpd.settings[UO_cmt_reflow_no_cmt_reflow_markers_at_SOL].str = strdup("'");
+	cpd.settings[UO_cmt_reflow_graphics_markers].str = strdup("+-_!|/,.=");
+	cpd.settings[UO_cmt_reflow_graphics_threshold].n = 5;
+	cpd.settings[UO_cmt_reflow_box_markers].str = strdup("'\"*#+',`.|-=_!/\\");
+	cpd.settings[UO_cmt_reflow_box_threshold].n = 20;
+	cpd.settings[UO_cmt_reflow_intermission_indent_threshold].n = 4;
+	cpd.settings[UO_cmt_reflow_box].b = true;
+	cpd.settings[UO_cmt_reflow_no_reflow_start_tag].str = strdup("<pre>");
+	cpd.settings[UO_cmt_reflow_no_reflow_end_tag].str = strdup("</pre>");
+	cpd.settings[UO_cmt_reflow_doxygen].b = true;
+	cpd.settings[UO_cmt_lead_markers].str = strdup("*#\\|+");
 }
 
 
@@ -1749,6 +1995,9 @@ std::string argtype_to_string(argtype_e argtype)
 {
    switch (argtype)
    {
+   case AT_TRISTATE_BOOL:
+      return("false/true/nochange");
+
    case AT_BOOL:
       return("false/true");
 
@@ -1773,6 +2022,25 @@ std::string argtype_to_string(argtype_e argtype)
    }
 }
 
+
+std::string tristate_to_string(tristate_t val)
+{
+   switch (val)
+   {
+   case TB_TRUE:
+      return("true");
+
+   case TB_FALSE:
+      return("false");
+
+   case TB_NOCHANGE:
+	   return("nochange");
+
+   default:
+      LOG_FMT(LWARN, "Unknown tristate value '%d'\n", val);
+      return("");
+   }
+}
 
 std::string bool_to_string(bool val)
 {
@@ -1882,6 +2150,9 @@ std::string op_val_to_string(argtype_e argtype, op_val_t op_val)
 {
    switch (argtype)
    {
+   case AT_TRISTATE_BOOL:
+      return(tristate_to_string(op_val.t));
+
    case AT_BOOL:
       return(bool_to_string(op_val.b));
 

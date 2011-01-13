@@ -9,6 +9,7 @@
  * @author  Ben Gardner
  * @license GPL v2+
  */
+
 #include "logger.h"
 
 #include <cstdio>
@@ -128,7 +129,7 @@ static void log_flush(bool force_nl)
          g_log.buf[g_log.buf_len++] = '\n';
          g_log.buf[g_log.buf_len]   = 0;
       }
-      dummy = fwrite(g_log.buf, 1, g_log.buf_len, g_log.log_file);
+      dummy = (int)fwrite(g_log.buf, 1, g_log.buf_len, g_log.log_file);
 
       g_log.buf_len = 0;
    }
@@ -198,7 +199,7 @@ void log_str(log_sev_t sev, const char *str, int len)
    {
       if (len > (int)cap)
       {
-         len = cap;
+         len = (int)cap;
       }
       memcpy(&g_log.buf[g_log.buf_len], str, len);
       g_log.buf_len           += len;
@@ -241,7 +242,7 @@ void log_fmt(log_sev_t sev, const char *fmt, ...)
    {
       if (len > (int)cap)
       {
-         len = cap;
+         len = (int)cap;
       }
       g_log.buf_len           += len;
       g_log.buf[g_log.buf_len] = 0;
@@ -342,7 +343,7 @@ void log_hex_blk(log_sev_t sev, const void *data, int len)
       buf[str_idx + 1] = to_hex_char(tmp);
       str_idx         += 3;
 
-      buf[chr_idx++] = unc_isprint(tmp) ? tmp : '.';
+      buf[chr_idx++] = unc_isprint(tmp) ? (char)tmp : '.';
 
       total++;
       count++;

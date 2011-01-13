@@ -5,6 +5,7 @@
  * @author  Ben Gardner
  * @license GPL v2+
  */
+
 #include "uncrustify_types.h"
 #include "char_table.h"
 #include "args.h"
@@ -21,7 +22,7 @@ typedef struct
 } dynamic_word_list_t;
 
 /* A dynamic list of keywords - add via add_keyword() */
-static dynamic_word_list_t wl;
+static dynamic_word_list_t wl = {0};
 
 
 /**
@@ -30,6 +31,7 @@ static dynamic_word_list_t wl;
  */
 static const chunk_tag_t keywords[] =
 {
+   { "$this",            CT_THIS,         LANG_PHP                                                                    },
    { "@catch",           CT_CATCH,        LANG_OC | LANG_CPP | LANG_C                                                 },
    { "@dynamic",         CT_OC_DYNAMIC,   LANG_OC | LANG_CPP | LANG_C                                                 },
    { "@end",             CT_OC_END,       LANG_OC | LANG_CPP | LANG_C                                                 },
@@ -48,6 +50,7 @@ static const chunk_tag_t keywords[] =
    { "__attribute__",    CT_ATTRIBUTE,    LANG_C | LANG_CPP                                                           },
    { "__const__",        CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
    { "__inline__",       CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
+   { "__inline",         CT_QUALIFIER,    LANG_C | LANG_CPP                                                           }, /* MSVC */
    { "__restrict",       CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
    { "__signed__",       CT_TYPE,         LANG_C | LANG_CPP                                                           },
    { "__traits",         CT_QUALIFIER,    LANG_D                                                                      },
@@ -77,14 +80,14 @@ static const chunk_tag_t keywords[] =
    { "callback",         CT_QUALIFIER,    LANG_VALA                                                                   },
    { "case",             CT_CASE,         LANG_ALL                                                                    }, // PAWN
    { "cast",             CT_D_CAST,       LANG_D                                                                      },
-   { "catch",            CT_CATCH,        LANG_CPP | LANG_CS | LANG_D | LANG_JAVA | LANG_ECMA                         },
+   { "catch",            CT_CATCH,        LANG_CPP | LANG_CS | LANG_D | LANG_JAVA | LANG_ECMA | LANG_PHP              },
    { "cdouble",          CT_TYPE,         LANG_D                                                                      },
    { "cent",             CT_TYPE,         LANG_D                                                                      },
    { "cfloat",           CT_TYPE,         LANG_D                                                                      },
    { "char",             CT_CHAR,         LANG_PAWN                                                                   }, // PAWN
    { "char",             CT_TYPE,         LANG_ALLC                                                                   },
    { "checked",          CT_QUALIFIER,    LANG_CS                                                                     },
-   { "class",            CT_CLASS,        LANG_CPP | LANG_CS | LANG_D | LANG_JAVA | LANG_VALA | LANG_ECMA             },
+   { "class",            CT_CLASS,        LANG_CPP | LANG_CS | LANG_D | LANG_JAVA | LANG_VALA | LANG_ECMA | LANG_PHP  },
    { "compl",            CT_ARITH,        LANG_C | LANG_CPP                                                           },
    { "const",            CT_QUALIFIER,    LANG_ALL                                                                    }, // PAWN
    { "const_cast",       CT_TYPE_CAST,    LANG_CPP                                                                    },
@@ -95,8 +98,8 @@ static const chunk_tag_t keywords[] =
    { "debug",            CT_DEBUG,        LANG_D                                                                      },
    { "debugger",         CT_DEBUGGER,     LANG_ECMA                                                                   },
    { "default",          CT_DEFAULT,      LANG_ALL                                                                    }, // PAWN
-   { "define",           CT_PP_DEFINE,    LANG_ALL | FLAG_PP                                                          }, // PAWN
-   { "defined",          CT_DEFINED,      LANG_PAWN                                                                   }, // PAWN
+   { "define",           CT_PP_DEFINE,    LANG_ALLC | FLAG_PP                                                         }, // PAWN
+   { "defined",          CT_DEFINED,      LANG_PAWN | LANG_PHP                                                        }, // PAWN, PHP
    { "defined",          CT_PP_DEFINED,   LANG_ALLC | FLAG_PP                                                         },
    { "delegate",         CT_DELEGATE,     LANG_CS | LANG_D                                                            },
    { "delete",           CT_DELETE,       LANG_CPP | LANG_D | LANG_ECMA                                               },
@@ -106,7 +109,7 @@ static const chunk_tag_t keywords[] =
    { "dynamic_cast",     CT_TYPE_CAST,    LANG_CPP                                                                    },
    { "elif",             CT_PP_ELSE,      LANG_ALLC | FLAG_PP                                                         },
    { "else",             CT_ELSE,         LANG_ALL                                                                    }, // PAWN
-   { "else",             CT_PP_ELSE,      LANG_ALL | FLAG_PP                                                          }, // PAWN
+   { "else",             CT_PP_ELSE,      LANG_ALLC | FLAG_PP                                                         }, // PAWN
    { "elseif",           CT_PP_ELSE,      LANG_PAWN | FLAG_PP                                                         }, // PAWN
    { "emit",             CT_PP_EMIT,      LANG_PAWN | FLAG_PP                                                         }, // PAWN
    { "endif",            CT_PP_ENDIF,     LANG_ALL | FLAG_PP                                                          }, // PAWN
@@ -132,7 +135,7 @@ static const chunk_tag_t keywords[] =
    { "foreach_reverse",  CT_FOR,          LANG_D                                                                      },
    { "forward",          CT_FORWARD,      LANG_PAWN                                                                   }, // PAWN
    { "friend",           CT_FRIEND,       LANG_CPP                                                                    },
-   { "function",         CT_FUNCTION,     LANG_D | LANG_ECMA                                                          },
+   { "function",         CT_FUNCTION,     LANG_D | LANG_ECMA | LANG_PHP                                               },
    { "get",              CT_GETSET,       LANG_CS | LANG_VALA                                                         },
    { "goto",             CT_GOTO,         LANG_ALL                                                                    }, // PAWN
    { "idouble",          CT_TYPE,         LANG_D                                                                      },
@@ -255,6 +258,197 @@ static const chunk_tag_t keywords[] =
 };
 
 
+/*
+MSVC
+
+__abstract 2
+abstract
+__alignof Operator
+array
+
+__asm
+__assume
+__based
+bool
+
+__box 2
+break
+case
+catch
+
+__cdecl
+char
+class
+const
+
+const_cast
+continue
+__declspec
+default
+
+__delegate 2
+delegate
+delete
+deprecated 1
+
+dllexport 1
+dllimport 1
+do
+double
+
+dynamic_cast
+else
+enum
+enum class
+
+enum struct
+event
+__event
+__except
+
+explicit
+extern
+false
+__fastcall
+
+__finally
+finally
+float
+for
+
+for each, in
+__forceinline
+friend
+friend_as
+
+__gc 2
+gcnew
+generic
+goto
+
+__hook 3
+__identifier
+if
+__if_exists
+
+__if_not_exists
+initonly
+__inline
+inline
+
+int
+__int8
+__int16
+__int32
+
+__int64
+__interface
+interface class
+interface struct
+
+interior_ptr
+__leave
+literal
+long
+
+__m64
+__m128
+__m128d
+__m128i
+
+__multiple_inheritance
+mutable
+naked 1
+namespace
+
+new
+new
+__nogc
+noinline
+
+__noop
+noreturn
+nothrow
+novtable
+
+nullptr
+operator
+__pin 2
+private
+
+__property 2
+property
+property 1
+protected
+
+public
+__raise
+ref struct
+ref class
+
+register
+reinterpret_cast
+return
+safecast
+
+__sealed 2
+sealed
+selectany 1
+short
+
+signed
+__single_inheritance
+sizeof
+static
+
+static_cast
+__stdcall
+struct
+__super
+
+switch
+template
+this
+thread 1
+
+throw
+true
+try
+__try/__except, __try/__finally
+
+__try_cast 2
+typedef
+typeid
+typeid
+
+typename
+__unaligned
+__unhook 3
+union
+
+unsigned
+using declaration, using directive
+uuid 1
+__uuidof
+
+value struct
+value class
+__value 2
+virtual
+
+__virtual_inheritance
+void
+volatile
+__w64
+
+__wchar_t, wchar_t
+while
+
+
+
+*/
+
+
 /**
  * Compares two chunk_tag_t entries using strcmp on the strings
  *
@@ -267,6 +461,39 @@ static int kw_compare(const void *p1, const void *p2)
    const chunk_tag_t *t2 = (const chunk_tag_t *)p2;
 
    return(strcmp(t1->tag, t2->tag));
+}
+
+
+/**
+ * Compares two chunk_tag_t entries using strncmp on the strings;
+ * where a full match is one where the entire length of the probe
+ * matches the same length of key AND the next character of key
+ * after this length is a NON-keyword entity.
+ *
+ * @param p1   The 'key' entry
+ * @param p2   The 'probe' entry
+ */
+static int kw_compare_ex(const void *p1, const void *p2) /* [i_a] */
+{
+   const chunk_tag_t *t1 = (const chunk_tag_t *)p1;
+   const chunk_tag_t *t2 = (const chunk_tag_t *)p2;
+	int len = (int)strlen(t2->tag);
+	int ret;
+
+	ret = strncmp(t1->tag, t2->tag, len);
+	if (!ret)
+	{
+	/* a match so far means the key is at least as long as the probe;
+       now check the next character in there for a possible full match */
+        if (!t1->tag[len] || !CharTable::IsKw2(t1->tag[len]))
+		ret = 0;
+	else
+    		ret = 1; /* key > probe; return sign cf. strcmp() */
+	}
+#if 0
+	printf("--- comparing '%40.40s' with '%s' --> %d\n", t1->tag, t2->tag, ret);
+#endif
+	return ret;
 }
 
 
@@ -362,8 +589,10 @@ static const chunk_tag_t *kw_static_match(const chunk_tag_t *tag)
 /**
  * Search first the dynamic and then the static table for a matching keyword
  *
- * @param word    Pointer to the text -- NOT zero terminated
- * @param len     The length of the text
+ * @param word    Pointer to the text -- zero terminated, though probably NOT at len
+ * @param len     The length of the text (WARNING: this function will scan
+ *                beyond the given len when trying to match dynamic, i.e.
+ *                user-specified 'keywords' to a maximum width of strlen(word)!)
  * @return        NULL (no match) or the keyword entry
  */
 const chunk_tag_t *find_keyword(const char *word, int len)
@@ -378,21 +607,34 @@ const chunk_tag_t *find_keyword(const char *word, int len)
               __func__, len, (int)sizeof(buf), len, word);
       return(NULL);
    }
+#if 0 /* [i_a] */
    memcpy(buf, word, len);
    buf[len] = 0;
 
    tag.tag = buf;
+#else
+   tag.tag = word; /* allow the tail end to be compared as well! */
+#endif
 
    /* check the dynamic word list first */
    p_ret = NULL;
    if (wl.p_tags)
    {
       p_ret = (const chunk_tag_t *)bsearch(&tag, wl.p_tags, wl.active,
+#if 0 /* [i_a] */
                                            sizeof(chunk_tag_t), kw_compare);
+#else
+                                           sizeof(chunk_tag_t), kw_compare_ex);
+#endif
    }
 
    if (p_ret == NULL)
    {
+	memcpy(buf, word, len); /* [i_a] */
+	buf[len] = 0;
+
+	tag.tag = buf; /* just plain keyword match from here */
+
       /* check the static word list */
       p_ret = (const chunk_tag_t *)bsearch(&tag, keywords, ARRAY_SIZE(keywords),
                                            sizeof(keywords[0]), kw_compare);
@@ -418,7 +660,7 @@ int load_keyword_file(const char *filename)
    FILE *pf;
    char buf[256];
    char *ptr;
-   char *args[3];
+   const char *args[3];
    int  argc;
    int  line_no = 0;
 

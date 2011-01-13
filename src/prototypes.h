@@ -53,6 +53,8 @@ int set_option_value(const char *name, const char *value);
 const group_map_value *get_group_name(int ug);
 const option_map_value *get_option_name(int uo);
 void print_options(FILE *pfile, bool verbose);
+void clear_options(void);
+
 
 std::string argtype_to_string(argtype_e argtype);
 std::string bool_to_string(bool val);

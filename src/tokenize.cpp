@@ -7,6 +7,7 @@
  * @author  Ben Gardner
  * @license GPL v2+
  */
+
 #include "uncrustify_types.h"
 #include "char_table.h"
 #include "prototypes.h"
@@ -99,7 +100,7 @@ static bool d_parse_string(chunk_t *pc)
          case '&':
             /* \& NamedCharacterEntity ; */
             pc->len++;
-            while (isalpha(pc->str[pc->len]))
+            while (unc_isalpha(pc->str[pc->len]))
             {
                pc->len++;
             }
@@ -138,7 +139,7 @@ static bool d_parse_string(chunk_t *pc)
  */
 static const char *str_search(const char *needle, const char *haystack, int haystack_len)
 {
-   int needle_len = strlen(needle);
+   int needle_len = (int)strlen(needle);
 
    while (haystack_len-- >= needle_len)
    {
@@ -545,8 +546,8 @@ static bool parse_string(chunk_t *pc, int quote_idx, bool allow_escape)
    bool escaped = 0;
    int  end_ch;
    int  len          = quote_idx;
-   char escape_char  = cpd.settings[UO_string_escape_char].n;
-   char escape_char2 = cpd.settings[UO_string_escape_char2].n;
+   char escape_char  = (char)cpd.settings[UO_string_escape_char].n;
+   char escape_char2 = (char)cpd.settings[UO_string_escape_char2].n;
 
    pc->type = CT_STRING;
 
@@ -724,10 +725,14 @@ bool parse_word(chunk_t *pc, bool skipcheck)
    }
 
    /* Turn it into a keyword now */
-   tag = find_keyword(pc->str, len);
+   tag = find_keyword(pc->str, len); /* [i_a] warning: will scan BEYOND 'len'! */
    if (tag != NULL)
    {
       pc->type = tag->type;
+	// adjust length to match the 'keyword' found - as those can be 'keyPHRASES' rather, this must be done.
+   cpd.column -= pc->len;
+	pc->len     = (int)strlen(tag->tag);
+   cpd.column += pc->len;
    }
    return(true);
 }
@@ -1221,7 +1226,7 @@ static bool parse_next(chunk_t *pc)
    if ((punc = find_punctuator(pc->str, cpd.lang_flags)) != NULL)
    {
       pc->type    = punc->type;
-      pc->len     = strlen(punc->tag);
+      pc->len     = (int)strlen(punc->tag);
       cpd.column += pc->len;
       pc->flags  |= PCF_PUNCTUATOR;
       return(true);

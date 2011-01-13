@@ -30,4 +30,6 @@ cat >> $outfile <<EOF
 };
 
 #endif /* TOKEN_NAMES_H_INCLUDED */
+
 EOF
+

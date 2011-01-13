@@ -5,6 +5,7 @@
  * @author  Ben Gardner
  * @license GPL v2+
  */
+
 #include "uncrustify_types.h"
 #include "char_table.h"
 #include "args.h"
@@ -21,7 +22,7 @@ typedef struct
    int          total;            /* number of items at p_tags */
    int          active;           /* number of valid entries */
 } define_list_t;
-static define_list_t dl;
+static define_list_t dl = {0};
 
 
 /**
@@ -143,7 +144,7 @@ int load_define_file(const char *filename)
    FILE *pf;
    char buf[160];
    char *ptr;
-   char *args[3];
+   const char *args[3];
    int  argc;
    int  line_no = 0;
 

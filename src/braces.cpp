@@ -666,7 +666,7 @@ chunk_t *insert_comment_after(chunk_t *ref, c_token_t cmt_type,
 
    if (cmt_len <= 0)
    {
-      cmt_len = strlen(cmt_text);
+      cmt_len = (int)strlen(cmt_text);
    }
    txt_len = cmt_len + 8;                  /* 8 is big enough for all types */
 

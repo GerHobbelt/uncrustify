@@ -38,7 +38,11 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	ChangeLog INSTALL NEWS config.guess config.sub install-sh \
 	missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.in
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_cflags_gcc_option.m4 \
+	$(top_srcdir)/m4/ax_cflags_warn_all.m4 \
+	$(top_srcdir)/m4/ax_cxxflags_gcc_option.m4 \
+	$(top_srcdir)/m4/ax_cxxflags_warn_all.m4 \
+	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -178,6 +182,7 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -231,10 +236,29 @@ pkgdata_DATA = etc/ben.cfg etc/d.cfg etc/defaults.cfg etc/gnu-indent.cfg etc/kr-
 
 # INCLUDES = @INCLUDES@
 testdir = tests
+# test_SCRIPTS = tests/run_tests.py
 TESTS = run_tests.sh
-EXTRA_DIST = scripts run_tests.sh make_token_names.sh $(pkgdata_DATA) \
-	tests/*.test tests/*.sh tests/*.py tests/config tests/input \
-	tests/output win32 uncrustify.xcodeproj osx make_win32.sh documentation
+EXTRA_DIST = etc m4 scripts run_tests.sh make_token_names.sh $(pkgdata_DATA) \
+		tests/*.test tests/*.sh tests/*.py tests/config tests/input \
+		win32/Uncrustify_Win32_2003.sln \
+		win32/Uncrustify_Win32_2003.vcproj \
+		win32/Uncrustify_Win32_2005.sln \
+		win32/Uncrustify_Win32_2005.vcproj \
+		win32/Uncrustify_Win32_2008.sln \
+		win32/Uncrustify_Win32_2008.vcproj \
+		win32/Uncrustify_Win32_2010.sln \
+		win32/Uncrustify_Win32_2010.vcproj \
+		win32/Uncrustify_Win32.sln \
+		win32/Uncrustify_Win32.vcproj \
+		win32/Uncrustify_Win32.dsw \
+		win32/Uncrustify_Win32.dsp \
+		win32/windows_compat.h \
+		tests/output uncrustify.xcodeproj osx make_win32.sh documentation \
+		ChangeLog \
+		BUGS AUTHORS aclocal.m4 autogen.sh COPYING do-c.sh do-d.sh extras.vpj HELP INSTALL \
+		install-sh make_token_names.sh mk_all_distros.sh \
+		NEWS README release-steps.txt todo.txt uncrustify.vpj uncrustify.vpw \
+		update-default-cfg.sh
 
 DISTCLEANFILES = 
 CLEANFILES = *~ *.bak
@@ -825,7 +849,14 @@ uninstall-am: uninstall-pkgdataDATA
 	uninstall uninstall-am uninstall-pkgdataDATA
 
 
-check-local:
+check-local: 
+
+depend:
+	(cd src && $(MAKE) $(AM_MAKEFLAGS) depend);
+
+.PHONY: test_all
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
