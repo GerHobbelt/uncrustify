@@ -518,7 +518,7 @@ int main(int argc, char *argv[])
 }
 #endif
 
-#if defined(WIN32) && 01
+#if defined(WIN32) && 0
 #if 0
    char *new_argv[] =
    {
