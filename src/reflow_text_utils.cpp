@@ -1029,9 +1029,9 @@ void cmt_reflow::strip_first_and_last_nl_from_text(void)
 
 		if (last_nl)
 		{
-			if (nl_count >= 2)
+			if (nl_count >= 1)
 			{
-				m_has_leading_and_trailing_nl = true;
+				m_has_trailing_nl = true;
 			}
 			/* clip to before NL */
 			*last_nl = 0;
@@ -1053,7 +1053,7 @@ void cmt_reflow::strip_first_and_last_nl_from_text(void)
 		{
 			if (nl_count >= 1)
 			{
-				m_has_leading_and_trailing_nl = true;
+				m_has_leading_nl = true;
 			}
 			/* strip leading NL */
 			memmove(text, last_nl + 1, text - last_nl - 1 + m_comment_len + 1);
@@ -1992,21 +1992,9 @@ int cmt_reflow::write2out_comment_start(paragraph_box *para, words_collection &w
 			strrepllead(m_doxygen_marker, '/', '*');
 			write2output(m_doxygen_marker);
 		}
-
-		if (((m_first_pc->parent_type == CT_COMMENT_START && 00)
-			|| m_first_pc->parent_type == CT_COMMENT_WHOLE)
-			&& !m_is_single_line_comment)
-		{
-			if (m_is_merged_comment
-				? cpd.settings[UO_cmt_cpp_nl_start].b
-				: cpd.settings[UO_cmt_c_nl_start].b)
-			{
-				return write2out_comment_next_line();
-			}
-		}
 	}
 
-	return m_extra_post_star_indent; // cpd.settings[UO_cmt_sp_after_star_cont].n;
+	return m_extra_post_star_indent;
 }
 
 
@@ -2042,21 +2030,6 @@ int cmt_reflow::write2out_comment_next_line(void)
 void cmt_reflow::write2out_comment_end(int deferred_whitespace, int deferred_nl)
 {
 	int j;
-
-	if (!m_is_cpp_comment)
-	{
-		if (((m_first_pc->parent_type == CT_COMMENT_END && 00)
-			|| m_first_pc->parent_type == CT_COMMENT_WHOLE)
-			&& !m_is_single_line_comment)
-		{
-			if (m_is_merged_comment
-				? cpd.settings[UO_cmt_cpp_nl_end].b
-				: cpd.settings[UO_cmt_c_nl_end].b)
-			{
-				deferred_nl++;
-			}
-		}
-	}
 
 	for (j = 1; j < deferred_nl; j++)
 	{

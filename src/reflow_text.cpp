@@ -70,7 +70,8 @@ cmt_reflow::cmt_reflow()
    m_is_single_line_comment(false),
    m_extra_pre_star_indent(-1),
    m_extra_post_star_indent(-1),
-   m_has_leading_and_trailing_nl(false),
+   m_has_leading_nl(false),
+   m_has_trailing_nl(false),
 	m_indent_cmt_with_tabs(false),
 	m_cmt_reflow_graphics_threshold(0),
 	m_cmt_reflow_box_threshold(0),
@@ -1170,6 +1171,82 @@ Set the parameters which depend on the text being chopped into words and the ini
 */
 void cmt_reflow::set_deferred_cmt_config_params_phase3(void)
 {
+	if (!m_is_cpp_comment)
+	{
+		if ((m_first_pc->parent_type == CT_COMMENT_START && 00)
+			|| m_first_pc->parent_type == CT_COMMENT_WHOLE)
+		{
+			if (!m_is_single_line_comment)
+			{
+				if (m_is_merged_comment
+					? (cpd.settings[UO_cmt_cpp_nl_start].a != AV_REMOVE)
+					  && ((cpd.settings[UO_cmt_cpp_nl_start].a == AV_FORCE)
+						  || (cpd.settings[UO_cmt_cpp_nl_start].a == AV_ADD)
+						  || (cpd.settings[UO_cmt_cpp_nl_start].a == AV_IGNORE && m_has_leading_nl))
+					: (cpd.settings[UO_cmt_c_nl_start].a != AV_REMOVE)
+					  && ((cpd.settings[UO_cmt_c_nl_start].a == AV_FORCE)
+						  || (cpd.settings[UO_cmt_c_nl_start].a == AV_ADD)
+						  || (cpd.settings[UO_cmt_c_nl_start].a == AV_IGNORE && m_has_leading_nl)))
+				{
+					// and adjust the marker to make sure the 'terminating NL print routine' will be aware of what we did here:
+					m_has_leading_nl = true;
+				}
+				else
+				{
+					m_has_leading_nl = false;
+				}
+
+				if (m_is_merged_comment
+					? (cpd.settings[UO_cmt_cpp_nl_end].a != AV_REMOVE)
+					  && ((cpd.settings[UO_cmt_cpp_nl_end].a == AV_FORCE)
+						  || (cpd.settings[UO_cmt_cpp_nl_end].a == AV_ADD && m_has_leading_nl) /* symmetric NL: add only at end when one exists at the beginning! */
+						  || (cpd.settings[UO_cmt_cpp_nl_end].a == AV_IGNORE && m_has_trailing_nl))
+					: (cpd.settings[UO_cmt_c_nl_end].a != AV_REMOVE)
+					  && ((cpd.settings[UO_cmt_c_nl_end].a == AV_FORCE)
+						  || (cpd.settings[UO_cmt_c_nl_end].a == AV_ADD && m_has_leading_nl) /* symmetric NL: add only at end when one exists at the beginning! */
+						  || (cpd.settings[UO_cmt_c_nl_end].a == AV_IGNORE && m_has_trailing_nl)))
+				{
+					// and adjust the marker to make sure the 'terminating NL print routine' will be aware of what we did here:
+					m_has_trailing_nl = true;
+				}
+				else
+				{
+					m_has_trailing_nl = false;
+				}
+			}
+			else
+			{
+				// single line C-style comment...
+				UNC_ASSERT(!m_is_merged_comment);
+
+				if ((cpd.settings[UO_cmt_c_nl_start].a != AV_REMOVE)
+					  && ((cpd.settings[UO_cmt_c_nl_start].a == AV_FORCE)
+						  || (cpd.settings[UO_cmt_c_nl_start].a == AV_ADD)
+						  || (cpd.settings[UO_cmt_c_nl_start].a == AV_IGNORE && m_has_leading_nl)))
+				{
+					// and adjust the marker to make sure the 'terminating NL print routine' will be aware of what we did here:
+					m_has_leading_nl = true;
+				}
+				else
+				{
+					m_has_leading_nl = false;
+				}
+
+				if ((cpd.settings[UO_cmt_c_nl_end].a != AV_REMOVE)
+					  && ((cpd.settings[UO_cmt_c_nl_end].a == AV_FORCE)
+						  || (cpd.settings[UO_cmt_c_nl_end].a == AV_ADD && m_has_leading_nl) /* symmetric NL: add only at end when one exists at the beginning! */
+						  || (cpd.settings[UO_cmt_c_nl_end].a == AV_IGNORE && m_has_trailing_nl)))
+				{
+					// and adjust the marker to make sure the 'terminating NL print routine' will be aware of what we did here:
+					m_has_trailing_nl = true;
+				}
+				else
+				{
+					m_has_trailing_nl = false;
+				}
+			}
+		}
+	}
 }
 
 
@@ -4671,6 +4748,22 @@ void cmt_reflow::fixup_paragraph_tree(paragraph_box *para)
 				prev_child->m_trailing_whitespace_length = child->m_leading_whitespace_length = lw;
 			}
 
+			if (!child->m_next_sibling)
+			{
+				/*
+				last child; aligned with parent.
+
+				Now make sure child has the same settings as parent -- at least for some tidbits!
+				*/
+				UNC_ASSERT(para->m_last_box == child->m_last_box);
+
+				int lc = max(para->m_min_required_linebreak_after, child->m_min_required_linebreak_after);
+				para->m_min_required_linebreak_after = child->m_min_required_linebreak_after = lc;
+
+				int lw = max(para->m_trailing_whitespace_length, child->m_trailing_whitespace_length);
+				para->m_trailing_whitespace_length = child->m_trailing_whitespace_length = lw;
+			}
+
 			/*
 			If this is an XML/XHTML tag, check if it is an UNCLOSED tag: if it is, we're apparently
 			coping with HTML like this
@@ -4870,10 +4963,10 @@ int cmt_reflow::grok_the_words(paragraph_box *root, words_collection &words)
 	also make sure the root paragraph has leading and trailing mandatory newlines when
 	the comment format requires them:
 	*/
-	if (m_has_leading_and_trailing_nl)
+	if (m_has_leading_nl || m_has_trailing_nl)
 	{
-		root->m_min_required_linebreak_before = 1;
-		root->m_min_required_linebreak_after = 1;
+		root->m_min_required_linebreak_before = (int)m_has_leading_nl;
+		root->m_min_required_linebreak_after = (int)m_has_trailing_nl;
 
 		/*
 		also make sure these newlines end up in the box collective:
@@ -6552,9 +6645,12 @@ public:
 		max_usable_linewidth = linewidth - cmt->m_extra_pre_star_indent
 			 - cmt->m_extra_post_star_indent
 			- cmt->m_lead_cnt;
-		if (!cmt->m_has_leading_and_trailing_nl)
+		if (!cmt->m_has_leading_nl)
 		{
 			firstline_extra_space = 1 /* TODO */ ;
+		}
+		if (!cmt->m_has_trailing_nl)
+		{
 			lastline_extra_space = 1 /* TODO */ ;
 		}
 	}
@@ -7188,7 +7284,7 @@ int cmt_reflow::reflow_a_single_para_4_trial(paragraph_box *para, words_collecti
 
 	scoring.add_cost(width, para, content_printed_on_this_line, words_printed_on_this_line, LAST_LINE_OF_PARA);
 
-	tuning.deferred_nl = deferred_nl;
+	tuning.deferred_nl = max(deferred_nl, tuning.mandatory_deferred_nl);
 	tuning.deferred_whitespace = deferred_whitespace;
 
 	return SUCCESS;
@@ -7199,6 +7295,7 @@ int cmt_reflow::reflow_a_single_para_4_trial(paragraph_box *para, words_collecti
 int cmt_reflow::reflow_para_tree_4_trial(paragraph_box *para, words_collection &words, break_suggestions &scoring, reflow_tune_parameters_t &tuning)
 {
 	int rv = SUCCESS;
+	paragraph_box *root = para;
 
 	UNC_ASSERT(para);
 	UNC_ASSERT(para->m_last_box + 1 == (int)words.count());
@@ -7266,8 +7363,38 @@ int cmt_reflow::reflow_para_tree_4_trial(paragraph_box *para, words_collection &
 		para = para->m_next_sibling;
 	}
 
-	if (tuning.level == 0)
+	if (tuning.level == 0 && root)
 	{
+		// fixup last box to carry any mandatory trailing newlines:
+		UNC_ASSERT(tuning.mandatory_deferred_nl > 0 ? tuning.deferred_nl == tuning.mandatory_deferred_nl : true);
+
+		if (tuning.mandatory_deferred_nl > 0)
+		{
+			int i;
+
+			for (i = root->m_last_box; i >= 0; i--)
+			{
+				UNC_ASSERT(i >= 0);
+				UNC_ASSERT(i < (int)words.count());
+
+				reflow_box *box = &words[i];
+
+				if (box->m_do_not_print)
+					continue;
+
+				// when the last printable box contains text of any kind, we put the deferred newline count in the NEXT box:
+				if (box->m_word_length > 0 || box->m_leading_whitespace_length > 0 || box->m_trailing_whitespace_length > 0)
+				{
+					i++;
+					box = &words[i];
+
+					box->m_do_not_print = false;
+				}
+				box->m_line_count = tuning.deferred_nl;
+				break;
+			}
+		}
+
 		// write2out_comment_end(deferred_whitespace, deferred_nl);
 	}
 

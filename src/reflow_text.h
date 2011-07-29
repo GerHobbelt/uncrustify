@@ -46,7 +46,8 @@ protected:
    bool	      m_is_single_line_comment;
    int        m_extra_pre_star_indent; /* 0 or 1: extra number of characters to indent for comment line 2+ */
    int        m_extra_post_star_indent; /* 0 or 1: extra number of characters to indent for comment line 2+ */
-   bool       m_has_leading_and_trailing_nl;
+   bool       m_has_leading_nl;
+   bool       m_has_trailing_nl;
 	bool    m_indent_cmt_with_tabs; /* cpd.settings[UO_indent_cmt_with_tabs].b */
 	int m_cmt_reflow_graphics_threshold; /* cpd.settings[UO_cmt_reflow_graphics_threshold].n */
 	int m_cmt_reflow_box_threshold; /* cpd.settings[UO_cmt_reflow_box_threshold].n */
@@ -76,10 +77,10 @@ protected:
 
    When the comment turned out to be a legal-ish XML/HTML comment, you'll get a (code: 0).
 
-   When the comment isn't even suspected of being XML/HTML (most probably due to it not having 
+   When the comment isn't even suspected of being XML/HTML (most probably due to it not having
    any '<' in there), the code remains (code: -1).
    */
-   int m_xml_text_has_stray_lt_gt; 
+   int m_xml_text_has_stray_lt_gt;
    const char *m_xml_offender; /* point in text which caused the parser to give up on assuming this to be XML/HTML */
 
 
@@ -93,11 +94,11 @@ protected:
    int m_lead_cnt; /* number of '*' lead characters used for each comment line [0..2] */
    char *m_lead_marker; /* the exact 'lead/prefix' string used for this comment (not necessarily "*") */
 
-   bool m_is_doxygen_comment; 
+   bool m_is_doxygen_comment;
    bool m_is_backreferencing_doxygen_comment; /* is a doxygen/javadoc section which documents a PRECEDING item */
    char *m_doxygen_marker; /* the detected 'doxygen/javadoc' marker at the start of this comment */
 
-	/* configuration settings */	
+	/* configuration settings */
 protected:
 	const char **m_no_reflow_marker_start;
 	const char **m_no_reflow_marker_end;
@@ -128,7 +129,7 @@ protected:
 	static bool chunk_is_inline_comment(const chunk_t *pc);
 	static bool is_viable_bullet_marker(const char *str, size_t len);
 	static bool is_doxygen_tagmarker(const char *text, char doxygen_tag_marker);
-	bool comment_is_part_of_preproc_macro(void) const; 
+	bool comment_is_part_of_preproc_macro(void) const;
 
 	int add_kw(const char *text);
 	void add_javaparam(chunk_t *pc);
