@@ -1,12 +1,12 @@
 /**
  * @file reflowtxt.cpp
- * 
+ *
  * A big honkin' text reflow engine, used to reformat comments in 'enhanced' mode 2.
  *
  * This reflow engine works on a 'per-page' basis, where a 'page' here is one entire
  * comment. It does not work on a per-paragraph basis as that prevents the reflow
  * engine from making choices based on info spanning more than one paragraph in there,
- * such as when a bullet item spans multiple paragraphs and you like your text reflown 
+ * such as when a bullet item spans multiple paragraphs and you like your text reflown
  * with spanning indent to properly identify the subsequent paragraphs as belonging
  * to the bullet item.
  *
@@ -19,11 +19,11 @@
  * - allows enforced line breaks at end-of-sentence within a paragraph
  * - detects and keeps 'ASCII art' intact, allowing graphical documentation to survive
  * - recognizes boxed comments and can reflow these
- * - extremely flexible as almost all decision elements and parameters are fully 
+ * - extremely flexible as almost all decision elements and parameters are fully
  *   configurable
  * - recognizes mixed 'leader' use and cleans up after you (e.g. when you're reflowing
  *   comments where only some lines are prefixed with a '*' comment lead character,
- *   a situation often happening when editing already formatted comments quickly in the 
+ *   a situation often happening when editing already formatted comments quickly in the
  *   heat of a deadline)
  * - supports a configurable set of 'directives', either as characters or tags, to hint
  *   the reflow engine (this is useful to keep a particular piece of formatted text
@@ -80,6 +80,11 @@
 static_inline int max(int a, int b)
 {
 	return (a > b ? a : b);
+}
+#undef min
+static_inline int min(int a, int b)
+{
+	return (a < b ? a : b);
 }
 
 
@@ -255,7 +260,7 @@ public:
 
 
 
-template<class T> class items_collection 
+template<class T> class items_collection
 {
 	//friend class cmt_reflow;
 
@@ -505,7 +510,7 @@ int strleadlen(const char *str, int c);
 /*
 return the number of 'c' characters trailing at the end of the string 'str'.
 
-'one_past_end_of_str' equals 'str + strlen(str)' but allows this routine to also work 
+'one_past_end_of_str' equals 'str + strlen(str)' but allows this routine to also work
 when inspecting non-NUl-terminated strings.
 */
 int strtaillen(const char *str, const char *one_past_end_of_str, int c);
@@ -514,7 +519,7 @@ int strtaillen(const char *str, const char *one_past_end_of_str, int c);
 /*
 return the number of characters matching the set trailing at the end of the string 'str'.
 
-'one_past_end_of_str' equals 'str + strlen(str)' but allows this routine to also work 
+'one_past_end_of_str' equals 'str + strlen(str)' but allows this routine to also work
 when inspecting non-NUl-terminated strings.
 */
 int strrspn(const char *str, const char *one_past_end_of_str, const char *set);
@@ -582,7 +587,7 @@ int calc_leading_whitespace4block(const char *text, int at_column);
 
 
 /*
-Check whether the given text starts with a HTML numeric entity 
+Check whether the given text starts with a HTML numeric entity
 in either '&#[0-9]+;' or '&#x[0-9A-F]+;' standard format.
 
 Return TRUE when so and set 'word_length' to the string length of this entity,
@@ -594,7 +599,7 @@ bool is_html_numeric_entity(const char *text, int *word_length);
 
 
 /*
-Check whether the given text starts with a HTML numeric entity 
+Check whether the given text starts with a HTML numeric entity
 in '&[A-Za-z0-9]+;' standard format.
 
 Return TRUE when so and set 'word_length' to the string length of this entity,

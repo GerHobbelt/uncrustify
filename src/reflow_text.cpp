@@ -928,8 +928,7 @@ int col_diff;
 	  m_base_col = m_left_global_output_column;
    }
 
-   LOG_FMT(LSYS, "%s: -- brace=%d base=%d outputcol=%d\n",
-           __func__, m_brace_col, m_base_col, m_left_global_output_column);
+   //LOG_FMT(LSYS, "%s: -- brace=%d base=%d outputcol=%d\n", __func__, m_brace_col, m_base_col, m_left_global_output_column);
 
    /* Bump out to the column */
    //cmt_output_indent(m_brace_col, m_base_col, m_column);
@@ -2567,9 +2566,9 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 					UNC_ASSERT(text == current_word->m_text);
 					s = text + 1;
 
-					for (s = text + 1; in_RE_set(m_cmt_reflow_bullets, *s); s++)
+					for (s = text + 1; *s && in_RE_set(m_cmt_reflow_bullets, *s); s++)
 						;
-					if (in_RE_set(m_cmt_reflow_bullet_terminators, *s))
+					if (*s && in_RE_set(m_cmt_reflow_bullet_terminators, *s))
 					{
 						/*
 						must be followed by one 'word' at least; simply check whether the current
@@ -6550,9 +6549,9 @@ public:
 		deferred_whitespace = 0; // cmt->m_extra_post_star_indent;
 		start_column = cmt->m_left_global_output_column + deferred_whitespace;
 
-		max_usable_linewidth = linewidth - cmt->m_extra_pre_star_indent /* cpd.settings[UO_cmt_sp_before_star_cont].n */
-			 - cmt->m_extra_post_star_indent /* - cpd.settings[UO_cmt_sp_after_star_cont].n */
-			- cmt->m_lead_cnt; /* cpd.settings[UO_cmt_star_cont].t */
+		max_usable_linewidth = linewidth - cmt->m_extra_pre_star_indent
+			 - cmt->m_extra_post_star_indent
+			- cmt->m_lead_cnt;
 		if (!cmt->m_has_leading_and_trailing_nl)
 		{
 			firstline_extra_space = 1 /* TODO */ ;
@@ -6901,7 +6900,7 @@ int cmt_reflow::reflow_a_single_para_4_trial(paragraph_box *para, words_collecti
 	int content_printed_on_this_line = 0;
 
 	int width = tuning.max_usable_linewidth;
-	int last_box_to_keep_together = 0;
+	int last_box_to_keep_together = -1;
 
 	window_orphan_info_t wo_info;
 	calculate_widow_and_orphan_aspects(para, words, tuning.max_usable_linewidth, wo_info);

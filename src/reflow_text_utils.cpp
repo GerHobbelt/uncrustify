@@ -1,12 +1,12 @@
 /**
  * @file reflowtxt.cpp
- * 
+ *
  * A big honkin' text reflow engine, used to reformat comments in 'enhanced' mode 2.
  *
  * This reflow engine works on a 'per-page' basis, where a 'page' here is one entire
  * comment. It does not work on a per-paragraph basis as that prevents the reflow
  * engine from making choices based on info spanning more than one paragraph in there,
- * such as when a bullet item spans multiple paragraphs and you like your text reflown 
+ * such as when a bullet item spans multiple paragraphs and you like your text reflown
  * with spanning indent to properly identify the subsequent paragraphs as belonging
  * to the bullet item.
  *
@@ -19,11 +19,11 @@
  * - allows enforced line breaks at end-of-sentence within a paragraph
  * - detects and keeps 'ASCII art' intact, allowing graphical documentation to survive
  * - recognizes boxed comments and can reflow these
- * - extremely flexible as almost all decision elements and parameters are fully 
+ * - extremely flexible as almost all decision elements and parameters are fully
  *   configurable
  * - recognizes mixed 'leader' use and cleans up after you (e.g. when you're reflowing
  *   comments where only some lines are prefixed with a '*' comment lead character,
- *   a situation often happening when editing already formatted comments quickly in the 
+ *   a situation often happening when editing already formatted comments quickly in the
  *   heat of a deadline)
  * - supports a configurable set of 'directives', either as characters or tags, to hint
  *   the reflow engine (this is useful to keep a particular piece of formatted text
@@ -115,7 +115,7 @@ int str_in_set(const char **haystack, const char *needle, size_t len)
 				return idx; // *haystack;
 			}
 		}
-		
+
 		idx++;
 		haystack++;
 	}
@@ -236,14 +236,14 @@ int strleadlen(const char *str, int c)
 /*
 return the number of 'c' characters trailing at the end of the string 'str'.
 
-'one_past_end_of_str' equals 'str + strlen(str)' but allows this routine to also work 
-when inspecting non-NUl-terminated strings.
+'one_past_end_of_str' equals 'str + strlen(str)' but allows this routine to also work
+when inspecting non-NUL-terminated strings.
 */
 int strtaillen(const char *str, const char *one_past_end_of_str, int c)
 {
 	const char *s;
 
-	for (s = one_past_end_of_str; s >= str && s[-1] == c; s--)
+	for (s = one_past_end_of_str; s > str && s[-1] == c; s--)
 		;
 	return (int)(one_past_end_of_str - s);
 }
@@ -252,14 +252,14 @@ int strtaillen(const char *str, const char *one_past_end_of_str, int c)
 /*
 return the number of characters matching the set trailing at the end of the string 'str'.
 
-'one_past_end_of_str' equals 'str + strlen(str)' but allows this routine to also work 
+'one_past_end_of_str' equals 'str + strlen(str)' but allows this routine to also work
 when inspecting non-NUl-terminated strings.
 */
 int strrspn(const char *str, const char *one_past_end_of_str, const char *set)
 {
 	const char *s;
 
-	for (s = one_past_end_of_str; s >= str && strchr(set, s[-1]); s--)
+	for (s = one_past_end_of_str; s > str && strchr(set, s[-1]); s--)
 		;
 	return (int)(one_past_end_of_str - s);
 }
@@ -395,7 +395,7 @@ int calc_leading_whitespace4block(const char *text, int at_column)
 
 
 /*
-Check whether the given text starts with a HTML numeric entity 
+Check whether the given text starts with a HTML numeric entity
 in either '&#[0-9]+;' or '&#x[0-9A-F]+;' standard format.
 
 Return TRUE when so and set 'word_length' to the string length of this entity,
@@ -448,7 +448,7 @@ bool is_html_numeric_entity(const char *text, int *word_length)
 
 
 /*
-Check whether the given text starts with a HTML numeric entity 
+Check whether the given text starts with a HTML numeric entity
 in '&[A-Za-z0-9]+;' standard format.
 
 Return TRUE when so and set 'word_length' to the string length of this entity,
@@ -509,14 +509,14 @@ bool cmt_reflow::chunk_is_inline_comment(const chunk_t *pc)
 
 bool cmt_reflow::is_doxygen_tagmarker(const char *text, char doxygen_tag_marker)
 {
-	return (doxygen_tag_marker 
+	return (doxygen_tag_marker
 					    ? *text == doxygen_tag_marker
 					    : in_set("@\\", *text));
 }
 
 /*
-A 'viable' bullet is a bullet which is either a non-alphanumeric character (or 2, or 3) 
-or a numeric or alphanumeric character followed by a terminating dot or other 
+A 'viable' bullet is a bullet which is either a non-alphanumeric character (or 2, or 3)
+or a numeric or alphanumeric character followed by a terminating dot or other
 non-alphanumeric character.
 
 Nope, chapter numbering and that sort of stuff is not recognized as 'viable' bullets.
@@ -566,7 +566,7 @@ bool cmt_reflow::is_viable_bullet_marker(const char *text, size_t len)
 	}
 
 	/*
-	check against the specified bullet size: it's a FAIL when these don't match. 
+	check against the specified bullet size: it's a FAIL when these don't match.
 	*/
 	if (len != (size_t)(s - text))
 		return false;
@@ -618,7 +618,7 @@ void cmt_reflow::resize_buffer(size_t extralen)
 		m_comment = (char *)realloc((void *)m_comment, newlen);
 		m_comment_size = newlen;
 	}
-	
+
 	if (!m_comment)
 	{
       LOG_FMT(LERR, "%s: buffer allocation failed: out of memory\n", __func__);
@@ -768,7 +768,7 @@ void cmt_reflow::add_javaparam(chunk_t *pc)
 int cmt_reflow::add_kw(const char *text) /* [i_a] */
 {
 	/* [i_a] strncmp vs. memcmp + len - now we don't need to scan to the end of the keyword in the caller! */
-   if (strncmp(text, "$(filename)", 11) == 0) 
+   if (strncmp(text, "$(filename)", 11) == 0)
    {
       push(path_basename(cpd.filename));
       return(11);
@@ -828,8 +828,8 @@ bool cmt_reflow::detect_as_javadoc_chunk(chunk_t *pc, bool setup)
 	bool backref = false;
 
 	if (pc
-		&& ((pc->type == CT_COMMENT) 
-			|| (pc->type == CT_COMMENT_MULTI) 
+		&& ((pc->type == CT_COMMENT)
+			|| (pc->type == CT_COMMENT_MULTI)
 			|| (pc->type == CT_COMMENT_CPP)))
 	{
 		const char *text = pc->str + 2;
@@ -840,7 +840,7 @@ bool cmt_reflow::detect_as_javadoc_chunk(chunk_t *pc, bool setup)
 		if (len > 0 && strchr("/*!<", *eojd_marker))
 		{
 			// if (pc->type == CT_COMMENT_MULTI || pc->type == CT_COMMENT)
-			do 
+			do
 			{
 				eojd_marker++;
 			} while (strchr("/*!<", *eojd_marker));
@@ -853,9 +853,9 @@ bool cmt_reflow::detect_as_javadoc_chunk(chunk_t *pc, bool setup)
 			bool has_content = false;
 			const char *s;
 
-			for (s = eojd_marker; s < eos; s++)
+			for (s = eojd_marker; s < eos && !has_content; s++)
 			{
-				has_content |= !!unc_isalpha(*s);
+				has_content = !!unc_isalpha(*s);
 			}
 
 			if (pc->type == CT_COMMENT_CPP)
@@ -1114,7 +1114,7 @@ int cmt_reflow::strip_nonboxed_lead_markers(char *text, int at_column)
 				{
 					past_lead_ws_cnt = past_cnt;
 				}
-				if (determine_leadin) 
+				if (determine_leadin)
 				{
 					m_lead_marker = strndup(second_line - 1, cnt);
 				}
@@ -1133,7 +1133,7 @@ int cmt_reflow::strip_nonboxed_lead_markers(char *text, int at_column)
 				{
 					past_lead_ws_cnt = past_cnt;
 				}
-				if (determine_leadin) 
+				if (determine_leadin)
 				{
 					UNC_ASSERT(m_lead_marker);
 					UNC_ASSERT((int)strlen(m_lead_marker) > cnt);
@@ -1219,7 +1219,7 @@ int cmt_reflow::strip_nonboxed_lead_markers(char *text, int at_column)
 		{
 			/* scan backwards to see whether the 'box' is a paragraph on its own. */
 			int llwscnt = strleadlen(previous_sol, ' ');
-			
+
 			if (llwscnt < last_nl - previous_sol)
 			{
 				/* previous line contains more than just whitespace: this line is not a boxed comment section! */
@@ -1339,27 +1339,27 @@ int cmt_reflow::get_line_leader(const char *str, int len) /* [i_a] obsoleted? no
 	int idx;
 
    /*
-   This method may only be called AFTER expand_tabs_and_clean() has taken care of CRLF, TAB, etc. 
+   This method may only be called AFTER expand_tabs_and_clean() has taken care of CRLF, TAB, etc.
    */
    UNC_ASSERT(!strnchr(str, '\r', len));
    UNC_ASSERT(!strnchr(str, '\t', len));
 
    for (idx = 0; idx < len; idx++)
    {
-      if (str[idx] == ' ') 
+      if (str[idx] == ' ')
       {
          continue;
       }
-      if (str[idx] == '\n') 
+      if (str[idx] == '\n')
       {
          /* Done */
          break;
       }
       if (in_set(m_defd_lead_markers, str[idx])
 		  /* '\\' is special: detect line continuation and escape sequences, as those cannot be part of a 'lead prefix' */
-		  && !(str[idx] == '\\' 
-				&& (idx+1 < len) 
-				&& (unc_isalnum(str[idx+1]) 
+		  && !(str[idx] == '\\'
+				&& (idx+1 < len)
+				&& (unc_isalnum(str[idx+1])
 					|| (str[idx+1] == '\n'))))
 	  {
 		  return idx;
@@ -1404,7 +1404,7 @@ void cmt_reflow::calculate_comment_body_indent(const char *str, int len)
    int width     = 0;
 
    /*
-   This method may only be called AFTER expand_tabs_and_clean() has taken care of CRLF, TAB, etc. 
+   This method may only be called AFTER expand_tabs_and_clean() has taken care of CRLF, TAB, etc.
    */
    UNC_ASSERT(!strnchr(str, '\r', len));
    UNC_ASSERT(!strnchr(str, '\t', len));
@@ -1551,7 +1551,7 @@ void cmt_reflow::push_text(const char *text, int len, bool esc_close, int first_
    UNC_ASSERT(m_orig_startcolumn == at_column);
 
    /*
-   before we go and 'position' the comment, we first check and remove any javadoc marker at the start as that 
+   before we go and 'position' the comment, we first check and remove any javadoc marker at the start as that
    is obstructing our operation.
 
    We could do this later on, but this is the most convenient place: the javadoc/doxygen marker starts right
@@ -1559,9 +1559,9 @@ void cmt_reflow::push_text(const char *text, int len, bool esc_close, int first_
    */
    if (m_first_pc == pc && detect_as_javadoc_chunk(pc, true))
    {
-	   /* 
+	   /*
 	   next: blow away the marker by replacing it with whitespace.
-	   
+
 	   Since 'text' is non-modifiable, we do it a different way: we shift the 'first_extra_offset' N spaces
 	   forward and so does 'text'; this will result in 'expand_tabs_and_clean()' dumping the
 	   desired whitespace in there.
@@ -1572,13 +1572,13 @@ void cmt_reflow::push_text(const char *text, int len, bool esc_close, int first_
 	   len -= javadoc_marker_len;
 	   text += javadoc_marker_len;
    }
-   else if (m_first_pc != pc 
+   else if (m_first_pc != pc
 			&& pc
-			&& pc->type == CT_COMMENT_CPP 
+			&& pc->type == CT_COMMENT_CPP
 			&& m_doxygen_marker
 			&& !strncmp(m_doxygen_marker, text, strlen(m_doxygen_marker)))
    {
-	   /* 
+	   /*
 	   Extra: for merged C++ doxygen comments (i.e. '///' prefixed comments)
 	   blow away the marker by replacing it with whitespace.
 
@@ -1602,7 +1602,7 @@ void cmt_reflow::push_text(const char *text, int len, bool esc_close, int first_
    size_t newlen;
    bool in_pp = ((cpd.in_preproc != CT_NONE) && (cpd.in_preproc != CT_PP_DEFINE));
    /*
-   unfortunately, 'pc && (pc->flags & PCF_IN_PREPROC)' is also TRUE when inside a big #if 0 ... #endif chunk :-( 
+   unfortunately, 'pc && (pc->flags & PCF_IN_PREPROC)' is also TRUE when inside a big #if 0 ... #endif chunk :-(
    */
    UNC_ASSERT((pc && (pc->flags & PCF_IN_PREPROC)) >= in_pp);
    len = (int)expand_tabs_and_clean(&dst, &newlen, text, len, first_extra_offset + at_column, in_pp);
@@ -1624,7 +1624,7 @@ void cmt_reflow::push_text(const char *text, int len, bool esc_close, int first_
    int leader_len = strip_nonboxed_lead_markers(dst, at_column);
 
    /*
-   when we arrive at this point, the text has been 'provisionally laid out', that is: all TABs 
+   when we arrive at this point, the text has been 'provisionally laid out', that is: all TABs
    have been discarded, preprocessor line continuation has been stripped off as well, and so
    has any trailing whitespace (these things can - and should - be added again in the output/render process anyhow).
 
@@ -1652,7 +1652,7 @@ void cmt_reflow::push_text(const char *text, int len, bool esc_close, int first_
    int strip_column0 = calc_leading_whitespace4block(dst, at_column + max(3, leader_len + max(0, m_extra_pre_star_indent) + max(0, m_extra_post_star_indent)));
 
    /*
-   now that we know the left WS edge, we can deduce whether the 'original comment' had whitespace trailing the possible 'star' prefix or C++ // comment marker. 
+   now that we know the left WS edge, we can deduce whether the 'original comment' had whitespace trailing the possible 'star' prefix or C++ // comment marker.
    */
    if (pc->type == CT_COMMENT_CPP)
    {
@@ -1670,7 +1670,7 @@ void cmt_reflow::push_text(const char *text, int len, bool esc_close, int first_
 		   m_extra_post_star_indent = diff;
 	   }
    }
-   else 
+   else
    {
 	   int diff = strip_column0 - (at_column + 2 - 1);
 	   if (m_extra_post_star_indent < 0 && diff >= 0)
@@ -1680,8 +1680,8 @@ void cmt_reflow::push_text(const char *text, int len, bool esc_close, int first_
    }
 
    /*
-   strip the 'first_extra_offset' extra WS for the first line only: those spaces were only in there 
-   as a 'stopgap' for the comment start marker and we don't want the text parser later on to 
+   strip the 'first_extra_offset' extra WS for the first line only: those spaces were only in there
+   as a 'stopgap' for the comment start marker and we don't want the text parser later on to
    'discover' this first line of comment text has N more leading WS than it actually had in
    the original source code.
 
@@ -1979,7 +1979,7 @@ int cmt_reflow::write2out_comment_start(paragraph_box *para, words_collection &w
 		if (m_is_doxygen_comment)
 		{
 			UNC_ASSERT(m_doxygen_marker);
-			strrepllead(m_doxygen_marker, '*', '//');
+			strrepllead(m_doxygen_marker, '*', '/');
 			write2output(m_doxygen_marker);
 		}
 	}
@@ -1989,7 +1989,7 @@ int cmt_reflow::write2out_comment_start(paragraph_box *para, words_collection &w
 		if (m_is_doxygen_comment)
 		{
 			UNC_ASSERT(m_doxygen_marker);
-			strrepllead(m_doxygen_marker, '//', '*');
+			strrepllead(m_doxygen_marker, '/', '*');
 			write2output(m_doxygen_marker);
 		}
 
@@ -2020,7 +2020,7 @@ int cmt_reflow::write2out_comment_next_line(void)
 		if (m_is_doxygen_comment)
 		{
 			UNC_ASSERT(m_doxygen_marker);
-			strrepllead(m_doxygen_marker, '*', '//');
+			strrepllead(m_doxygen_marker, '*', '/');
 			write2output(m_doxygen_marker);
 		}
 	}
@@ -2035,7 +2035,7 @@ int cmt_reflow::write2out_comment_next_line(void)
 		write2output(m_lead_marker);
 	}
 
-	return m_extra_post_star_indent; // cpd.settings[UO_cmt_sp_after_star_cont].n;
+	return m_extra_post_star_indent;
 }
 
 
@@ -2070,7 +2070,9 @@ void cmt_reflow::write2out_comment_end(int deferred_whitespace, int deferred_nl)
 	}
 
 	/*
-	when a comment has whitespace between per-line lead-in and the content itself, than it should also have that same whitespace between content and comment end marker when the end marker is printed on the same line as the last bit of content. */
+	when a comment has whitespace between per-line lead-in and the content itself, than it
+	should also have that same whitespace between content and comment end marker when the
+	end marker is printed on the same line as the last bit of content. */
 	if (deferred_nl == 0 && deferred_whitespace == 0)
 	{
 		deferred_whitespace = m_extra_post_star_indent;
