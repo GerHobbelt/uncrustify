@@ -77,21 +77,20 @@ typedef uint64_t   UINT64;
 
 #include <stdarg.h>
 
-#define UNC_ASSERT(expr)													\
-		(!(expr)	      													\
-		? report_assertion_failed(#expr, __func__, __FILE__, __LINE__, 0)	\
-			, 0																\
-		: 1)
+#define UNC_ASSERT(expr)														\
+		((void)(!(expr)	      													\
+		? report_assertion_failed(#expr, __func__, __FILE__, __LINE__, 0)		\
+		: 1))
 
-#define UNC_ASSERT_EX(expr, msgcombo)										\
-	do																		\
-	{																		\
-		if (!(expr))														\
-		{																	\
-			assert_extended_reporter __m msgcombo ;							\
-			report_assertion_failed(#expr, __func__, __FILE__, __LINE__,	\
-					&__m);													\
-		}																	\
+#define UNC_ASSERT_EX(expr, msgcombo)											\
+	do																			\
+	{																			\
+		if (!(expr))															\
+		{																		\
+			assert_extended_reporter __m msgcombo;								\
+			(void)report_assertion_failed(#expr, __func__, __FILE__, __LINE__,	\
+					&__m);														\
+		}																		\
 	} while (0)
 
 class assert_extended_reporter
@@ -117,7 +116,7 @@ protected:
 	int vprint(int suggested_buflen, const char *msg, va_list args);
 };
 
-void report_assertion_failed(const char *expr, const char *function, const char *filepath, int lineno, assert_extended_reporter *rprtr);
+int report_assertion_failed(const char *expr, const char *function, const char *filepath, int lineno, assert_extended_reporter *rprtr);
 
 #endif
 

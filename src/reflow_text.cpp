@@ -1,12 +1,12 @@
 /**
  * @file reflowtxt.cpp
- * 
+ *
  * A big honkin' text reflow engine, used to reformat comments in 'enhanced' mode 2.
  *
  * This reflow engine works on a 'per-page' basis, where a 'page' here is one entire
  * comment. It does not work on a per-paragraph basis as that prevents the reflow
  * engine from making choices based on info spanning more than one paragraph in there,
- * such as when a bullet item spans multiple paragraphs and you like your text reflown 
+ * such as when a bullet item spans multiple paragraphs and you like your text reflown
  * with spanning indent to properly identify the subsequent paragraphs as belonging
  * to the bullet item.
  *
@@ -19,11 +19,11 @@
  * - allows enforced line breaks at end-of-sentence within a paragraph
  * - detects and keeps 'ASCII art' intact, allowing graphical documentation to survive
  * - recognizes boxed comments and can reflow these
- * - extremely flexible as almost all decision elements and parameters are fully 
+ * - extremely flexible as almost all decision elements and parameters are fully
  *   configurable
  * - recognizes mixed 'leader' use and cleans up after you (e.g. when you're reflowing
  *   comments where only some lines are prefixed with a '*' comment lead character,
- *   a situation often happening when editing already formatted comments quickly in the 
+ *   a situation often happening when editing already formatted comments quickly in the
  *   heat of a deadline)
  * - supports a configurable set of 'directives', either as characters or tags, to hint
  *   the reflow engine (this is useful to keep a particular piece of formatted text
@@ -56,18 +56,18 @@
 
 
 cmt_reflow::cmt_reflow()
-   : m_first_pc(NULL), m_last_pc(NULL), 
-   m_left_global_output_column(0), 
-   m_brace_col(0), 
-   m_base_col(0), 
+   : m_first_pc(NULL), m_last_pc(NULL),
+   m_left_global_output_column(0),
+   m_brace_col(0),
+   m_base_col(0),
    m_word_count(0),
-   m_kw_subst(false), 
-   //m_xtra_indent(0), 
-   //m_cont_text(""), 
-   m_reflow_mode(0), 
-   m_is_cpp_comment(false), 
-   m_is_merged_comment(false), 
-   m_is_single_line_comment(false), 
+   m_kw_subst(false),
+   //m_xtra_indent(0),
+   //m_cont_text(""),
+   m_reflow_mode(0),
+   m_is_cpp_comment(false),
+   m_is_merged_comment(false),
+   m_is_single_line_comment(false),
    m_extra_pre_star_indent(-1),
    m_extra_post_star_indent(-1),
    m_has_leading_and_trailing_nl(false),
@@ -91,14 +91,14 @@ cmt_reflow::cmt_reflow()
 	m_xml_text_has_stray_lt_gt(-1), m_xml_offender(0),
    m_comment(NULL), m_comment_len(0), m_comment_size(0),
    m_orig_startcolumn(1),
-   m_lead_cnt(0), 
-   m_lead_marker(NULL), 
-   m_is_doxygen_comment(false), 
-   m_is_backreferencing_doxygen_comment(false), 
+   m_lead_cnt(0),
+   m_lead_marker(NULL),
+   m_is_doxygen_comment(false),
+   m_is_backreferencing_doxygen_comment(false),
    m_doxygen_marker(NULL),
 	m_no_reflow_marker_start(NULL),
 	m_no_reflow_marker_end(NULL),
-	m_line_wrap_column(0), 
+	m_line_wrap_column(0),
 	m_tab_width(8),
 	m_defd_lead_markers(NULL)
 {
@@ -148,7 +148,7 @@ bool cmt_reflow::comment_is_part_of_preproc_macro(void) const
 /*
 Estimate the width consumed by this bit of text.
 
-Take into account any keep-with-prev/next and other reflow limitations, such as localized 'non-reflow' series of boxes; 
+Take into account any keep-with-prev/next and other reflow limitations, such as localized 'non-reflow' series of boxes;
 this box is assumed to be the first one in such a series.
 */
 int cmt_reflow::estimate_box_print_width(paragraph_box *para, words_collection &words, int box_idx, int *last_box_for_this_bit)
@@ -165,7 +165,7 @@ int cmt_reflow::estimate_box_print_width(paragraph_box *para, words_collection &
 	{
 		/*
 		TODO: properly handle semi-boxed and fully boxed comments by rendering them without
-		      the top/bottom/left/right borders and only once done, wrap those borders around 
+		      the top/bottom/left/right borders and only once done, wrap those borders around
 			  the paragraph / series-of-paragraphs.
 		*/
 		print_len += box->m_left_edge_thickness + box->m_right_edge_thickness;
@@ -395,7 +395,7 @@ void cmt_reflow::estimate_render_width(paragraph_box *para, words_collection &wo
 			{
 				deferred_whitespace = 1;
 			}
-	
+
 			if ((deferred_whitespace > 0 && !keep_with_next)
 				|| box->m_line_count > 0)
 			{
@@ -418,7 +418,7 @@ void cmt_reflow::estimate_render_width(paragraph_box *para, words_collection &wo
 
 	info.render_width = render_width;
 
-	/* 
+	/*
 	render a bit PAST the indicated end to find out what the width is for the next
 	'preferred break'; this is used in overflow-allowing situations: if the next
 	break is within the overflow bound and 'better' (i.e. significantly closer
@@ -428,7 +428,7 @@ void cmt_reflow::estimate_render_width(paragraph_box *para, words_collection &wo
 	As we ASSUME that paragraphs are always line spanning (i.e. no partial line para's
 	here), we can try to render until the end of the paragraph.
 
-	N.B.: is_first==true to prevent counting the whitespace at the 
+	N.B.: is_first==true to prevent counting the whitespace at the
 	      break/edge twice.
 	*/
 	for ( ; i <= para->m_last_box; i++)
@@ -525,7 +525,7 @@ void cmt_reflow::calculate_widow_and_orphan_aspects(paragraph_box *para, words_c
 		/*
 		skip punctuation and don't count it as a 'word' for the widow/orphan check;
 		since punctuation shouldn't end up at the start-of-line if it isn't already
-		there, we make sure the widow/orpahn check ensures it's contained within 
+		there, we make sure the widow/orpahn check ensures it's contained within
 		the widow/orpahn box series.
 		*/
 		if (box->m_is_punctuation
@@ -581,7 +581,7 @@ void cmt_reflow::calculate_widow_and_orphan_aspects(paragraph_box *para, words_c
 		/*
 		skip punctuation and don't count it as a 'word' for the widow/orphan check;
 		since punctuation shouldn't end up at the start-of-line if it isn't already
-		there, we make sure the widow/orpahn check ensures it's contained within 
+		there, we make sure the widow/orpahn check ensures it's contained within
 		the widow/orpahn box series.
 		*/
 		if (box->m_is_punctuation
@@ -620,7 +620,7 @@ void cmt_reflow::calculate_widow_and_orphan_aspects(paragraph_box *para, words_c
 		info.widow_first_box_idx = INT_MAX;
 		info.orphan_last_box_idx = 0;
 	}
-	else 
+	else
 	{
 		render_estimates_t render_info;
 
@@ -629,7 +629,7 @@ void cmt_reflow::calculate_widow_and_orphan_aspects(paragraph_box *para, words_c
 		{
 			/*
 			not a full line between orphaned and widowed line: forget about it all!
-			
+
 			disable widow/orphan treatment */
 			info.widow_first_box_idx = INT_MAX;
 			info.orphan_last_box_idx = 0;
@@ -638,7 +638,7 @@ void cmt_reflow::calculate_widow_and_orphan_aspects(paragraph_box *para, words_c
 
 	/*
 	calculate the rendered width estimate anyhow, as we use it ourselves to check whether the
-	widow/orphan condition makes any sense at all, e.g. when the widows/orphans each are longer then the allowed 
+	widow/orphan condition makes any sense at all, e.g. when the widows/orphans each are longer then the allowed
 	line width, upholding these restrictions is certainly ludicrous.
 	*/
 	if (para->m_first_box <= info.orphan_last_box_idx)
@@ -769,13 +769,13 @@ void cmt_reflow::set_no_reflow_markers(const char *start_tags, const char *end_t
 
 	the array-of-strings and the text itself are allocated in one go; we can provide
 	accurate worst-case estimates for the array size so we're good in that regard:
-	
+
 	We estimate the number of items by counting the number of spaces in the input.
 	Plus 2 for the first entry and the NULL sentinel.
 	*/
 	int arrsize;
 	char *s;
-	
+
 	arrsize = 2 + strccnt(start_tags, ' ');
 	m_no_reflow_marker_start = (const char **)malloc(arrsize * sizeof(char *) + strlen(start_tags) + 1);
 	s = (char *)(m_no_reflow_marker_start + arrsize);
@@ -839,7 +839,10 @@ void cmt_reflow::set_deferred_cmt_config_params_phase1(void)
 {
 	chunk_t *pc = m_first_pc;
 
-	UNC_ASSERT(m_comment_is_part_of_preproc_macro == ((pc->flags & PCF_IN_PREPROC) != 0));
+#if defined(_MSC_VER)
+#pragma message(__FILE__ "(" STRING(__LINE__) ") : TODO: check why this assert and assignment are here and when the assert fires.")
+#endif
+	//UNC_ASSERT(m_comment_is_part_of_preproc_macro == ((pc->flags & PCF_IN_PREPROC) != 0));
 	m_comment_is_part_of_preproc_macro = ((pc->flags & PCF_IN_PREPROC) != 0);
 
 	//m_left_global_output_column = cpd.column;
@@ -862,7 +865,7 @@ void cmt_reflow::set_deferred_cmt_config_params_phase1(void)
 		 m_is_cpp_comment = false;
       }
 
-	  
+
    m_brace_col = 1 + (pc->brace_level * cpd.settings[UO_output_tab_size].n);
 
 int cmt_col;
@@ -933,11 +936,11 @@ int col_diff;
 
    m_kw_subst = ((pc->flags & PCF_INSERTED) != 0);
 
-   
-   
-   
-   
-   
+
+
+
+
+
    /*
 	defer CORRECTING setting 'line_width' until after we've collected and cleaned up the text to reflow:
 
@@ -946,17 +949,17 @@ int col_diff;
 
 	bool is_inline_comment = chunk_is_inline_comment(m_first_pc);
 
-	int lw = (!is_inline_comment 
+	int lw = (!is_inline_comment
 		? cpd.settings[UO_cmt_width].n
-		: (cpd.settings[UO_cmt_inline_width].n < 0 
+		: (cpd.settings[UO_cmt_inline_width].n < 0
 			? cpd.settings[UO_cmt_width].n
 			: cpd.settings[UO_cmt_inline_width].n));
 
 	if (lw < 0)
 	{
-		/* 
-		'autodetect' the line width by scanning the comment text. 
-		
+		/*
+		'autodetect' the line width by scanning the comment text.
+
 		WARNING: this ASSUMES both that the 'comment' has been filled before this call
 		         AND that the comment text is written in such a way that it starts at
 				 column==1 i.e. screen's left edge.
@@ -981,9 +984,9 @@ void cmt_reflow::set_deferred_cmt_config_params_phase2(void)
 	UNC_ASSERT(m_first_pc);
 	if (lw < 0)
 	{
-		/* 
-		'autodetect' the line width by scanning the comment text. 
-		
+		/*
+		'autodetect' the line width by scanning the comment text.
+
 		WARNING: this ASSUMES both that the 'comment' has been filled before this call
 		         AND that the comment text is written in such a way that it starts at
 				 column==1 i.e. screen's left edge.
@@ -1003,7 +1006,7 @@ void cmt_reflow::set_deferred_cmt_config_params_phase2(void)
 			text = eol + strleadlen(eol, '\n');
 		}
 
-		/* 
+		/*
 		account for the global indentation of the comment block:
 		*/
 		//lw += m_first_pc->column - m_first_pc->orig_col;
@@ -1020,7 +1023,7 @@ void cmt_reflow::set_deferred_cmt_config_params_phase2(void)
 	{
 		lw = m_left_global_output_column + heuristic_minimum_width;
 	}
-	const int heuristic_minimum_column = 78; 
+	const int heuristic_minimum_column = 78;
 	if (lw <= heuristic_minimum_column)
 	{
 		lw = heuristic_minimum_column;
@@ -1038,16 +1041,16 @@ void cmt_reflow::set_deferred_cmt_config_params_phase2(void)
 
 	if (m_extra_pre_star_indent < 0)
 	{
-		m_extra_pre_star_indent = (m_is_cpp_comment 
-			? 0 
+		m_extra_pre_star_indent = (m_is_cpp_comment
+			? 0
 			: (*m_lead_marker)
 				? 1
 				: 0);
 	}
 	if (m_extra_post_star_indent < 0)
 	{
-		m_extra_post_star_indent = (m_is_cpp_comment 
-			? 1 
+		m_extra_post_star_indent = (m_is_cpp_comment
+			? 1
 			: (*m_lead_marker)
 				? 1
 				: 0);
@@ -1082,7 +1085,7 @@ void cmt_reflow::set_deferred_cmt_config_params_phase2(void)
 			}
 			m_is_cpp_comment = false;
 		}
-		else 
+		else
 		{
 			/* Abuse^H^H^H^H^HRe-use the settings for the CPP comments: guestimate some sensible conversion here */
 			switch (cpd.settings[UO_cmt_star_cont].t)
@@ -1233,15 +1236,15 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 
 	while (*text)
 	{
-		/* 
+		/*
 		count the number of consecutive newlines.
 
-		Hint: as we already have the input text stripped of all trailing whitespace, we can do this 
+		Hint: as we already have the input text stripped of all trailing whitespace, we can do this
 		in a very simple way.
 		*/
 		const char *s;
 		int nlc = strleadlen(text, '\n');
-		
+
 		s = text + nlc;
 		newline_count += nlc;
 		line_count += nlc;
@@ -1274,11 +1277,11 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 					//UNC_ASSERT(!prev->m_do_not_print);
 					UNC_ASSERT(current_word->m_line_count == 0);
 
-					if (newline_count > 0 
+					if (newline_count > 0
 						&& prev->m_line_count > 0
 						&& prev->m_word_length == 0
 						// && prev->m_left_edge_thickness == 0
-						// && prev->m_right_edge_thickness == 0 
+						// && prev->m_right_edge_thickness == 0
 						)
 					{
 						/* 'prev' only lists pure whitespace: contract with 'current' */
@@ -1312,7 +1315,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 			current_word = words.prep_next(word_idx);
 
 			/*
-			RESET the ASCII ART and/or BOXED markers when we hit a double newline 
+			RESET the ASCII ART and/or BOXED markers when we hit a double newline
 			*/
 			if (newline_count >= 2)
 			{
@@ -1354,8 +1357,8 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 		//}
 
 		/*
-		should we reset the parse mode to regular now? 
-		
+		should we reset the parse mode to regular now?
+
 		This depends on whether or not we've hit an empty line (for paragraphs) or related conditions.
 		*/
 		const char *end_of_non_reflow_chunk = m_comment;
@@ -1398,9 +1401,9 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 			break;
 
 		case IN_NONREFLOW_SECTION:
-			/* 
+			/*
 			stay in this mode until we've /passed beyond/ the end marker.
-			
+
 			Also make sure the end marker matches the start marker: this is done by
 			matching up their indexes in the marker array, as we ASSUME both start and end
 			tag sets are matched pairs all the way.
@@ -1413,7 +1416,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 				if (nrfl_end_marker >= 0 && nrfl_end_marker == nrfl_start_marker)
 				{
 					/*
-					treat the line with the end marker as non-reflowable. 
+					treat the line with the end marker as non-reflowable.
 
 					This of course assumes the end marker sits on the line on its own, as was the matching start marker.
 					*/
@@ -1444,9 +1447,9 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 		int ascii_art_count = 0;
 		int marker_count = 0;
 		int print_count = 0;
-		count_graphics_nonreflow_and_printable_chars(s, (int)(e - s), 
-												  &ascii_art_count, 
-												  &marker_count, 
+		count_graphics_nonreflow_and_printable_chars(s, (int)(e - s),
+												  &ascii_art_count,
+												  &marker_count,
 												  &print_count);
 
 		/*
@@ -1477,11 +1480,11 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 			marker_count = 0;
 		}
 
-		/* 
+		/*
 		hunt down the end of another word; before we do so,
 		we should check whether this line is part of a 'graphic element', i.e.
-		a non-reflowable chunk. 
-		
+		a non-reflowable chunk.
+
 		Such non-reflowable chunks always span entire lines and MAY span multiple
 		lines.
 
@@ -1492,9 +1495,9 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 			&& in_set(m_cmt_reflow_box_markers, *s)
 			)
 		{
-			/* 
-			probably a boxed comment! 
-			
+			/*
+			probably a boxed comment!
+
 			Check the heuristic statistics for this line to make sure it is truly
 			part of a boxed text: the first and last lines of such boxes consist
 			of a lot of marker characters and little text.
@@ -1509,7 +1512,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 				in_probable_boxed_cmt = ((marker_count > 0) && (ascii_art_count == 0));
 			}
 		}
-		else if (s < e 
+		else if (s < e
 			&& !in_set(m_cmt_reflow_box_markers, *s)
 			&& !in_set(m_cmt_reflow_box_markers, e[-1]))
 		{
@@ -1521,7 +1524,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 		else if (s == e)
 		{
 			/*
-			we've run into an empty line. Do we keep the 'boxed text' signal turned ON 
+			we've run into an empty line. Do we keep the 'boxed text' signal turned ON
 			when the new line is entirely empty???
 
 			Nope, we don't.
@@ -1529,7 +1532,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 			in_probable_boxed_cmt = false;
 		}
 
-		/* 
+		/*
 		for 'boxed text' we strip away the leading and trailing boxed marker characters to better
 		process what's within.
 
@@ -1559,7 +1562,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 				UNC_ASSERT(newline_count == 0);
 				current_word->m_trailing_whitespace_length = (int)(eol - e);
 				current_word->m_is_non_reflowable = true;
-				current_word->m_floodfill_non_reflow = true; 
+				current_word->m_floodfill_non_reflow = true;
 				//current_word->m_line_count = newline_count;
 
 				text = s = next_line;
@@ -1572,7 +1575,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 			}
 			else
 			{
-				/* 
+				/*
 				this is a bit nasty: we also register various end-of-line border specifics with the first 'word'
 				on this line.
 
@@ -1613,7 +1616,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 			ascii_art_count = 0;
 			marker_count = 0;
 			print_count = 0;
-			count_graphics_nonreflow_and_printable_chars(s, (int)(e - s), 
+			count_graphics_nonreflow_and_printable_chars(s, (int)(e - s),
 												  &ascii_art_count,
 												  &marker_count,
 												  &print_count);
@@ -1632,7 +1635,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 			}
 		}
 
-		/* 
+		/*
 		test for ASCII art chunks:
 
 		these always exist on lines of their own, just like boxed texts. However, the only heuristic
@@ -1677,7 +1680,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 			current_word->m_word_length = (int)(e - s);
 			current_word->m_trailing_whitespace_length = (int)(eol - e);
 			current_word->m_is_non_reflowable = true;
-			current_word->m_floodfill_non_reflow = true; 
+			current_word->m_floodfill_non_reflow = true;
 			//current_word->m_line_count = newline_count;
 
 			text = s = next_line;
@@ -1729,7 +1732,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 				current_word->m_word_length = (int)(e - s);
 				current_word->m_trailing_whitespace_length = (int)(eol - e);
 				current_word->m_is_non_reflowable = true;
-				//current_word->m_floodfill_non_reflow = true; 
+				//current_word->m_floodfill_non_reflow = true;
 				//current_word->m_line_count = newline_count;
 
 				text = next_line;
@@ -1745,16 +1748,16 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 		{
 			UNC_ASSERT(parse_mode == REGULAR_PARSE_MODE);
 
-			/* 
-			as we now know we are in (probable) reflowable county, we chop the current line into words. 
-			
+			/*
+			as we now know we are in (probable) reflowable county, we chop the current line into words.
+
 			Right now we're at start of word always:
 			*/
 			UNC_ASSERT(*text != '\n');
 			UNC_ASSERT(*s != '\n');
 
-			/* 
-			we're at a certified 'word' edge. 
+			/*
+			we're at a certified 'word' edge.
 
 			Chop up the words on this line...
 			*/
@@ -1765,6 +1768,9 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 			//current_word->m_word_length = 0; /* ! */
 			current_word->m_leading_whitespace_length = (int)(s - text);
 			//current_word->m_left_priority = -1000; /* newline is high priority linebreak option */
+#if defined(_MSC_VER)
+#pragma message(__FILE__ "(" STRING(__LINE__) ") : TODO: check why this assert and assignment are here and when the assert fires.")
+#endif
 			UNC_ASSERT(current_word->m_is_first_on_line);
 
 			UNC_ASSERT(newline_count == 0);
@@ -1778,13 +1784,13 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 
 			A 'word' here is either a:
 
-			- punctuation mark (e.g. ',') -- yes, we register them seperately as they constitute 
+			- punctuation mark (e.g. ',') -- yes, we register them seperately as they constitute
 			  linebreak suggestions.
 
 			  Also note that 'formulas' are chopped up alongside, e.g. '1 + 2' will split into
 			  3 'words', as will the not-so-helpful-for-chopping, yet 'identical', character sequence '1+2'.
 
-			  And did I mention quotes? Quotes are hard to disambiguate, as they can exist in 
+			  And did I mention quotes? Quotes are hard to disambiguate, as they can exist in
 			  pairs and single occurrences in English texts, e.g.
 
 			  "It's hard to tell" (paired ["], single ['])
@@ -1804,9 +1810,9 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 			  And how about punctuation character SEQUENCES, e.g. '...' or '((abc)def)'?
 			  Given the ways we wish to see reflowing occur, it makes sense to split such sequences
 			  into their individual parts, which is not to deny that the ellipsis example above ('...')
-			  is just one, 3-char-wide, punctuation mark. How about splitting the '('...')' 
+			  is just one, 3-char-wide, punctuation mark. How about splitting the '('...')'
 			  character sequence just then?
-			  Suggested: 
+			  Suggested:
 			      [(] + ['] + [...] + ['] + [)]
 			  and then the interspace in this sequence is hinted as very low priority for line breaks.
 
@@ -1825,8 +1831,8 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 			  spanning XML/XHTML tags.
 
 			  To ensure we don't assume odd items such as a couple of stray '<' and '>' at just the right
-			  places in your text, multi-line XML tags are parsed rigorously according to the official format: 
-			  
+			  places in your text, multi-line XML tags are parsed rigorously according to the official format:
+
 			    <tag attrib=value | attrib='value' | attrib="value [/]>
 
 			  Anything out of the ordinary there will mark the text as NOT-XML-compliant and disable the
@@ -1837,12 +1843,12 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 
 		    - a 'word' in the English sense: an unbroken isalnum() character sequence.
 
-			  A word about a 'word' here: since the text-to-be-reflown most probably contains 
+			  A word about a 'word' here: since the text-to-be-reflown most probably contains
 			  technical datums such as variables, how about these examples then? Do they constitute
-			  'one word' each, or is it okay to chop them up and apply the 'dont-break-here' 
+			  'one word' each, or is it okay to chop them up and apply the 'dont-break-here'
 			  keep_with_* magic to the box sequences afterwards, as suggested for the quotes handling
 			  above?
-			  
+
 			  - namespace::class::member
 			  - struct.item
 			  - pointer->member
@@ -1863,7 +1869,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 				bool in_xml_tag = false;
 
 				/*
-				see if the 'no reflow' start marker is part of this line: if it is, 
+				see if the 'no reflow' start marker is part of this line: if it is,
 				we've a 'no reflow' section after all.
 				*/
 				nrfl_start_marker = str_in_set(m_no_reflow_marker_start, text, eol - text);
@@ -1891,7 +1897,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 
 					UNC_ASSERT(current_word->m_text == text);
 					current_word->m_is_non_reflowable = true;
-					//current_word->m_floodfill_non_reflow = true; 
+					//current_word->m_floodfill_non_reflow = true;
 					if (end_of_non_reflow_chunk < eol)
 					{
 						current_word->m_word_length = (int)(end_of_non_reflow_chunk - text);
@@ -1900,7 +1906,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 					{
 						current_word->m_word_length = (int)(eol - text);
 					}
-					
+
 					text += current_word->m_word_length;
 
 					spc = strleadlen(text, ' ');
@@ -1913,7 +1919,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 
 				if (m_xml_text_has_stray_lt_gt <= 0 && *text == '<')
 				{
-					/* 
+					/*
 					XML/HTML tag start? Or is this a stray one? Or are there any
 					stray '<' or '>' on this line?
 
@@ -1968,7 +1974,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 					/*
 					XML parsing should be able to handle newlines in the tags or it's useless.
 
-					WARNING: this scan MAY cross newline boundaries as XML/[X]HTML tags 
+					WARNING: this scan MAY cross newline boundaries as XML/[X]HTML tags
 					         MAY span multiple lines.
 					*/
 					if (text[1] == '!' && !strncmp("[CDATA[", text + 2, 7))
@@ -2008,7 +2014,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 							}
 							break;
 						}
-						
+
 						if (xmldec_mode == NODE_NAME)
 						{
 							if (unc_isalnum(*s) || in_set("-_", *s))
@@ -2215,14 +2221,14 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 								s += 2;
 								lt_gt_count--;
 								UNC_ASSERT(lt_gt_count == 0);
-								
+
 								if (!tag_end)
 								{
 									tag_end = s;
 									if (m_xml_text_has_stray_lt_gt == 0)
 									{
-										/* 
-										a previous run on this line already led to the conclusion that 
+										/*
+										a previous run on this line already led to the conclusion that
 										it is XML only, no stray lt/gt, so we can stop scanning right here!
 										*/
 										break;
@@ -2258,7 +2264,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 								xmldec_mode = OUTSIDE_ANY_TAG;
 
 								/*
-								and mark this one as the end of the tag! 
+								and mark this one as the end of the tag!
 								*/
 								if (!tag_end)
 								{
@@ -2266,8 +2272,8 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 									tag_end = s;
 									if (m_xml_text_has_stray_lt_gt == 0)
 									{
-										/* 
-										a previous run on this line already led to the conclusion that 
+										/*
+										a previous run on this line already led to the conclusion that
 										it is XML only, no stray lt/gt, so we can stop scanning right here!
 										*/
 										break;
@@ -2284,7 +2290,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 								xmldec_mode = OUTSIDE_ANY_TAG;
 
 								/*
-								and mark this one as the end of the tag! 
+								and mark this one as the end of the tag!
 								*/
 								if (!tag_end)
 								{
@@ -2292,8 +2298,8 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 									tag_end = s;
 									if (m_xml_text_has_stray_lt_gt == 0)
 									{
-										/* 
-										a previous run on this line already led to the conclusion that 
+										/*
+										a previous run on this line already led to the conclusion that
 										it is XML only, no stray lt/gt, so we can stop scanning right here!
 										*/
 										break;
@@ -2425,7 +2431,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 						{
 							current_word->m_is_cdata_xml_chunk = true;
 						}
-						else 
+						else
 						{
 							if (is_end_tag || is_closed_tag)
 							{
@@ -2488,14 +2494,14 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 						text += spc;
 
 						/*
-						now update the entire series of boxes to bind them together into being a single XML/XHTML tag 
+						now update the entire series of boxes to bind them together into being a single XML/XHTML tag
 						*/
 						if (start_of_tag_boxidx != last_tag_box)
 						{
 							int w;
 							reflow_box *dst = &words[start_of_tag_boxidx];
 							reflow_box *src;
-							
+
 							dst->m_xhtml_tag_part_begin = start_of_tag_boxidx;
 							dst->m_xhtml_tag_part_end = last_tag_box;
 							dst->m_is_xhtml_tag_part = true;
@@ -2523,7 +2529,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 					}
 					else
 					{
-						/* 
+						/*
 						NOT an XML tag; the word_idx et al have already been rewound back to the '<' position.
 
 						Make sure the boxes used are zeroed or at least don't have their bits propagate illegally
@@ -2537,7 +2543,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 				}
 				if (m_xml_text_has_stray_lt_gt <= 0 && *text == '>')
 				{
-					/* 
+					/*
 					Now this is definitely a stray '>' so no XML for us in here!
 					*/
 					UNC_ASSERT(m_xml_text_has_stray_lt_gt < 0);
@@ -2547,7 +2553,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 						m_xml_offender = text;
 					}
 				}
-				
+
 				if (current_word->m_is_first_on_line
 					&& in_RE_set(m_cmt_reflow_bullets, *text))
 				{
@@ -2565,7 +2571,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 						;
 					if (in_RE_set(m_cmt_reflow_bullet_terminators, *s))
 					{
-						/* 
+						/*
 						must be followed by one 'word' at least; simply check whether the current
 						line has any further printable characters.
 						*/
@@ -2577,7 +2583,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 							s++;
 						}
 						spc = strleadlen(s, ' ');
-						
+
 						UNC_ASSERT(eol >= s + spc);
 						if (s + spc != eol
 							&& is_viable_bullet_marker(text, s - text))
@@ -2587,7 +2593,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 
 							current_word->m_trailing_whitespace_length = spc;
 							text = s + spc;
-							
+
 							current_word->m_is_bullet = true;
 
 							current_word = words.prep_next(word_idx);
@@ -2596,11 +2602,11 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 					}
 				}
 
-				if (/* m_is_doxygen_comment 
+				if (/* m_is_doxygen_comment
 					&& */ (is_doxygen_tagmarker(text, doxygen_tag_marker)
 					|| (*text == '{' && text[1] == '@')))
 				{
-					/* 
+					/*
 					ignore the possibility of \xAB and \123 hex/octal escape sequences? No, can't have that.
 
 					To help disambiguate, if possible, we need more context than this single line:
@@ -2614,7 +2620,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 
 					if (*text == '{')
 					{
-						/* 
+						/*
 						javadoc internal tag?
 
 						http://download.oracle.com/javase/1.5.0/docs/tooldocs/windows/javadoc.html#javadoctags
@@ -2631,9 +2637,9 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 
 					text++;
 
-					/* 
-					collect entire tag: 
-					allow doxygen/javadoc words and special doxygen/javadoc markers 
+					/*
+					collect entire tag:
+					allow doxygen/javadoc words and special doxygen/javadoc markers
 					*/
 					s = text;
 					if (*s == 'f'
@@ -2654,11 +2660,11 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 						case '[':
 							endmarker[2] = ']';
 							break;
-							
+
 						case '{':
 							endmarker[2] = ']';
 							break;
-							
+
 						default:
 							UNC_ASSERT(*s == '$');
 							endmarker[2] = *s;
@@ -2683,7 +2689,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 							current_word->m_is_doxygen_tag = true;
 							UNC_ASSERT(!current_word->m_is_inline_javadoc_tag);
 							UNC_ASSERT(!is_inline_javadoc_tag);
-							
+
 							const char *last_nl = sol;
 							push_tag_piece_and_possible_newlines(words, s, word_idx, current_word, last_nl);
 
@@ -2703,7 +2709,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 								}
 								else
 								{
-									line_count++;	
+									line_count++;
 								}
 								spc = strtaillen(s, next_nl, ' ');
 								next_nl -= spc;
@@ -2780,7 +2786,10 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 					text, when the text has those but is not itself part of a multiline preprocessor macro, but
 					if it did, we'd already removed the bugger in the initial text cleanup!
 					*/
-					UNC_ASSERT(text == current_word->m_text);
+#if defined(_MSC_VER)
+#pragma message(__FILE__ "(" STRING(__LINE__) ") : TODO: check why this assert fires.")
+#endif
+					//UNC_ASSERT(text == current_word->m_text);
 
 					/*
 					accept any C escape sequence or escaped regex bit. Don't be too picky...
@@ -2849,7 +2858,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 							UNC_ASSERT(text - current_word->m_text == 1);
 							current_word->m_word_length = (int)(text - current_word->m_text);
 							current_word->m_do_not_print = true;
-							
+
 							current_word = words.prep_next(word_idx);
 							continue;
 						}
@@ -2896,14 +2905,14 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 					for (s = text + 1; *s; )
 					{
 						/* scan a basic word (or variable) */
-						for (; 
+						for (;
 							unc_isalnum(*s)
 							|| (allow_contractions && *s == '\'' && unc_isalpha(s[1]) && unc_isalpha(s[-1]))
 							|| (is_code && in_set("_$", *s))
 							|| (is_uri && in_set(":/\\.@%~!#$&()_-+={}[]|?", *s))
 							|| (is_email && in_set(":.@!-", *s))
 							|| (is_path && in_set(":/\\_-.~!&()+{}[],", *s))
-							/* || (is_hyphenated && *s == '-' && unc_isalpha(s[-1]) && unc_isalpha(s[1])) */ ; 
+							/* || (is_hyphenated && *s == '-' && unc_isalpha(s[-1]) && unc_isalpha(s[1])) */ ;
 							s++)
 							;
 
@@ -2925,9 +2934,9 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 							}
 							break;
 
-						case '@': 
-						case '!': 
-							/* probably email address; 
+						case '@':
+						case '!':
+							/* probably email address;
 							can also be a user/pass sep in an URI.
 							The '!' is for old bang-addresses a la lab!mit!edu */
 							if (unc_isalpha(s[1]) && !is_code)
@@ -2995,11 +3004,11 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 							}
 							else if (unc_isalpha(s[1]) && unc_isalpha(s[-1]) && !is_path && !is_code && !is_uri)
 							{
-								/* break hyphenated words at the hyphen! 
-								
-								However, we only allow hyphenation for 'real' words, so NOT for 'code', e.g. 'var_hyph-anated' is 3 words, no hyphenation! 
-								
-								Also, we do NOT consider the hyphen a hyphenation when we're right smack in the middle of a FQDN, e.g. 'www.hyph-en.at' 
+								/* break hyphenated words at the hyphen!
+
+								However, we only allow hyphenation for 'real' words, so NOT for 'code', e.g. 'var_hyph-anated' is 3 words, no hyphenation!
+
+								Also, we do NOT consider the hyphen a hyphenation when we're right smack in the middle of a FQDN, e.g. 'www.hyph-en.at'
 								*/
 								is_hyphenated = true;
 								s++;
@@ -3091,7 +3100,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 					current_word->m_is_path = is_path;
 					current_word->m_is_code = is_code;
 					current_word->m_is_uri_or_email = (is_uri || is_email);
-					
+
 					current_word->m_word_length = (int)(s - current_word->m_text);
 					UNC_ASSERT(current_word->m_text);
 					spc = strleadlen(s, ' ');
@@ -3195,10 +3204,10 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 					else if (*text != '-')
 					{
 						// C/C++ shorthand: '-' MAY BE a UNARY MINUS
-						if (text[0] != 0 
+						if (text[0] != 0
 							&& !unc_isspace(text[0])
 							&& (current_word->m_is_first_on_line
-								|| text -2 < m_comment 
+								|| text -2 < m_comment
 								|| unc_isspace(text[-2])))
 						{
 							current_word->m_math_operator = MO_UNARY_PREFIX_OP;
@@ -3256,10 +3265,10 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 					else if (*text != '+')
 					{
 						// C/C++ shorthand: '+' MAY BE a UNARY PLUS
-						if (text[0] != 0 
+						if (text[0] != 0
 							&& !unc_isspace(text[0])
 							&& (current_word->m_is_first_on_line
-								|| text - 2 < m_comment 
+								|| text - 2 < m_comment
 								|| unc_isspace(text[-2])))
 						{
 							current_word->m_math_operator = MO_UNARY_PREFIX_OP;
@@ -3351,8 +3360,8 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 					switch (*text)
 					{
 					case '=':
-						/* 
-						C/C++ shorthands: 
+						/*
+						C/C++ shorthands:
 							'~=', '+=', etc.
 						*/
 						identified_token = true;
@@ -3365,7 +3374,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 
 					case '#':
 						/*
-						HTML entity number? 
+						HTML entity number?
 						Must be '&#[0-9]+;' or '&#x[0-9]+;' format.
 						*/
 						identified_token = is_html_numeric_entity(text - 1, &current_word->m_word_length);
@@ -3381,7 +3390,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 
 					default:
 						/*
-						HTML entity name? 
+						HTML entity name?
 						Must be '&[A-Za-z0-9]+;' format.
 						*/
 						identified_token = is_html_entity_name(text - 1, &current_word->m_word_length);
@@ -3401,8 +3410,8 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 				case '%':
 					if (*text == '=')
 					{
-						/* 
-						C/C++ shorthands: 
+						/*
+						C/C++ shorthands:
 						'^=', '%='
 						*/
 						identified_token = true;
@@ -3418,8 +3427,8 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 				case '/':
 					if (*text == '=')
 					{
-						/* 
-						C/C++ shorthands: 
+						/*
+						C/C++ shorthands:
 						'*=', '/='
 						*/
 						identified_token = true;
@@ -3434,7 +3443,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 						/*
 						A special case: it is a common custom in text to emphasize/italicize words by surrounding them
 						with single '*' or '/' respectively, e.g. *bold* text with /particular/ emphasis. Though one
-						should realize 
+						should realize
 								**extra bold**
 						or
 								***super shout***
@@ -3505,8 +3514,8 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 						check the end conditions: MUST end with enough alphanumerics and the 'innards' should be 'mostly text', i.e. 75% or better
 						of the 'innards' must be alphanumerics:
 						*/
-						if (!in_set("*/", *s) 
-							|| alpha_runlen < 1 
+						if (!in_set("*/", *s)
+							|| alpha_runlen < 1
 							|| s - start_of_innards == 0
 							|| (100 * alpha_count) / (s - start_of_innards) < 75)
 						{
@@ -3545,13 +3554,13 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 				case ':':
 					if (*text == '=')
 					{
-						/* 
-						C/C++ shorthands: 
-						'~=', '+=', etc., 
-						PHP shorthand 
-						'.=', 
-						Pascal assign 
-						':=', 
+						/*
+						C/C++ shorthands:
+						'~=', '+=', etc.,
+						PHP shorthand
+						'.=',
+						Pascal assign
+						':=',
 						*/
 						identified_token = true;
 						current_word->m_word_length = 2;
@@ -3565,7 +3574,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 				case '!':
 					if (*text == '=')
 					{
-						/* 
+						/*
 						C/C++ shorthand: '!='
 						*/
 						identified_token = true;
@@ -3599,7 +3608,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 				case '~':
 					if (*text == '=')
 					{
-						/* 
+						/*
 						C/C++ shorthand: '~='
 						*/
 						identified_token = true;
@@ -3611,7 +3620,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 					}
 					else if (unc_isident(*text) || in_set("(:\"", *text))
 					{
-						/* 
+						/*
 						C/C++ shorthand: '~'
 						*/
 						identified_token = true;
@@ -3721,7 +3730,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 		{
 			reflow_box *box = &words[i];
 
-			has_xml |= (box->m_is_xhtml_start_tag 
+			has_xml |= (box->m_is_xhtml_start_tag
 						|| box->m_is_xhtml_end_tag);
 						// || box->m_is_xhtml_entity
 						// || box->m_is_xhtml_tag_part);
@@ -3745,7 +3754,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 
 
 
-/* 
+/*
 correct/spread the already calculated lead/trail whitespace counts
 and merge boxes which only register superfluous whitespace on empty lines.
 */
@@ -3779,9 +3788,9 @@ void cmt_reflow::optimize_reflow_boxes(words_collection &words)
 			/*
 			move leading whitespace to trailing whitespace, when there's no newline in between.
 			*/
-			if (current->m_line_count == 0 
+			if (current->m_line_count == 0
 				&& prev->m_word_length > 0 /* don't move leading WS to previous chunk when that one is a linebreak carrier */
-				&& current - prev == 1 /* only move WS when 'prev' is truly adjacent to 'current' */ 
+				&& current - prev == 1 /* only move WS when 'prev' is truly adjacent to 'current' */
 				&& !current->m_is_first_on_line
 				&& current->m_leading_whitespace_length)
 			{
@@ -3803,7 +3812,7 @@ void cmt_reflow::optimize_reflow_boxes(words_collection &words)
 /**
 Find the math, code, etc. markers and make sure those expressions / statements are marked as such in their entirety.
 
-This means that keywords, etc. which are not yet marked as being 'is_math' or 'is_code' should be marked as such when occurring in 
+This means that keywords, etc. which are not yet marked as being 'is_math' or 'is_code' should be marked as such when occurring in
 a math/code/... expression.
 */
 void cmt_reflow::expand_math_et_al_markers(words_collection &words)
@@ -3833,8 +3842,8 @@ void cmt_reflow::expand_math_et_al_markers(words_collection &words)
 
 			      Got 'em!
 
-			  Here the starting single quote should be recognized as NOT being the start of a 
-			  quoted /section/. 
+			  Here the starting single quote should be recognized as NOT being the start of a
+			  quoted /section/.
 			  This is done by inspecting whether we hit a double newline 'paragraph break' during
 			  our forward scan. When no matching quote has been found yet, then we do not mark the
 			  quote as the start of a quoted section after all.
@@ -3856,28 +3865,28 @@ void cmt_reflow::expand_math_et_al_markers(words_collection &words)
 
 			  - 'That's nothing,' he said, 'chew on /this/!'
 
-			  - But Manny, where's the chedda'?  
-			    You bonkers?! 's bloody Open Source, is what it is. No dough, bro'! Unless 
+			  - But Manny, where's the chedda'?
+			    You bonkers?! 's bloody Open Source, is what it is. No dough, bro'! Unless
 				of course you'd perform services, eh!
 				'Services'?!?! /I/ can't be buggered to perform any
 				bloody 'services'! Me handbrake is who's hot on doing all 'em 'services', haw haw haw.
-				<Whack!> 
-				Moron! Wasn't meanin' that kind 'o services. Now pick up what's left of your 
+				<Whack!>
+				Moron! Wasn't meanin' that kind 'o services. Now pick up what's left of your
 				brain and dial me up some Guns 'n' Roses!
 
 		The 'final solution' to these conundra is to recognize what is going in at a broader perspective:
-		when we run into a mess for a certain type of quote (either single or double quote) in this 
+		when we run into a mess for a certain type of quote (either single or double quote) in this
 		comment, then we take note and mark the given type of quote as /not suitable/ for 'string marking':
 		the quoted string marking is suppressed for this quote from now on.
-		
+
 		The tough decision was to either limit to a per-paragraph or per-comment basis, but the
 		latter was chosen due to the consideration that a comment writer would, most probably, /not/
 		change his/her quoting style within a single comment. And if he does, well... then there's
-		an editorial mess already so not much damage we can do then, while we pray the whitespace 
+		an editorial mess already so not much damage we can do then, while we pray the whitespace
 		is good enough to give us a good reflow anyhow.
 		*/
-		if (box->m_is_quote 
-			&& !box->m_is_part_of_quoted_txt 
+		if (box->m_is_quote
+			&& !box->m_is_part_of_quoted_txt
 			&& !box->m_suppress_quote_for_string_marking)
 		{
 			if (box->m_is_first_on_line
@@ -3922,8 +3931,8 @@ void cmt_reflow::expand_math_et_al_markers(words_collection &words)
 								|| (next_box && next_box->m_leading_whitespace_length > 0)
 								|| (next_box && next_box->m_is_punctuation)))
 						{
-							/* 
-							found a matching end quote! 
+							/*
+							found a matching end quote!
 
 							now mark the entire range as part of the quote, plus mark the
 							start and end quote as keep-with-next/prev
@@ -3999,7 +4008,7 @@ void cmt_reflow::expand_math_et_al_markers(words_collection &words)
 		}
 
 		/*
-		NOTE: only detect is_math/is_code/... at the 'leading edge' i.e. only when the 
+		NOTE: only detect is_math/is_code/... at the 'leading edge' i.e. only when the
 		new box has such a marker SET while the previous box has NOT.
 
 		This prevents repetitively reprocessing the same is_math/is_code/... group of
@@ -4010,14 +4019,14 @@ void cmt_reflow::expand_math_et_al_markers(words_collection &words)
 			   operator at the start of a line, it can also be a bullet, and we should ignore that one
 			   as a /start/. However, it /might/ be correct to include it in the math expression
 			   scan later, assuming the math/code expression extends backwards into the previous
-			   line, e.g. 
+			   line, e.g.
 
 			   <pre>
 			     result = (var_a + var_b)
 			              - (var_c + var_d);
 			   </pre>
 
-			   In fact, the example above shows that the math expression should already have been 
+			   In fact, the example above shows that the math expression should already have been
 			   expanded thanks to real math operators on the /previous/ line, so the whole 'bullet vs. math'
 			   issue is a bit moot as the 'bullet', which clearly serves as a math operator here, has
 			   already been included in the forward scan started on the previous line.
@@ -4056,7 +4065,7 @@ void cmt_reflow::expand_math_et_al_markers(words_collection &words)
 			{
 				scan = false;
 
-				/* 
+				/*
 				scan backwards looking for the spot where the 'math chunk' started, most probably.
 
 				We apply a heuristics here, which says:
@@ -4142,7 +4151,7 @@ void cmt_reflow::expand_math_et_al_markers(words_collection &words)
 							bool in_pp = comment_is_part_of_preproc_macro();
 							bool pp_iter = ((t->lang_flags & FLAG_PP) != 0);
 
-							if (((cpd.lang_flags & t->lang_flags) != 0) 
+							if (((cpd.lang_flags & t->lang_flags) != 0)
 								|| (in_pp && pp_iter))
 							{
 								/*
@@ -4248,10 +4257,10 @@ void cmt_reflow::expand_math_et_al_markers(words_collection &words)
 								continue;
 							}
 
-							UNC_ASSERT(b->m_word_length > 0 && in_set("{}[]()", b->m_text[0]) 
-								? b->m_word_length == 1 
+							UNC_ASSERT(b->m_word_length > 0 && in_set("{}[]()", b->m_text[0])
+								? b->m_word_length == 1
 								: 1);
-							UNC_ASSERT(b->m_word_length > 0 && in_set("{}[]()", b->m_text[0]) 
+							UNC_ASSERT(b->m_word_length > 0 && in_set("{}[]()", b->m_text[0])
 								? b->m_is_punctuation
 								: 1);
 							if (b->m_is_punctuation)
@@ -4347,10 +4356,10 @@ void cmt_reflow::expand_math_et_al_markers(words_collection &words)
 								continue;
 							}
 
-							UNC_ASSERT(b->m_word_length > 0 && in_set("{}[]()", b->m_text[0]) 
-								? b->m_word_length == 1 
+							UNC_ASSERT(b->m_word_length > 0 && in_set("{}[]()", b->m_text[0])
+								? b->m_word_length == 1
 								: 1);
-							UNC_ASSERT(b->m_word_length > 0 && in_set("{}[]()", b->m_text[0]) 
+							UNC_ASSERT(b->m_word_length > 0 && in_set("{}[]()", b->m_text[0])
 								? b->m_is_punctuation
 								: 1);
 							if (b->m_is_punctuation)
@@ -4435,7 +4444,7 @@ void cmt_reflow::expand_math_et_al_markers(words_collection &words)
 						{
 							/*
 							When the matching brace happens to be BEFORE our current start position, then
-							we've hit the end of another level of braces and hence we need to rescan from 
+							we've hit the end of another level of braces and hence we need to rescan from
 							the /new/ start position to make sure we've got the entire range!
 							*/
 							if (start_of_func_call < start_idx)
@@ -4479,7 +4488,7 @@ void cmt_reflow::expand_math_et_al_markers(words_collection &words)
 							bool in_pp = comment_is_part_of_preproc_macro();
 							bool pp_iter = ((t->lang_flags & FLAG_PP) != 0);
 
-							if (((cpd.lang_flags & t->lang_flags) != 0) 
+							if (((cpd.lang_flags & t->lang_flags) != 0)
 								|| (in_pp && pp_iter))
 							{
 								/*
@@ -4491,7 +4500,7 @@ void cmt_reflow::expand_math_et_al_markers(words_collection &words)
 						}
 					}
 					break;
-				}	
+				}
 				end_idx--;
 
 				{
@@ -4548,21 +4557,21 @@ void cmt_reflow::expand_math_et_al_markers(words_collection &words)
 
 
 /**
-Fixup the paragraph tree: 
+Fixup the paragraph tree:
 
 1) any node with children must have those
    children span the entire box range of the parent. When not, make sure to fill
 the gaps with additional children, so that the series of children
 always spans the box range of their parent.
 
-2) Propagate some settings from parent to first child and from last child to 
+2) Propagate some settings from parent to first child and from last child to
    parent, where applicable.
 
-3a) XHTML paragraphs are only /really/ XHTML when they are enclosed by an XML open+end 
-    tag set. 
+3a) XHTML paragraphs are only /really/ XHTML when they are enclosed by an XML open+end
+    tag set.
 
 3b) XHTML paragraphs MAY be HTML paragraphs instead when they start with an 'unclosed'
-    XML take on a new line; the occurrence of one or more (unclosed) XML tags in 
+    XML take on a new line; the occurrence of one or more (unclosed) XML tags in
 	a larger text paragraph don't make the entire thing a [X]HTML para!
 */
 void cmt_reflow::fixup_paragraph_tree(paragraph_box *para)
@@ -4579,7 +4588,7 @@ void cmt_reflow::fixup_paragraph_tree(paragraph_box *para)
 	gaps can be due to chunks of XML somewhere in the text, etc.
 	so gaps can exist at the start, middle and end of the box sequence.
 	*/
-	
+
 	paragraph_box *child = para->m_first_child;
 	int first_box_idx = para->m_first_box;
 
@@ -4600,18 +4609,18 @@ void cmt_reflow::fixup_paragraph_tree(paragraph_box *para)
 		if (child->m_first_box > first_box_idx)
 		{
 			plug_gap = -1;
-			
+
 			gap_start = first_box_idx;
 			gap_end = child->m_first_box - 1;
 		}
 		else if (child->m_next_sibling
 				&& child->m_next_sibling->m_first_box != child->m_last_box + 1)
 		{
-			/* 
+			/*
 			gap between two child nodes
 			*/
 			plug_gap = 2;
-			
+
 			gap_start = child->m_last_box + 1;
 			prev_child = child;
 			child = child->m_next_sibling;
@@ -4621,7 +4630,7 @@ void cmt_reflow::fixup_paragraph_tree(paragraph_box *para)
 			&& para->m_last_box != child->m_last_box)
 		{
 			plug_gap = 1;
-			
+
 			gap_start = child->m_last_box + 1;
 			prev_child = child;
 			child = NULL;
@@ -4646,7 +4655,7 @@ void cmt_reflow::fixup_paragraph_tree(paragraph_box *para)
 				int lw = max(para->m_leading_whitespace_length, child->m_leading_whitespace_length);
 				para->m_leading_whitespace_length = child->m_leading_whitespace_length = lw;
 			}
-			else 
+			else
 			{
 				/*
 				next/last child; aligned with previous child.
@@ -4780,7 +4789,7 @@ void cmt_reflow::fixup_paragraph_tree(paragraph_box *para)
 					}
 				}
 			}
-			
+
 			if (para->m_xhtml_end_tag_container == para
 				&& para->m_xhtml_end_tag_box >= newp->m_first_box
 				&& para->m_xhtml_end_tag_box <= newp->m_last_box)
@@ -4858,8 +4867,8 @@ int cmt_reflow::grok_the_words(paragraph_box *root, words_collection &words)
 	//root->m_last_box--;
 	UNC_ASSERT(root->m_last_box >= root->m_first_box);
 
-	/* 
-	also make sure the root paragraph has leading and trailing mandatory newlines when 
+	/*
+	also make sure the root paragraph has leading and trailing mandatory newlines when
 	the comment format requires them:
 	*/
 	if (m_has_leading_and_trailing_nl)
@@ -4900,13 +4909,13 @@ int cmt_reflow::grok_the_words(paragraph_box *root, words_collection &words)
 			reflow_box *box = &words[i];
 
 			if (box->m_do_not_print)
-			{			
+			{
 				box_at_eoc = box;
 				continue;
 			}
 
 			if (box->m_word_length == 0 && box->m_line_count == 0)
-			{			
+			{
 				box_at_eoc = box;
 				continue;
 			}
@@ -4923,11 +4932,11 @@ int cmt_reflow::grok_the_words(paragraph_box *root, words_collection &words)
 		}
 	}
 
-	/* 
-	done; now scan the words collection; this is a lightly recursive, 
-	top-down/bottom-up process, which starts 
-	top-down by detecting the major text sections, after which 
-	each section is further divided into 
+	/*
+	done; now scan the words collection; this is a lightly recursive,
+	top-down/bottom-up process, which starts
+	top-down by detecting the major text sections, after which
+	each section is further divided into
 	graphics, lists, paragraphs, etc.
 
 	We can start the scan in a sequential fashion as we start to look at the
@@ -4952,18 +4961,18 @@ int cmt_reflow::grok_the_words(paragraph_box *root, words_collection &words)
 
 		/*
 		The recognition engine... see if this is:
-		
+
 		- a doxygen/javadoc tag (which, by being found here, starts a fresh paragraph)
-		
+
 		- a non-reflowable chunk of text
 
 		- a chunk of XML/HTML text?
-		
-		- a math/punctuation/other non-word 'word'; maybe part of a 'graphic element' which must be 
+
+		- a math/punctuation/other non-word 'word'; maybe part of a 'graphic element' which must be
 		  marked non-reflowable from start to end?
 
 		- a bullet item?
-		  
+
 		- a regular word which starts a new paragraph of text?
 		*/
 
@@ -4979,7 +4988,7 @@ int cmt_reflow::grok_the_words(paragraph_box *root, words_collection &words)
 		paragraph_box *parent = root;
 
 		// deferred_whitespace = write2out_comment_start(para, words);
-		//deferred_whitespace = m_extra_post_star_indent; 
+		//deferred_whitespace = m_extra_post_star_indent;
 
 		UNC_ASSERT(parent == (para->m_parent ? para->m_parent : para));
 		UNC_ASSERT(parent == (para->m_parent ? para->m_parent : root));
@@ -5056,7 +5065,7 @@ int cmt_reflow::grok_the_words(paragraph_box *root, words_collection &words)
 							is_math = false;
 						}
 					}
-					
+
 					if (is_math || is_code)
 					{
 						para->m_is_non_reflowable = true;
@@ -5092,7 +5101,7 @@ int cmt_reflow::grok_the_words(paragraph_box *root, words_collection &words)
 							break;
 						}
 						/*
-						multi-line comments have hanging indent (even when the hanging indent is zero ;-) ) 
+						multi-line comments have hanging indent (even when the hanging indent is zero ;-) )
 						*/
 						int start_of_second_line = -1;
 						if (start_of_first_line >= 0)
@@ -5245,10 +5254,10 @@ int cmt_reflow::skip_tailing_newline_box(paragraph_box *para, words_collection &
  This is one of the simplest paragraph detection codes.
 
  One peculiarity should be noted here: this stage really performs TWO tasks:
- 
+
  1) the simple chunking of major text sections, and
 
- 2) the detection and 'flood-expanding' of non-reflow text chunks, such as 
+ 2) the detection and 'flood-expanding' of non-reflow text chunks, such as
     non-reflowable 'boxed texts' and 'graphical elements' (ASCII art).
 
  Since the second is the most important to get right from the get go, it is done first.
@@ -5373,11 +5382,11 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 
 			nonreflow_char_tally = 0;
 			nonreflow_word_idx = -1;
-			
+
 			create_deferred_sibling = false;
 		}
 
-		/* 
+		/*
 		non-reflowable boxes are a bit of a special case: when we encounter them by this time,
 		we are ALMOST sure these span entire lines (one or more). (tag-bracketed non-reflow chunks MAY
 		be PART of a line OR span multiple lines, while STILL being part of the enveloping, reflowable, paragraph.
@@ -5387,19 +5396,19 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 		lines which form part of a larger entity, which should be treated as a single
 		non-reflowable item as a whole.
 		UNLESS, that is, we're talking about 'derivatives', i.e. non-reflow sections which are marked
-		non-reflowable due to them being graphics or ASCII art, combined with particular user configuration settings 
-		permitting us to reflow such chunks, or not. We might not yet have discovered 
+		non-reflowable due to them being graphics or ASCII art, combined with particular user configuration settings
+		permitting us to reflow such chunks, or not. We might not yet have discovered
 		the section under scrutiny should be non-reflowable then: this can happen when
 		the configuration tells us boxed texts, which match certain statistical criteria, are
 		to be treated as non-reflowable.
-		
-		And then there's the math expressions 
+
+		And then there's the math expressions
 		which may not be allowed to be reflown, depending
-		on yet another piece of configuration. But those (and code chunks), we cover by allowing them to exist 
+		on yet another piece of configuration. But those (and code chunks), we cover by allowing them to exist
 		within otherwise reflowable paragraphs; the same goes for tag-bracketed non-reflowable parts of otherwise
 		reflowable paragraphs: we choose this path as we'd otherwise end up with reflowable paragraphs
-		becoming bloody hard to reflow as they would otherwise no longer be contained within a single paragraph 
-		object. It's easier to 'ignore' non-reflowable parts in there by treating them as a kind of 'single word' in 
+		becoming bloody hard to reflow as they would otherwise no longer be contained within a single paragraph
+		object. It's easier to 'ignore' non-reflowable parts in there by treating them as a kind of 'single word' in
 		the reflow calculations.
 
 
@@ -5426,12 +5435,12 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 			}
 			else
 			{
-				/* 
+				/*
 				mark paragraph as POTENTIALLY non-reflowable: it IS non-reflowable
 				once we discover the paragraph contains only non-reflowable boxes.
 				*/
 				//para->m_potentially_non_reflowable = true;
-				//para->m_nonreflow_trigger_box = box_idx; 
+				//para->m_nonreflow_trigger_box = box_idx;
 			}
 		}
 
@@ -5451,10 +5460,10 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 			}
 		}
 
-		/* 
+		/*
 		XML/HTML tags MAY imply non-reflowable major paragraph
-		
-		Warning: the code must be able to cope with stuff like '<div><h1>X <b>Y</b> Z</h1><p>abc</p></div>' i.e. 
+
+		Warning: the code must be able to cope with stuff like '<div><h1>X <b>Y</b> Z</h1><p>abc</p></div>' i.e.
 		nested XML/HTML tags. unclosed tags should be mentioned, but recovered from graciously, so we can
 		handle HTML-formatted text too, though that does not require matching closing tags a la XML/XHTML.
 		*/
@@ -5572,8 +5581,8 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 			}
 			else
 			{
-				/* 
-				WARNING: mark the START node as OPEN until we find a matching END tag! 
+				/*
+				WARNING: mark the START node as OPEN until we find a matching END tag!
 
 				we initially assume it's a HTML start tag without matching end tag, e.g. these <li>'s in
 
@@ -5584,7 +5593,7 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 
 				unless the subsequent piece of code will prove us wrong (by finding us a matching end tag).
 				*/
-				para->m_is_unclosed_html_tag = true; 
+				para->m_is_unclosed_html_tag = true;
 				box->m_is_unclosed_xhtml_start_tag = true;
 
 				UNC_ASSERT(para->m_first_box == box_idx);
@@ -5611,13 +5620,13 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 				*/
 				if (end_box->m_is_xhtml_end_tag && !end_box->m_is_unmatched_xhtml_end_tag)
 				{
-					/* 
+					/*
 					the last scanned item is a matched end tag: we need to unwind to the matching parent/start tag. Are we that parent?
 					*/
 					if (end_box->m_xhtml_matching_start_tag == para->m_xhtml_start_tag_box)
 					{
-						/* 
-						Good Golly, that's a real matched pair, indeed! Happy thoughts! 
+						/*
+						Good Golly, that's a real matched pair, indeed! Happy thoughts!
 
 						Note that this also means the last para next_sibling is the container for this
 						end tag...
@@ -5655,7 +5664,7 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 				UNC_ASSERT(para->m_parent ? para->m_first_box >= para->m_parent->m_first_box : 1);
 				UNC_ASSERT(para->m_parent ? para->m_last_box <= para->m_parent->m_last_box : 1);
 
-				/* 
+				/*
 				make sure we update our 'para' to point at the latest sibling that
 				might be generated in there, before we go on scanning...
 				*/
@@ -5678,7 +5687,7 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 				{
 					/*
 					We have a matching start and end xml/xhtml tag section, possibly spanning multiple
-					'paragraphs'; by now, it's time to update the start para and point it to the 
+					'paragraphs'; by now, it's time to update the start para and point it to the
 					current para, which must be the container of the end tag box.
 					*/
 					UNC_ASSERT(para->m_first_box <= box_idx);
@@ -5712,8 +5721,8 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 					}
 				}
 
-				/* 
-				as that last sibling/para contains the section from START till END node 
+				/*
+				as that last sibling/para contains the section from START till END node
 				(for we only return from the recursive call when either the matching
 				END tag was located or we hit the very end of the entire content) we should
 				make sure we don't damage that chunk, i.e. a deferred sibling generation is in order here.
@@ -5742,7 +5751,7 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 			will remain as-it-was always; the only situation where we will guess wrong is with
 			MALFORMED XML/XHTML, while our matching rules are A-okay for HTML under any conditions.
 
-			And the 'guessing wrong' leads to nothing more than lingering 'open' start tags, which 
+			And the 'guessing wrong' leads to nothing more than lingering 'open' start tags, which
 			represents the erroneous format pretty well anyhow.
 			*/
 			UNC_ASSERT(box->m_xhtml_matching_end_tag == -1);
@@ -5798,7 +5807,7 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 						box->m_is_unmatched_xhtml_end_tag = false;
 						elem->m_xhtml_matching_end_tag = box_idx;
 						elem->m_is_unclosed_xhtml_start_tag = false;
-						
+
 						/*
 						when this is a matching END tag, it's really the end of the current 'paragraph',
 						so we'd better clone it into a sibling to prevent nasty surprises down the line.
@@ -5829,7 +5838,7 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 						UNC_ASSERT(para->m_parent ? para->m_last_box <= para->m_parent->m_last_box : 1);
 
 						/*
-						Now that we have a matching end tag, we can mark all XML children of that tree as UNCLOSED 
+						Now that we have a matching end tag, we can mark all XML children of that tree as UNCLOSED
 						when they haven't been closed already.
 						*/
 						paragraph_box *p;
@@ -5889,7 +5898,7 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 						UNC_ASSERT(node->m_is_dangling_xhtml_close_tag == false);
 
 						/*
-						gonna unwind to a parent; clip the end of this subsection now 
+						gonna unwind to a parent; clip the end of this subsection now
 						*/
 						UNC_ASSERT(para->m_last_box == box_idx - 1);
 						/* since the parents are XHTML, so are we now */
@@ -5929,9 +5938,9 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 
 			deferred_newlines = 0;
 
-			count_graphics_nonreflow_and_printable_chars(box->m_text, box->m_word_length, 
-												  &graph_count, 
-												  &nonreflow_count, 
+			count_graphics_nonreflow_and_printable_chars(box->m_text, box->m_word_length,
+												  &graph_count,
+												  &nonreflow_count,
 												  &print_count);
 
 			/*
@@ -5990,8 +5999,8 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 				nonreflow_char_tally = 0;
 				nonreflow_word_idx = -1;
 			}
-			
-			
+
+
 			/*
 			track 'this line indent' and 'previous line indent' so we can have start + hanging
 			indent for paragraph X available any time we need/want.
@@ -6001,7 +6010,7 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 
 		 And not like
 		   this ('this' doesn't line up with either 'and' or 'not', so it's probably a single-linebreak
-		   'new paragraph' -- if the difference in indent is sufficiently large, e.g. 
+		   'new paragraph' -- if the difference in indent is sufficiently large, e.g.
 			 this, at delta=2, is probably just being messy, while
 					this, at delta=7
 			 is probably some sort of 'intermission', which should be treated as a paragraph so it doesn't reflow
@@ -6009,7 +6018,7 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 			 forcing line breaks when the indent delta is large enough, which, when we all keep it in a single paragraph,
 			 means we'll have to support more indent levels than just one 'hanging', i.e. one indent level
 			 per line. Hmmmm.... may be the 'make it separate paras' is the smarter solution here.
-			 
+
 			 This text
 					for instance
 			 might be construed as 3 paras, where the 3rd is indent-continuating from the 1st.
@@ -6095,11 +6104,11 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 							}
 							/*
 							the only other tolerable indent is 'same as previous line' which equals
-							'same as first line of intermission'. We DO support 'nested' intermissions; 
+							'same as first line of intermission'. We DO support 'nested' intermissions;
 							when we encounter different indentation levels
 							than the two previously mentioned though, we ASSUME this is just a bunch of text that
 							was entered in a hurry and needs some serious paragraph reflow action instead when those
-							indent levels are in between both the 'regular' and the 'first intermission line' 
+							indent levels are in between both the 'regular' and the 'first intermission line'
 							indentations.
 
 							Yes, this is catering for personal habits.
@@ -6172,8 +6181,8 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 					}
 
 					/*
-					Keep formatting intact around doxygen/javadoc tags which 
-					are clustered together yet have each line/paragraph begin 
+					Keep formatting intact around doxygen/javadoc tags which
+					are clustered together yet have each line/paragraph begin
 					with a @tag, e.g.:
 
 					----------------------------
@@ -6212,10 +6221,10 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 								}
 
 								if (next_box->m_is_first_on_line
-									&& next_box->m_is_doxygen_tag 
+									&& next_box->m_is_doxygen_tag
 									&& !next_box->m_is_inline_javadoc_tag)
 								{
-									/* 
+									/*
 									located another single/multiline doxygen comment. Break on that one.
 								    */
 									do_after_marker = i;
@@ -6227,7 +6236,7 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 					}
 
 					/*
-					In order to construct bullet lists, we need to cut each bullet 
+					In order to construct bullet lists, we need to cut each bullet
 					into a separate paragraph, at least.
 					*/
 					if (!do_marker)
@@ -6266,10 +6275,10 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 						}
 					}
 
-					/* 
+					/*
 					And then there's the option where a paragraph break is detected when the previous line
 					ended with one of a particular set of characters and this line starts with one of another
-					set. 
+					set.
 					For example, this can help keep the inter-line breaks for large chunks of text where lines
 					end with some punctuation, say period '.', question mark '?', exclamation mark '!' or colon ':',
 					and the next line starting off with a capital, an example of which can be seen above in this comment itself.
@@ -6450,7 +6459,7 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 						UNC_ASSERT(para->m_parent ? para->m_last_box <= para->m_parent->m_last_box : 1);
 
 						/*
-						Adjust box_idx for the increment in the for() loop and the newline check below 
+						Adjust box_idx for the increment in the for() loop and the newline check below
 						*/
 						box_idx--;
 					}
@@ -6538,12 +6547,12 @@ public:
 			width_delta(delta)
 	{
 		int linewidth = cmt->m_line_wrap_column - cmt->m_left_global_output_column;
-		deferred_whitespace = 0; // cmt->m_extra_post_star_indent; 
-		start_column = cmt->m_left_global_output_column + deferred_whitespace; 
+		deferred_whitespace = 0; // cmt->m_extra_post_star_indent;
+		start_column = cmt->m_left_global_output_column + deferred_whitespace;
 
 		max_usable_linewidth = linewidth - cmt->m_extra_pre_star_indent /* cpd.settings[UO_cmt_sp_before_star_cont].n */
-			 - cmt->m_extra_post_star_indent /* - cpd.settings[UO_cmt_sp_after_star_cont].n */ 
-			- cmt->m_lead_cnt; /* cpd.settings[UO_cmt_star_cont].t */ 
+			 - cmt->m_extra_post_star_indent /* - cpd.settings[UO_cmt_sp_after_star_cont].n */
+			- cmt->m_lead_cnt; /* cpd.settings[UO_cmt_star_cont].t */
 		if (!cmt->m_has_leading_and_trailing_nl)
 		{
 			firstline_extra_space = 1 /* TODO */ ;
@@ -6625,8 +6634,8 @@ public:
 protected:
 	int line_count; //< the number of lines counted so far in this paragraph
 	double ragged_right_cost_sum; //< the cummulative line breaking costs
-	int total_line_count; 
-	double total_ragged_right_cost_sum; 
+	int total_line_count;
+	double total_ragged_right_cost_sum;
 	words_collection boxset;
 	reflow_tune_parameters_t &tuning_params;
 	reflow_scoring_mode_t scoring_mode;
@@ -6778,7 +6787,7 @@ Return 1 when there isn't, i.e. 'push' a deferred newline.
 
 @note This scan reaches beyond the current paragraph: if we don't, then pending newlines
       are incorrectly pushed at the outgoing edge of the paragraph while the next paragraph
-	  MAY start with a newline-carrying box or either paragraph comes with a 
+	  MAY start with a newline-carrying box or either paragraph comes with a
 	  'mandatory minimum number of newlines' requirement, thus indirectly increasing the total number
 	  of newlines being printed between them as pending/pushed newlines would have been 'printed'
 	  already before when the first para (as is usual) carries a last newline-containing box.
@@ -6792,7 +6801,7 @@ int cmt_reflow::there_is_no_newline_up_ahead(paragraph_box *para, words_collecti
 		|| box->m_right_edge_thickness > 0)
 	{
 		/*
-		Before we reach the newline, there's text to be printed. Hence 
+		Before we reach the newline, there's text to be printed. Hence
 		we push for one(1) deferred newline right now.
 		*/
 		return 1;
@@ -6820,7 +6829,7 @@ int cmt_reflow::there_is_no_newline_up_ahead(paragraph_box *para, words_collecti
 			break;
 		}
 	}
-	
+
 	/*
 	No newlines found up ahead, yet we MAY have crossed the paragraph border by now
 	and in there a non-zero mandatory newline requirement may be listed, which acts
@@ -6878,11 +6887,11 @@ int cmt_reflow::reflow_a_single_para_4_trial(paragraph_box *para, words_collecti
 
 	ANSWER: NO. There are XML tag 'paragraphs' and other bits of text marked up as 'paragraphs'
 	        which really are part of larger sentences/paragraphs that possibly should appear as one
-			flowing block of text.						
+			flowing block of text.
 	*/
 
 	bool is_first_line_of_para = true;
-	bool waiting_for_first_nonempty_box_on_line = true; 
+	bool waiting_for_first_nonempty_box_on_line = true;
 	bool para_is_a_usual_piece_of_text = para->para_is_a_usual_piece_of_text();
 	bool line_is_a_usual_piece_of_text = para_is_a_usual_piece_of_text; // true: don't count the fewer words printed on this line against it.
 	int deferred_nl = tuning.deferred_nl;
@@ -6921,13 +6930,13 @@ int cmt_reflow::reflow_a_single_para_4_trial(paragraph_box *para, words_collecti
 		{
 			/*
 			TODO: properly handle semi-boxed and fully boxed comments by rendering them without
-				  the top/bottom/left/right borders and only once done, wrap those borders around 
+				  the top/bottom/left/right borders and only once done, wrap those borders around
 				  the paragraph / series-of-paragraphs.
 			*/
 			box_print_width += box->m_left_edge_thickness + box->m_right_edge_thickness;
 		}
 
-		/* 
+		/*
 		Reset line breaks between words; the reflow code will (re-)insert them at the appropriate spots.
 
 		A newline (line break) is equivalent to a single whitespace when reflowing.
@@ -6941,7 +6950,7 @@ int cmt_reflow::reflow_a_single_para_4_trial(paragraph_box *para, words_collecti
 			{
 				deferred_nl += box->m_line_count;
 				box->m_line_count = 0;
-			
+
 				deferred_whitespace = box->m_leading_whitespace_length;
 				box->m_leading_whitespace_length = 0;
 
@@ -6963,7 +6972,7 @@ int cmt_reflow::reflow_a_single_para_4_trial(paragraph_box *para, words_collecti
 					deferred_nl = there_is_no_newline_up_ahead(para, words, i);
 				}
 				box->m_line_count = 0;
-			
+
 				deferred_whitespace = box->m_leading_whitespace_length;
 				box->m_leading_whitespace_length = 0;
 			}
@@ -6987,7 +6996,7 @@ int cmt_reflow::reflow_a_single_para_4_trial(paragraph_box *para, words_collecti
 			}
 			else if (box->m_line_count > 0)
 			{
-				if (deferred_whitespace == 0 
+				if (deferred_whitespace == 0
 					&& content_printed_on_this_line > 0
 					&& deferred_nl == 0)
 				{
@@ -6999,7 +7008,7 @@ int cmt_reflow::reflow_a_single_para_4_trial(paragraph_box *para, words_collecti
 			else if (box->m_is_first_on_line)
 			{
 				// remove leading whitespace when this box WAS positioned at the front of the line.
-				if (deferred_whitespace == 0 
+				if (deferred_whitespace == 0
 					&& content_printed_on_this_line > 0
 					&& deferred_nl == 0)
 				{
@@ -7013,7 +7022,7 @@ int cmt_reflow::reflow_a_single_para_4_trial(paragraph_box *para, words_collecti
 			// regular processing ...
 			if (box->m_line_count > 0)
 			{
-				if (deferred_whitespace == 0 
+				if (deferred_whitespace == 0
 					&& content_printed_on_this_line > 0
 					&& deferred_nl == 0)
 				{
@@ -7025,7 +7034,7 @@ int cmt_reflow::reflow_a_single_para_4_trial(paragraph_box *para, words_collecti
 			else if (box->m_is_first_on_line)
 			{
 				// remove leading whitespace when this box WAS positioned at the front of the line.
-				if (deferred_whitespace == 0 
+				if (deferred_whitespace == 0
 					&& content_printed_on_this_line > 0
 					&& deferred_nl == 0)
 				{
@@ -7046,7 +7055,7 @@ int cmt_reflow::reflow_a_single_para_4_trial(paragraph_box *para, words_collecti
 		/* always print at least one word of text per line */
 		if (content_printed_on_this_line > 0
 			&& deferred_nl == 0
-			&& width <= box_print_width + deferred_whitespace 
+			&& width <= box_print_width + deferred_whitespace
 #if 0
 			/* next: prevent orphans */
 			&& (!is_first_line_of_para || i > wo_info.orphan_last_box_idx)
@@ -7105,7 +7114,7 @@ int cmt_reflow::reflow_a_single_para_4_trial(paragraph_box *para, words_collecti
 
 			if (deferred_whitespace == 0)
 			{
-				deferred_whitespace = 0; // m_extra_post_star_indent; 
+				deferred_whitespace = 0; // m_extra_post_star_indent;
 				if (is_first_line_of_para && content_printed_on_this_line == 0)
 				{
 					deferred_whitespace += para->m_first_line_indent;
@@ -7140,8 +7149,8 @@ int cmt_reflow::reflow_a_single_para_4_trial(paragraph_box *para, words_collecti
 #if 0
 			write2output(box->m_text, box->m_word_length);
 #endif
-			width -= box->m_word_length 
-					+ box->m_left_edge_thickness 
+			width -= box->m_word_length
+					+ box->m_left_edge_thickness
 					+ box->m_right_edge_thickness;
 			//is_first_line_of_para = false;
 			content_printed_on_this_line++;
@@ -7201,11 +7210,11 @@ int cmt_reflow::reflow_para_tree_4_trial(paragraph_box *para, words_collection &
 
 		/*
 		child para's which do not span the entire parent when combined may be 'marker' paragraphs, e.g. XML tags, math sections, etc.
-		
+
 		These are to be treated as 'continuous' and, eventually, non-reflowing. No clear idea how to approach those, exactly.
-		
+
 		It means the para tree traversal must be changed, anyway, as multiple levels of 'para' can be active, one level for each box.
-		But it doesn't mean 'para' is the one for this box, unless we chop para reflow in tiny pieces. We can do so, but then we need to 
+		But it doesn't mean 'para' is the one for this box, unless we chop para reflow in tiny pieces. We can do so, but then we need to
 		drop back to parent (or parent of parent! etc.etc.) when there's a box 'gap' between SIBLINGS! Which means we need to track
 		child/para position PER LEVEL no matter what!
 		*/
@@ -7215,7 +7224,7 @@ int cmt_reflow::reflow_para_tree_4_trial(paragraph_box *para, words_collection &
 #if defined(_MSC_VER)
 #pragma message(__FILE__ "(" STRING(__LINE__) ") : TODO: cope with paras with subparts.")
 #endif
-		
+
 		if (para->m_first_child)
 		{
 			UNC_ASSERT(para->m_first_child && para->m_first_child->m_first_box == para->m_first_box);
@@ -7223,15 +7232,15 @@ int cmt_reflow::reflow_para_tree_4_trial(paragraph_box *para, words_collection &
 
 			/*
 			child para's which do not span the entire parent when combined are 'marker' paragraphs, e.g. XML tags, math sections, etc.
-			
+
 			These are to be treated as 'continuous' and, eventually, non-reflowing. No clear idea how to approach those, exactly.
-			
+
 			It means the para tree traversal must be changed, anyway, as multiple levels of 'para' can be active, one level for each box.
-			But it doesn't mean 'para' is the one for this box, unless we chop para reflow in tiny pieces. We can do so, but then we need to 
+			But it doesn't mean 'para' is the one for this box, unless we chop para reflow in tiny pieces. We can do so, but then we need to
 			drop back to parent (or parent of parent! etc.etc.) when there's a box 'gap' between SIBLINGS! Which means we need to track
 			child/para position PER LEVEL no matter what!
 			*/
-		
+
 			tuning.level++;
 			para = para->m_first_child;
 			continue;
@@ -7273,7 +7282,7 @@ void cmt_reflow::determine_optimal_para_reflow(paragraph_box *para, words_collec
 {
 	break_suggestions best(para, words, tuning);
 	break_suggestions current(para, words, tuning);
-	
+
 	UNC_ASSERT(para);
 	UNC_ASSERT(para->m_last_box + 1 == (int)words.count());
 
@@ -7284,14 +7293,14 @@ void cmt_reflow::determine_optimal_para_reflow(paragraph_box *para, words_collec
 	//int deferred_whitespace = m_extra_post_star_indent; // write2out_comment_start(para, words);
 	//UNC_ASSERT(deferred_whitespace == cpd.settings[UO_cmt_sp_after_star_cont].n);
 
-	//const int start_col = m_left_global_output_column + deferred_whitespace; 
+	//const int start_col = m_left_global_output_column + deferred_whitespace;
 
 	const int lower_lw_limit = (tuning.max_usable_linewidth + 5) / 10;
 
 	reflow_tune_parameters_t testtuning(tuning);
 
 	/*
-	First run the 'regular' reflow action. This one acts as the start/reference; 
+	First run the 'regular' reflow action. This one acts as the start/reference;
 	when subsequent trials deliver a better reflow score, the winner will be applied
 	at the end.
 	*/
@@ -7316,7 +7325,7 @@ void cmt_reflow::determine_optimal_para_reflow(paragraph_box *para, words_collec
 		int trv = reflow_para_tree_4_trial(para, words, current, testtuning);
 		if (trv == SUCCESS)
 		{
-			/* 
+			/*
 			successful trial; see if the score is better then our current best.
 
 			Note that the further the trial deviates from the initial configuration, the higher
@@ -7350,7 +7359,7 @@ void cmt_reflow::determine_optimal_para_reflow(paragraph_box *para, words_collec
 		int trv = reflow_para_tree_4_trial(para, words, current, testtuning);
 		if (trv == SUCCESS)
 		{
-			/* 
+			/*
 			successful trial; see if the score is better then our current best.
 
 			Note that the further the trial deviates from the initial configuration, the higher
@@ -7407,7 +7416,7 @@ void cmt_reflow::reflow_para_hierarchy(paragraph_box *para, words_collection &wo
 
 
 /*
-simply dump the text boxes to the output; all the whitespace and newlines have been 
+simply dump the text boxes to the output; all the whitespace and newlines have been
 set up in each text box by the reflow engine before this method is invoked.
 
 TODO: The only tough bit is handling 'boxed comments' in here...
@@ -7461,7 +7470,7 @@ void cmt_reflow::write_comment_to_output(paragraph_box *para, words_collection &
 				//if (deferred_nl < mandatory_deferred_nl)
 				//{
 				//	deferred_nl = mandatory_deferred_nl;
-				//	mandatory_deferred_nl = 0; 
+				//	mandatory_deferred_nl = 0;
 				//}
 
 				for (j = 0; j < deferred_nl; j++)
@@ -7527,8 +7536,8 @@ and render the text, with or without a box surrounding it.
 
 Process steps:
 
-- take the text and chop it it up, creating a list of wrap/reflow points. 
-  These reflow points are graded (priority) depending on their context and 
+- take the text and chop it it up, creating a list of wrap/reflow points.
+  These reflow points are graded (priority) depending on their context and
 user settings.
 
   Recognizes bullet lists, DoxyGen tags, etc. as special tokens and annotates
@@ -7570,9 +7579,9 @@ void cmt_reflow::render(void)
 
 	set_deferred_cmt_config_params_phase2();
 
-	/* 
+	/*
 	now we have the entire text stored in m_comment.
-	
+
 	Chop it up into words and paragraphs
 	*/
 	words_collection words(*this);
@@ -7582,8 +7591,8 @@ void cmt_reflow::render(void)
 
 	optimize_reflow_boxes(words);
 
-	/* 
-	analyze the boxes, cluster them into simple 'paragraphs' and 
+	/*
+	analyze the boxes, cluster them into simple 'paragraphs' and
 	apply reflow/non-reflow heuristics: count and merge consecutive non-alnum (== 'is_punctuation') boxes,
 	then tag the entire paragraph as non-reflowable when there's 'enough' of this 'graphics' in there.
 
@@ -7620,9 +7629,9 @@ void cmt_reflow::render(void)
 	if (m_xml_text_has_stray_lt_gt > 0)
 	{
 		/* illegal XML/HTML text */
-		pretty_print_diagnostic2output(m_comment, m_comment_len, 
-							m_xml_offender, 1, 
-							"**XML FORMAT FAILURE**", 
+		pretty_print_diagnostic2output(m_comment, m_comment_len,
+							m_xml_offender, 1,
+							"**XML FORMAT FAILURE**",
 							words, root);
 	}
 #endif

@@ -345,7 +345,7 @@ bfc_report_mem_analysis(void)
 
 #endif
 
-void report_assertion_failed(const char *expr, const char *function, const char *filepath, int lineno, assert_extended_reporter *rprtr)
+int report_assertion_failed(const char *expr, const char *function, const char *filepath, int lineno, assert_extended_reporter *rprtr)
 {
 	const char *msg = (rprtr ? rprtr->c_msg() : "");
 
@@ -359,7 +359,7 @@ void report_assertion_failed(const char *expr, const char *function, const char 
 #else
 
 
-void report_assertion_failed(const char *expr, const char *function, const char *filepath, int lineno, assert_extended_reporter *rprtr)
+int report_assertion_failed(const char *expr, const char *function, const char *filepath, int lineno, assert_extended_reporter *rprtr)
 {
 	const char *msg = (rprtr ? rprtr->c_msg() : "");
 	if (!msg[0])
