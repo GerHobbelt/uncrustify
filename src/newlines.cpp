@@ -2351,7 +2351,7 @@ void do_blank_lines(void)
 
       /* Limit consecutive newlines */
       if ((cpd.settings[UO_nl_max].n > 0) &&
-          (pc->nl_count > (cpd.settings[UO_nl_max].n)))
+          (pc->nl_count > cpd.settings[UO_nl_max].n))
       {
          pc->nl_count = cpd.settings[UO_nl_max].n;
       }

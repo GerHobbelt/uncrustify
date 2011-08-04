@@ -402,7 +402,7 @@ void add_long_preprocessor_conditional_block_comment(void)
                           str.c_str());
 
                   /* Add a comment after the close brace */
-                  insert_comment_after(br_close, style, str.length(), str.c_str());
+                  insert_comment_after(br_close, style, (int)str.length(), str.c_str());
                }
             }
 

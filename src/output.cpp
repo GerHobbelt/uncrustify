@@ -54,7 +54,7 @@ static void add_char(char ch)
       if ((ch == '\t') && (last_char == ' '))
       {
          int endcol = next_tab_column(cpd.column);
-         while (cpd.column < endcol)
+         while ((int)cpd.column < endcol)
          {
             add_char(' ');
          }
@@ -114,30 +114,6 @@ static void add_text_len(const char *text, size_t len)
 
 
 
-void cmt_reflow::write(char ch)
-{
-	UNC_ASSERT(ch);
-	::add_char(ch);
-}
-
-void cmt_reflow::write(const char *str)
-{
-	UNC_ASSERT(str);
-	UNC_ASSERT(*str);
-	::add_text(str);
-}
-
-void cmt_reflow::write(const char *str, size_t len)
-{
-	UNC_ASSERT(str);
-	UNC_ASSERT(len);
-	UNC_ASSERT(*str);
-	::add_text_len(str, len);
-}
-
-
-
-
 /**
  * Advance to a specific column
  * cpd.column is the current column
@@ -164,7 +140,7 @@ void output_to_column(int column, bool allow_tabs, int max_tabbed_column = -1)
       }
    }
    /* space out the final bit */
-   while (cpd.column < column)
+   while ((int)cpd.column < column)
    {
       add_text(" ");
    }
@@ -312,7 +288,7 @@ void output_text(FILE *pfile)
                   pc->column = cpd.column + orig_sp;
 				  UNC_ASSERT(pc->column >= 0);
                   if ((cpd.settings[UO_sp_before_nl_cont].a != AV_IGNORE) &&
-                      (pc->column < (cpd.column + 1)))
+                      (pc->column < (int)(cpd.column + 1)))
                   {
                      pc->column = cpd.column + 1;
                   }
@@ -387,7 +363,7 @@ void output_text(FILE *pfile)
              * This has to be done here because comments are not formatted
              * until the output phase.
              */
-            if (pc->column < cpd.column)
+            if (pc->column < (int)cpd.column)
             {
                reindent_line(pc, cpd.column);
             }
@@ -443,5 +419,33 @@ static chunk_t *output_comment(chunk_t *pc)
 
    return pc;
 }
+
+
+
+
+
+
+void cmt_reflow::write(char ch)
+{
+	UNC_ASSERT(ch);
+	::add_char(ch);
+}
+
+void cmt_reflow::write(const char *str)
+{
+	UNC_ASSERT(str);
+	UNC_ASSERT(*str);
+	::add_text(str);
+}
+
+void cmt_reflow::write(const char *str, size_t len)
+{
+	UNC_ASSERT(str);
+	UNC_ASSERT(len);
+	UNC_ASSERT(*str);
+	::add_text_len(str, len);
+}
+
+
 
 
