@@ -1590,15 +1590,34 @@ void cmt_reflow::write2output(const char *text, size_t len)
 {
 	UNC_ASSERT(text);
 
-	/*
-	TODO: take care of the indenting.    Needs to watch cpd.column
-	*/
+	if (m_write_to_initial_column_pending && len > 0 && text[0] != '\n')
+	{
+		write_line_to_initial_column();
+		m_write_to_initial_column_pending = false;
+	}
+
 	while (len-- > 0)
 	{
 		write(*text);
 		if (*text == '\n')
 		{
-			write_line_to_initial_column();
+			/*
+			Prevent trailing whitespace from appearing the output:
+
+			Don't print leading whitespace block when this turns to be an empty line in the end. We will however only find out
+			by the time we receive the next call to write2output() with a non-empty text.
+			*/
+			if (len > 0)
+			{
+				if (text[1] && text[1] != '\n')
+				{
+					write_line_to_initial_column();
+				}
+			}
+			else
+			{
+				m_write_to_initial_column_pending = true;
+			}
 		}
 		text++;
 	}
@@ -1606,20 +1625,7 @@ void cmt_reflow::write2output(const char *text, size_t len)
 
 void cmt_reflow::write2output(const char *text)
 {
-	UNC_ASSERT(text);
-
-	/*
-	TODO: take care of the indenting.    Needs to watch cpd.column
-	*/
-	while (*text)
-	{
-		write(*text);
-		if (*text == '\n')
-		{
-			write_line_to_initial_column();
-		}
-		text++;
-	}
+	write2output(text, strlen(text));
 }
 
 void cmt_reflow::write_line_to_initial_column(void)
@@ -1627,25 +1633,77 @@ void cmt_reflow::write_line_to_initial_column(void)
 	int left_col = m_left_global_output_column;
 	int diff = left_col - get_global_block_left_column();
 	UNC_ASSERT(diff >= 0);
-	int curcol = align_tab_column(left_col + 1);
-	if (curcol == left_col)
-	{
-		int tabcount = diff / cpd.settings[UO_output_tab_size].n;
+	bool allow_tabs;
+    chunk_t *prev = chunk_get_prev(m_first_pc);
+	int max_tabbed_column = -1;
+	bool first_thing_on_this_line;
 
-		while (tabcount-- > 0)
+    /* if not the first item on a line */
+	if ((prev && prev->type != CT_NEWLINE) || chunk_is_inline_comment(m_first_pc))
+	{
+		first_thing_on_this_line = false;
+
+		if (cpd.settings[UO_align_keep_tabs].b)
 		{
-			write('\t');
-			UNC_ASSERT(left_col <= get_global_block_left_column());
+		   allow_tabs = m_first_pc->after_tab;
 		}
-		diff = left_col - get_global_block_left_column();
-		UNC_ASSERT(diff >= 0);
+		else
+		{
+		   allow_tabs = (cpd.settings[UO_align_with_tabs].b &&
+						 ((m_first_pc->flags & PCF_WAS_ALIGNED) != 0) &&
+						 prev && ((prev->column + prev->len + 1) != m_first_pc->column));
+		}
+	}
+	else
+	{
+		first_thing_on_this_line = true;
+
+		allow_tabs = (cpd.settings[UO_indent_with_tabs].n != 0);
+	}
+	LOG_FMT(LOUTIND, " for comment: %d(%d)/%d -", m_first_pc->column, allow_tabs, m_first_pc->level);
+
+	if (diff > 0)
+	{
+		switch (cpd.settings[UO_indent_with_tabs].n)
+		{
+		default:
+		case 0:
+			diff = 0;
+			break;
+
+		case 1:
+#if 0
+			diff = 1 + m_first_pc->brace_level * cpd.settings[UO_output_tab_size].n - get_global_block_left_column();
+#else
+			diff = 1 + m_first_pc->column_indent - get_global_block_left_column();
+#endif
+			break;
+
+		case 2:
+			if (!m_indent_cmt_with_tabs /* cpd.settings[UO_indent_cmt_with_tabs].b */)
+			{
+				diff = m_base_col - get_global_block_left_column();
+			}
+			break;
+		}
+
+		if (diff > 0)
+		{
+			max_tabbed_column = diff / cpd.settings[UO_output_tab_size].n;
+		}
+		else
+		{
+			max_tabbed_column = 0;
+		}
+	}
+	else
+	{
+		allow_tabs = false;
 	}
 
-	while (diff-- > 0)
-	{
-		write(' ');
-		UNC_ASSERT(left_col >= get_global_block_left_column());
-	}
+	output_to_column(m_left_global_output_column, allow_tabs, 1 + max_tabbed_column * cpd.settings[UO_output_tab_size].n);
+
+	UNC_ASSERT(left_col >= get_global_block_left_column());
 }
 
 
@@ -1756,6 +1814,7 @@ int cmt_reflow::write2out_comment_start(paragraph_box *para, words_collection &w
 {
 	UNC_ASSERT(para);
 
+	m_write_to_initial_column_pending = false;
 	write_line_to_initial_column();
 
 	if (m_is_cpp_comment)

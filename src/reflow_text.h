@@ -233,6 +233,7 @@ protected:
 
 	int get_global_block_left_column(void);
 	void write_line_to_initial_column(void);
+	void output_to_column(int column, bool allow_tabs, int max_tabbed_column = -1);
 
 	int write2out_comment_start(paragraph_box *para, words_collection &words);
 	int write2out_comment_next_line(void);

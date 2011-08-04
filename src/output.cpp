@@ -114,13 +114,14 @@ static void add_text_len(const char *text, size_t len)
 
 
 
+
 /**
  * Advance to a specific column
  * cpd.column is the current column
  *
  * @param column  The column to advance to
  */
-void output_to_column(int column, bool allow_tabs, int max_tabbed_column = -1)
+static void output_to_column(int column, bool allow_tabs, int max_tabbed_column = -1)
 {
 	if (allow_tabs)
 	   LOG_FMT(LOUTIND, " to_col:%d/%d/%d - ", cpd.column, max_tabbed_column, column);
@@ -446,6 +447,8 @@ void cmt_reflow::write(const char *str, size_t len)
 	::add_text_len(str, len);
 }
 
-
-
+void cmt_reflow::output_to_column(int column, bool allow_tabs, int max_tabbed_column)
+{
+	::output_to_column(column, allow_tabs, max_tabbed_column);
+}
 
