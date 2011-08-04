@@ -1,5 +1,5 @@
 /**
- * @file reflowtxt.cpp
+ * @file reflow_text_utils.cpp
  *
  * A big honkin' text reflow engine, used to reformat comments in 'enhanced' mode 2.
  *
@@ -35,10 +35,7 @@
  *
  * @author  Ger Hobbelt
    @maintainer Ger Hobbelt
-   @maintainer Ben Gardner
  * @license GPL v2+
- *
- * $Id: reflowtxt.cpp 1599 2009-08-08 19:58:52Z bengardner $
  */
 
 #include "uncrustify_types.h"
@@ -356,7 +353,7 @@ int count_tabs(const char *text, size_t len)
 
 
 /**
-inspect the comment block (sans start/end markers) and determine the number of whitespace characters to strip
+Inspect the comment block (sans start/end markers) and determine the number of whitespace characters to strip
 from each line.
 
 Do this by counting the minimum number of leading whitespace (including possible '*' leading edge) for
@@ -1327,172 +1324,6 @@ void cmt_reflow::set_doxygen_marker(const char *marker, size_t len)
 
 
 
-#if 0
-
-/*
-Return the start index of the comment lead/prefix.
-
-Return -1 when the given line has no lead/prefix.
-*/
-int cmt_reflow::get_line_leader(const char *str, int len) /* [i_a] obsoleted? not yet! */
-{
-	int idx;
-
-   /*
-   This method may only be called AFTER expand_tabs_and_clean() has taken care of CRLF, TAB, etc.
-   */
-   UNC_ASSERT(!strnchr(str, '\r', len));
-   UNC_ASSERT(!strnchr(str, '\t', len));
-
-   for (idx = 0; idx < len; idx++)
-   {
-      if (str[idx] == ' ')
-      {
-         continue;
-      }
-      if (str[idx] == '\n')
-      {
-         /* Done */
-         break;
-      }
-      if (in_set(m_defd_lead_markers, str[idx])
-		  /* '\\' is special: detect line continuation and escape sequences, as those cannot be part of a 'lead prefix' */
-		  && !(str[idx] == '\\'
-				&& (idx+1 < len)
-				&& (unc_isalnum(str[idx+1])
-					|| (str[idx+1] == '\n'))))
-	  {
-		  return idx;
-	  }
-   }
-
-   return -1;
-}
-
-
-
-/**
- * Scans a multiline comment to determine the following:
- *  - the extra indent of the non-first line (0 or 1)
- *  - the continuation text ('' or '* ')
- *
- * The decision is based on:
- *  - cmt_indent_multi
- *  - cmt_star_cont
- *  - the first line length
- *  - the second line leader length
- *  - the last line length
- *
- * If the first and last line are the same length and don't contain any alnum
- * chars and (the first line len > 2 or the second leader is the same as the
- * first line length), then the indent is 0.
- *
- * If the leader on the second line is 1 wide or missing, then the indent is 1.
- *
- * Otherwise, the indent is 0.
- *
- * @param str       The comment string
- * @param len       Length of the comment
- * @param start_col Starting column
- * @return 0 or 1
- */
-void cmt_reflow::calculate_comment_body_indent(const char *str, int len)
-{
-   int idx       = 0;
-   int first_len = 0;
-   int last_len  = 0;
-   int width     = 0;
-
-   /*
-   This method may only be called AFTER expand_tabs_and_clean() has taken care of CRLF, TAB, etc.
-   */
-   UNC_ASSERT(!strnchr(str, '\r', len));
-   UNC_ASSERT(!strnchr(str, '\t', len));
-
-   if (!cpd.settings[UO_cmt_indent_multi].b)
-   {
-      return;
-   }
-
-   if (cpd.settings[UO_cmt_multi_check_last].b)
-   {
-      /* find the last line length */
-      for (idx = len - 1; idx > 0; idx--)
-      {
-         if (str[idx] == '\n')
-         {
-            idx++;
-            while ((idx < len) && (str[idx] == ' '))
-            {
-               idx++;
-            }
-            last_len = len - idx;
-            break;
-         }
-      }
-   }
-
-   /* find the first line length */
-   for (idx = 0; idx < len; idx++)
-   {
-      if (str[idx] == '\n')
-      {
-         first_len = idx;
-         while (str[first_len - 1] == ' ')
-         {
-            first_len--;
-         }
-
-         idx++;
-         break;
-      }
-   }
-
-   /* Scan the second line */
-   width = 0;
-   for (/* nada */; idx < len; idx++)
-   {
-      if (str[idx] == ' ')
-      {
-         if (width > 0)
-         {
-            break;
-         }
-         continue;
-      }
-      if (str[idx] == '\n')
-      {
-         /* Done with second line */
-         break;
-      }
-
-      /* Count the leading chars */
-	  if (0 == get_line_leader(str + idx, len - idx))
-      {
-         width++;
-      }
-      else
-      {
-         width = 0;
-         break;
-      }
-   }
-
-   //LOG_FMT(LSYS, "%s: first=%d last=%d width=%d\n", __func__, first_len, last_len, width);
-
-   /*TODO: make the first_len minimum (4) configurable? */
-   if ((first_len == last_len) && ((first_len > 4) || (first_len == width)))
-   {
-      return;
-   }
-
-   m_extra_pre_star_indent = ((width == 2) ? 0 : 1);
-}
-
-#endif
-
-
-
 
 
 void cmt_reflow::push_chunk(chunk_t *pc)
@@ -1750,52 +1581,6 @@ void cmt_reflow::push_text(const char *text, int len, bool esc_close, int first_
 }
 
 
-
-
-#if 0
-
-/**
- * Output a comment to the column using indent_with_tabs and
- * indent_cmt_with_tabs as the rules.
- * base_col is the indent of the first line of the comment.
- * On the first line, column == base_col.
- * On subsequent lines, column >= base_col.
- *
- * @param brace_col the brace-level indent of the comment
- * @param base_col  the indent of the start of the comment (multiline)
- * @param column    the column that we should end up in
- */
-static void cmt_output_indent(int brace_col, int base_col, int column)
-{
-   int iwt;
-   int tab_col;
-
-   iwt = cpd.settings[UO_indent_cmt_with_tabs].b ? 2 :
-         (cpd.settings[UO_indent_with_tabs].n ? 1 : 0);
-
-   tab_col = (iwt == 0) ? 0 : ((iwt == 1) ? brace_col : base_col);
-
-   LOG_FMT(LOUTIND, " indent:%d/%d/%d - ", cpd.column, brace_col, column);
-   //LOG_FMT(LSYS, "%s(brace=%d base=%d col=%d iwt=%d) tab=%d cur=%d\n",
-   //        __func__, brace_col, base_col, column, iwt, tab_col, cpd.column);
-
-   if ((iwt == 2) || ((cpd.column == 1) && (iwt == 1)))
-   {
-      /* tab out as far as possible and then use spaces */
-      while (next_tab_column(cpd.column) <= tab_col)
-      {
-         add_text("\t");
-      }
-   }
-
-   /* space out the rest */
-   while (cpd.column < column)
-   {
-      add_text(" ");
-   }
-}
-
-#endif
 
 
 

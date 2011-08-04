@@ -1,5 +1,5 @@
 /**
- * @file reflowtxt.cpp
+ * @file reflow_text.cpp
  *
  * A big honkin' text reflow engine, used to reformat comments in 'enhanced' mode 2.
  *
@@ -35,10 +35,7 @@
  *
  * @author  Ger Hobbelt
    @maintainer Ger Hobbelt
-   @maintainer Ben Gardner
  * @license GPL v2+
- *
- * $Id: reflowtxt.cpp 1599 2009-08-08 19:58:52Z bengardner $
  */
 
 #include "uncrustify_types.h"

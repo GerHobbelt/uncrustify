@@ -1,11 +1,43 @@
 /**
  * @file reflow_text.h
  *
- * @author  Ben Gardner / Ger Hobbelt
- * @license GPL v2+
+ * A big honkin' text reflow engine, used to reformat comments in 'enhanced' mode 2.
  *
- * $Id: token_enum.h 1533 2009-04-15 01:43:50Z bengardner $
+ * This reflow engine works on a 'per-page' basis, where a 'page' here is one entire
+ * comment. It does not work on a per-paragraph basis as that prevents the reflow
+ * engine from making choices based on info spanning more than one paragraph in there,
+ * such as when a bullet item spans multiple paragraphs and you like your text reflown
+ * with spanning indent to properly identify the subsequent paragraphs as belonging
+ * to the bullet item.
+ *
+ * Features:
+ *
+ * - recognizes (and applies) hanging indent
+ * - widow and orphan control
+ * - recognizes (nested) bullet lists
+ * - recognizes (nested) numbered lists (numbering can be alphanumeric [configurable])
+ * - allows enforced line breaks at end-of-sentence within a paragraph
+ * - detects and keeps 'ASCII art' intact, allowing graphical documentation to survive
+ * - recognizes boxed comments and can reflow these
+ * - extremely flexible as almost all decision elements and parameters are fully
+ *   configurable
+ * - recognizes mixed 'leader' use and cleans up after you (e.g. when you're reflowing
+ *   comments where only some lines are prefixed with a '*' comment lead character,
+ *   a situation often happening when editing already formatted comments quickly in the
+ *   heat of a deadline)
+ * - supports a configurable set of 'directives', either as characters or tags, to hint
+ *   the reflow engine (this is useful to keep a particular piece of formatted text
+ *   exactly as-is, while the other parts are reflown)
+ * - supports DoxyGen / JavaDoc / .NET documentation tags and adjusts formatting accordingly.
+ *
+ * This code resides in its own source file to help maintainance by keeping a very
+ * specialized piece of output formatting functionality cordonned off.
+ *
+ * @author  Ger Hobbelt
+   @maintainer Ger Hobbelt
+ * @license GPL v2+
  */
+
 #ifndef REFLOW_TEXT_H_INCLUDED
 #define REFLOW_TEXT_H_INCLUDED
 

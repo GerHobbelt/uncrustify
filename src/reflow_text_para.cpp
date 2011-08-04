@@ -1,12 +1,12 @@
 /**
- * @file reflowtxt.cpp
- * 
+ * @file reflow_text_para.cpp
+ *
  * A big honkin' text reflow engine, used to reformat comments in 'enhanced' mode 2.
  *
  * This reflow engine works on a 'per-page' basis, where a 'page' here is one entire
  * comment. It does not work on a per-paragraph basis as that prevents the reflow
  * engine from making choices based on info spanning more than one paragraph in there,
- * such as when a bullet item spans multiple paragraphs and you like your text reflown 
+ * such as when a bullet item spans multiple paragraphs and you like your text reflown
  * with spanning indent to properly identify the subsequent paragraphs as belonging
  * to the bullet item.
  *
@@ -19,11 +19,11 @@
  * - allows enforced line breaks at end-of-sentence within a paragraph
  * - detects and keeps 'ASCII art' intact, allowing graphical documentation to survive
  * - recognizes boxed comments and can reflow these
- * - extremely flexible as almost all decision elements and parameters are fully 
+ * - extremely flexible as almost all decision elements and parameters are fully
  *   configurable
  * - recognizes mixed 'leader' use and cleans up after you (e.g. when you're reflowing
  *   comments where only some lines are prefixed with a '*' comment lead character,
- *   a situation often happening when editing already formatted comments quickly in the 
+ *   a situation often happening when editing already formatted comments quickly in the
  *   heat of a deadline)
  * - supports a configurable set of 'directives', either as characters or tags, to hint
  *   the reflow engine (this is useful to keep a particular piece of formatted text
@@ -35,10 +35,7 @@
  *
  * @author  Ger Hobbelt
    @maintainer Ger Hobbelt
-   @maintainer Ben Gardner
  * @license GPL v2+
- *
- * $Id: reflowtxt.cpp 1599 2009-08-08 19:58:52Z bengardner $
  */
 
 #include "uncrustify_types.h"
@@ -61,7 +58,7 @@ paragraph_box::paragraph_box() :
 		m_first_line_indent(0), m_hanging_indent(0),
 		m_starts_on_new_line(false),
 		m_keep_with_next(0), m_keep_with_prev(0),
-		m_is_non_reflowable(false), m_is_boxed_txt(false), m_is_graphics(false), 
+		m_is_non_reflowable(false), m_is_boxed_txt(false), m_is_graphics(false),
 		m_graphics_trigger_box(-1), m_nonreflow_trigger_box(-1),
 		m_indent_as_previous(false), m_continue_from_previous(false),
 		m_is_bullet(false), m_is_bulletlist(false), m_bullet_box(-1), m_bulletlist_level(0),
@@ -69,7 +66,7 @@ paragraph_box::paragraph_box() :
 		m_is_xhtml(false), m_is_unclosed_html_tag(false),
 		m_is_dangling_xhtml_close_tag(false),
 		m_xhtml_start_tag_box(-1), m_xhtml_end_tag_box(-1),
-		m_xhtml_start_tag_container(NULL), m_xhtml_end_tag_container(NULL), 
+		m_xhtml_start_tag_container(NULL), m_xhtml_end_tag_container(NULL),
 		m_leading_whitespace_length(0), m_trailing_whitespace_length(0),
 		m_min_required_linebreak_before(0), m_min_required_linebreak_after(0),
 		//m_forced_linebreak_before(0), m_forced_linebreak_after(0),
@@ -78,7 +75,7 @@ paragraph_box::paragraph_box() :
 		m_left_edge_text(NULL), m_left_edge_thickness(0), m_left_edge_trailing_whitespace(0),
 		m_right_edge_text(NULL), m_right_edge_thickness(0), m_right_edge_leading_whitespace(0)
 {}
-	
+
 paragraph_box::~paragraph_box()
 {
 	/* remove entire tree from memory */

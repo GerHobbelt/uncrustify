@@ -153,11 +153,11 @@
 
 00615  pp-indent-2.cfg         c/pp-nest.c
 
-00620  ben.cfg         c/indent-assign.c
-00621  nl_endif.cfg         c/nl_endif.c
+00620  ben.cfg                 c/indent-assign.c
+00621  nl_endif.cfg            c/nl_endif.c
 
-00631  nl_assign1.cfg         c/nl_assign.c
-00632  nl_assign2.cfg         c/nl_assign.c
+00631  nl_assign1.cfg          c/nl_assign.c
+00632  nl_assign2.cfg          c/nl_assign.c
 
 # function def newlines
 00701  func-def-1.cfg          c/function-def.c
@@ -262,9 +262,9 @@
 
 21060 freebsd.cfg               c/freebsd.c
 
-66601 ger.cfg			c/custom_types_ssl.c
-66602 custom_types_ssl.cfg	c/custom_types_ssl.c
-66603 ger.cfg			c/pp_concat_asn1.h
+66601 ger.cfg                   c/custom_types_ssl.c
+66602 custom_types_ssl.cfg      c/custom_types_ssl.c
+66603 ger.cfg                   c/pp_concat_asn1.h
 
 # a series of tests for the new comment reformatter
 99901 ger.cfg			c/cmt-not-a-boxed-cmt.h

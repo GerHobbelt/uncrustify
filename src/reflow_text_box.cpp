@@ -1,12 +1,12 @@
 /**
- * @file reflowtxt.cpp
- * 
+ * @file reflow_text_box.cpp
+ *
  * A big honkin' text reflow engine, used to reformat comments in 'enhanced' mode 2.
  *
  * This reflow engine works on a 'per-page' basis, where a 'page' here is one entire
  * comment. It does not work on a per-paragraph basis as that prevents the reflow
  * engine from making choices based on info spanning more than one paragraph in there,
- * such as when a bullet item spans multiple paragraphs and you like your text reflown 
+ * such as when a bullet item spans multiple paragraphs and you like your text reflown
  * with spanning indent to properly identify the subsequent paragraphs as belonging
  * to the bullet item.
  *
@@ -19,11 +19,11 @@
  * - allows enforced line breaks at end-of-sentence within a paragraph
  * - detects and keeps 'ASCII art' intact, allowing graphical documentation to survive
  * - recognizes boxed comments and can reflow these
- * - extremely flexible as almost all decision elements and parameters are fully 
+ * - extremely flexible as almost all decision elements and parameters are fully
  *   configurable
  * - recognizes mixed 'leader' use and cleans up after you (e.g. when you're reflowing
  *   comments where only some lines are prefixed with a '*' comment lead character,
- *   a situation often happening when editing already formatted comments quickly in the 
+ *   a situation often happening when editing already formatted comments quickly in the
  *   heat of a deadline)
  * - supports a configurable set of 'directives', either as characters or tags, to hint
  *   the reflow engine (this is useful to keep a particular piece of formatted text
@@ -35,10 +35,7 @@
  *
  * @author  Ger Hobbelt
    @maintainer Ger Hobbelt
-   @maintainer Ben Gardner
  * @license GPL v2+
- *
- * $Id: reflowtxt.cpp 1599 2009-08-08 19:58:52Z bengardner $
  */
 
 #include "uncrustify_types.h"

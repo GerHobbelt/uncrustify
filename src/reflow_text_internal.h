@@ -1,5 +1,5 @@
 /**
- * @file reflowtxt.cpp
+ * @file reflow_text_internal.h
  *
  * A big honkin' text reflow engine, used to reformat comments in 'enhanced' mode 2.
  *
@@ -35,10 +35,7 @@
  *
  * @author  Ger Hobbelt
    @maintainer Ger Hobbelt
-   @maintainer Ben Gardner
  * @license GPL v2+
- *
- * $Id: reflowtxt.cpp 1599 2009-08-08 19:58:52Z bengardner $
  */
 
 #ifndef __COMMENT_REFLOW_ENGINE_INTERNAL_H__
@@ -571,7 +568,7 @@ int count_tabs(const char *text, size_t len);
 
 
 /**
-inspect the comment block (sans start/end markers) and determine the number of whitespace characters to strip
+Inspect the comment block (sans start/end markers) and determine the number of whitespace characters to strip
 from each line.
 
 Do this by counting the minimum number of leading whitespace (including possible '*' leading edge) for

@@ -91,7 +91,7 @@
 #define PACKAGE_NAME "uncrustify"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "uncrustify 0.57"
+#define PACKAGE_STRING "uncrustify 0.57+git"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "uncrustify"
@@ -100,7 +100,7 @@
 #define PACKAGE_URL "http://uncrustify.sourceforge.net/"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.57"
+#define PACKAGE_VERSION "0.57+git"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -131,7 +131,7 @@
 
 
 /* Version number of package */
-#define VERSION "0.57"
+#define VERSION "0.57+git"
 
 /* Define to 1 if on MINIX. */
 /* #undef _MINIX */
