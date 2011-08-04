@@ -601,6 +601,11 @@ const chunk_tag_t *find_keyword(const char *word, int len)
    char              buf[128];
    const chunk_tag_t *p_ret;
 
+   if (len == 0)
+   {
+	   return NULL;
+   }
+
    if (len > (int)(sizeof(buf) - 1))
    {
       LOG_FMT(LNOTE, "%s: keyword too long at %d char (%d max) : %.*s\n",
