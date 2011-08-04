@@ -91,11 +91,11 @@ static void unc_add_option(const char *name, uncrustify_options id, argtype_e ty
       break;
 
    case AT_LINE:
-      value.max_val = 3;
+      value.max_val = (int)LE_AUTO;
       break;
 
    case AT_POS:
-      value.max_val = 2;
+      value.max_val = (int)TP_TRAIL_FORCE;
       break;
 
    case AT_STRING:
@@ -1275,15 +1275,21 @@ static void convert_value(const option_map_value *entry, const char *val, op_val
          dest->le = LE_CR;
          return;
       }
-      if (strcasecmp(val, "AUTO") != 0)
+      if (strcasecmp(val, "AUTO") == 0)
       {
+		 dest->le = LE_AUTO;
+		 return;
+	  }
+	   tmp = unc_find_option(val);
+	   if ((tmp != NULL) && (tmp->type == entry->type))
+	   {
+		  dest->le = cpd.settings[tmp->id].le;
+		  return;
+	   }
          LOG_FMT(LWARN, "%s:%d Expected AUTO, LF, CRLF, or CR for %s, got %s\n",
                  cpd.filename, cpd.line_number, entry->name, val);
          cpd.error_count++;
-      }
-      dest->le = LE_AUTO;
       return;
-
 
    case AT_POS:
       if (strcasecmp(val, "LEAD") == 0)
@@ -1316,21 +1322,53 @@ static void convert_value(const option_map_value *entry, const char *val, op_val
          dest->tp = TP_TRAIL_FORCE;
          return;
       }
-      if (strcasecmp(val, "IGNORE") != 0)
+	  if (strcasecmp(val, "BREAK") == 0)
       {
+         dest->tp = TP_BREAK;
+         return;
+      }
+      if (strcasecmp(val, "FORCE") == 0)
+      {
+         dest->tp = TP_FORCE;
+         return;
+      }
+	  if (strcasecmp(val, "IGNORE") == 0)
+      {
+		dest->tp = TP_IGNORE;
+		return;
+	  }
+	   tmp = unc_find_option(val);
+	   if ((tmp != NULL) && (tmp->type == entry->type))
+	   {
+		  dest->tp = cpd.settings[tmp->id].tp;
+		  return;
+	   }
          LOG_FMT(LWARN, "%s:%d Expected IGNORE, LEAD, LEAD_BREAK, LEAD_FORCE, "
-                 "TRAIL, TRAIL_BREAK, TRAIL_FORCE for %s, got %s\n",
+                 "TRAIL, TRAIL_BREAK, TRAIL_FORCE, BREAK, or FORCE for %s, got %s\n",
                  cpd.filename, cpd.line_number, entry->name, val);
          cpd.error_count++;
-      }
-      dest->tp = TP_IGNORE;
       return;
 
    case AT_NUM:
       if (unc_isdigit(*val) ||
           (unc_isdigit(val[1]) && ((*val == '-') || (*val == '+'))))
       {
-         dest->n = strtol(val, NULL, 0);
+		  char *left_over = NULL;
+		  errno = 0;
+         long v = strtol(val, &left_over, 0);
+
+		 if (v < entry->min_val || v > entry->max_val
+			 || (left_over && *left_over != 0)
+			 || errno != 0)
+		 {
+			 LOG_FMT(LWARN, "%s:%d Expected an integer in the range %d .. %d for %s, got %s\n",
+					 cpd.filename, cpd.line_number, entry->min_val, entry->max_val, entry->name, val);
+			 cpd.error_count++;
+		 }
+		 else
+		 {
+			 dest->n = v;
+		 }
          return;
       }
       else
@@ -1346,14 +1384,25 @@ static void convert_value(const option_map_value *entry, const char *val, op_val
 		 tmp = unc_find_option(val);
          if ((tmp != NULL) && (tmp->type == entry->type))
          {
-            dest->n = cpd.settings[tmp->id].n * mult;
+            long v = cpd.settings[tmp->id].n * mult;
+
+			 if (v < entry->min_val || v > entry->max_val)
+			 {
+				 LOG_FMT(LWARN, "%s:%d Expected an integer in the range %d .. %d for %s, got %s (= %ld)\n",
+						 cpd.filename, cpd.line_number, entry->min_val, entry->max_val, entry->name, val, v);
+				 cpd.error_count++;
+			 }
+			 else
+			 {
+				 dest->n = v;
+			 }
             return;
          }
       }
       LOG_FMT(LWARN, "%s:%d Expected a number for %s, got %s\n",
               cpd.filename, cpd.line_number, entry->name, val);
       cpd.error_count++;
-      dest->n = 0;
+      //dest->n = 0;
       return;
 
    case AT_TRISTATE_BOOL:
@@ -1416,7 +1465,7 @@ static void convert_value(const option_map_value *entry, const char *val, op_val
       LOG_FMT(LWARN, "%s:%d Expected 'NoChange', 'True' or 'False' for %s, got %s\n",
               cpd.filename, cpd.line_number, entry->name, val);
       cpd.error_count++;
-      dest->t = TB_NOCHANGE;
+      //dest->t = TB_NOCHANGE;
       return;
 
    case AT_BOOL:
@@ -1470,7 +1519,7 @@ static void convert_value(const option_map_value *entry, const char *val, op_val
       LOG_FMT(LWARN, "%s:%d Expected 'True' or 'False' for %s, got %s\n",
               cpd.filename, cpd.line_number, entry->name, val);
       cpd.error_count++;
-      dest->b = false;
+      //dest->b = false;
       return;
 
    case AT_STRING:
@@ -1516,7 +1565,7 @@ static void convert_value(const option_map_value *entry, const char *val, op_val
 	   LOG_FMT(LWARN, "%s:%d Expected 'Add', 'Remove', 'Force', or 'Ignore' for %s, got %s\n",
 			   cpd.filename, cpd.line_number, entry->name, val);
 	   cpd.error_count++;
-	   dest->a = AV_IGNORE;
+	   // dest->a = AV_IGNORE;
 	   return;
    }
 }
@@ -1734,6 +1783,12 @@ int save_option_file(FILE *pfile, bool withDoc)
             fprintf(pfile, "%*.s # %s",
                     8 - val_len, " ",
                     argtype_to_string(option->type).c_str());
+
+			if (option->type == AT_NUM)
+			{
+				fprintf(pfile, " (Accepted value range: [%d .. %d])",
+					    option->min_val, option->max_val);
+			}
          }
          fputs("\n", pfile);
       }
@@ -1964,6 +2019,15 @@ void set_option_defaults(void)
    cpd.settings[UO_sp_angle_shift].a       = AV_ADD;
    cpd.settings[UO_tok_split_gte].b        = true;
 
+   cpd.settings[UO_pos_arith].tp		= TP_IGNORE;
+   cpd.settings[UO_pos_assign].tp		= TP_IGNORE;
+   cpd.settings[UO_pos_bool].tp			= TP_IGNORE;
+   cpd.settings[UO_pos_compare].tp		= TP_IGNORE;
+   cpd.settings[UO_pos_conditional].tp	= TP_IGNORE;
+   cpd.settings[UO_pos_comma].tp		= TP_IGNORE;
+   cpd.settings[UO_pos_class_comma].tp	= TP_IGNORE;
+   cpd.settings[UO_pos_class_colon].tp	= TP_IGNORE;
+
    cpd.settings[UO_cmt_star_cont].t = TB_NOCHANGE;
 	cpd.settings[UO_cmt_width].n = -1;
 	cpd.settings[UO_cmt_inline_width].n = -1;
@@ -2016,7 +2080,7 @@ std::string argtype_to_string(argtype_e argtype)
       return("auto/lf/crlf/cr");
 
    case AT_POS:
-      return("ignore/lead/lead_break/lead_force/trail/trail_break/trail_force");
+      return("ignore/lead/lead_break/lead_force/trail/trail_break/trail_force/break/force");
 
    case AT_STRING:
       return("string");
@@ -2143,6 +2207,12 @@ std::string tokenpos_to_string(tokenpos_e tokenpos)
 
    case TP_TRAIL_FORCE:
       return("trail_force");
+
+   case TP_BREAK:
+      return("break");
+
+   case TP_FORCE:
+      return("force");
 
    default:
       LOG_FMT(LWARN, "Unknown tokenpos '%d'\n", tokenpos);
