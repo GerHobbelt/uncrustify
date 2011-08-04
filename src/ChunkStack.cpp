@@ -12,6 +12,7 @@
 
 ChunkStack::ChunkStack(const ChunkStack& cs)
 {
+   Init();
    Set(cs);
 }
 
@@ -23,19 +24,20 @@ ChunkStack::~ChunkStack()
       free(m_cse);
       m_cse  = NULL;
       m_size = m_len = 0;
+	  m_seqnum = 0;
    }
 }
 
 
 void ChunkStack::Set(const ChunkStack& cs)
 {
-   Init();
+   Reset();
    Resize(cs.m_len);
    for (int idx = 0; idx < cs.m_len; idx++)
    {
       Push(cs.m_cse[idx].m_pc, cs.m_cse[idx].m_seqnum);
    }
-   m_seqnum = cs.m_seqnum;
+   //m_seqnum = cs.m_seqnum;
 }
 
 

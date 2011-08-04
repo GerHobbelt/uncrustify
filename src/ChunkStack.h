@@ -67,6 +67,7 @@ public:
    void Reset()
    {
       m_len = 0;
+      m_seqnum = 0;
    }
 
 
