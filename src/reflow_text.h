@@ -1,7 +1,7 @@
 /**
  * @file reflow_text.h
  *
- * A big honkin' text reflow engine, used to reformat comments in 'enhanced' mode 2.
+ * A big honkin' text reflow engine, used to reformat comments in 'enhanced' mode CMT_REFLOW_MODE_DO_FULL_REFLOW.
  *
  * This reflow engine works on a 'per-page' basis, where a 'page' here is one entire
  * comment. It does not work on a per-paragraph basis as that prevents the reflow
@@ -62,7 +62,7 @@ public:
 
 protected:
    int        m_left_global_output_column;      /* Column of the comment start */
-   int        m_brace_col;   /* Brace column (for indenting with tabs) */
+   //int        m_brace_col;   /* Brace column (for indenting with tabs) */
    int        m_base_col;    /* Base column (for indenting with tabs) */
    int        m_word_count;  /* number of words on this line */
    bool       m_kw_subst;    /* do keyword substitution */
@@ -70,7 +70,12 @@ protected:
    int        m_xtra_indent; /* extra indent of non-first lines (0 or 1) */
 #endif
    //const char *m_cont_text;  /* fixed text to output at the start of a line (0 to 3 chars) */
-   int        m_reflow_mode; /* reflow mode for the current text */
+   enum cmt_reflow_mode_t
+   {
+		CMT_REFLOW_MODE_DO_ONLY_LINEWRAP = 0,
+		CMT_REFLOW_MODE_DO_NOT_REFLOW = 1,
+		CMT_REFLOW_MODE_DO_FULL_REFLOW = 2
+   }		  m_reflow_mode; /* reflow mode for the current text */
    bool       m_is_cpp_comment;
 public:
    bool       m_is_merged_comment;
@@ -121,14 +126,15 @@ protected:
    size_t m_comment_len; /* (used) length of the 'comment' string buffer, excluding NUL sentinel */
    size_t m_comment_size; /* allocated size of the 'comment' string buffer */
 
-   int m_orig_startcolumn;     /* Column at which the text was positioned; used while adding comment text */
+   //int m_orig_startcolumn;     /* Column at which the text was positioned; used while adding comment text */
 
-   int m_lead_cnt; /* number of '*' lead characters used for each comment line [0..2] */
    char *m_lead_marker; /* the exact 'lead/prefix' string used for this comment (not necessarily "*") */
 
    bool m_is_doxygen_comment;
    bool m_is_backreferencing_doxygen_comment; /* is a doxygen/javadoc section which documents a PRECEDING item */
    char *m_doxygen_marker; /* the detected 'doxygen/javadoc' marker at the start of this comment */
+
+	bool m_write_to_initial_column_pending;
 
 	/* configuration settings */
 protected:
@@ -138,9 +144,13 @@ protected:
 	int m_tab_width;
 	const char *m_defd_lead_markers;
 
+	static const int NONBREAKING_SPACE_CHAR = 0x07;
+
 public:
    cmt_reflow();
    ~cmt_reflow();
+
+   void set_reflow_mode(int mode);
 
 	void push_chunk(chunk_t *pc);
 	void push(const char *text);
@@ -179,12 +189,13 @@ protected:
 	void set_deferred_cmt_config_params_phase2(void);
 	void set_deferred_cmt_config_params_phase3(void);
 	void set_no_reflow_markers(const char *start_tags, const char *end_tags);
+	void infer_pre_and_post_star_spacing_from_input(int pre, int post);
 
 	void chop_text_into_reflow_boxes(words_collection &words);
 
 	void optimize_reflow_boxes(words_collection &words);
 
-	int grok_the_words(paragraph_box *root, words_collection &words);
+	void grok_the_words(paragraph_box *root, words_collection &words);
 
 	void expand_math_et_al_markers(words_collection &words);
 

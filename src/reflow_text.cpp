@@ -1,7 +1,7 @@
 /**
  * @file reflow_text.cpp
  *
- * A big honkin' text reflow engine, used to reformat comments in 'enhanced' mode 2.
+ * A big honkin' text reflow engine, used to reformat comments in 'enhanced' mode CMT_REFLOW_MODE_DO_FULL_REFLOW.
  *
  * This reflow engine works on a 'per-page' basis, where a 'page' here is one entire
  * comment. It does not work on a per-paragraph basis as that prevents the reflow
@@ -55,13 +55,13 @@
 cmt_reflow::cmt_reflow()
    : m_first_pc(NULL), m_last_pc(NULL),
    m_left_global_output_column(0),
-   m_brace_col(0),
+   //m_brace_col(0),
    m_base_col(0),
    m_word_count(0),
    m_kw_subst(false),
    //m_xtra_indent(0),
    //m_cont_text(""),
-   m_reflow_mode(0),
+   m_reflow_mode(CMT_REFLOW_MODE_DO_NOT_REFLOW),
    m_is_cpp_comment(false),
    m_is_merged_comment(false),
    m_is_single_line_comment(false),
@@ -88,12 +88,12 @@ cmt_reflow::cmt_reflow()
 	m_cmt_reflow_intermission_indent_threshold(0),
 	m_xml_text_has_stray_lt_gt(-1), m_xml_offender(0),
    m_comment(NULL), m_comment_len(0), m_comment_size(0),
-   m_orig_startcolumn(1),
-   m_lead_cnt(0),
+   //m_orig_startcolumn(1),
    m_lead_marker(NULL),
    m_is_doxygen_comment(false),
    m_is_backreferencing_doxygen_comment(false),
    m_doxygen_marker(NULL),
+   m_write_to_initial_column_pending(false),
 	m_no_reflow_marker_start(NULL),
 	m_no_reflow_marker_end(NULL),
 	m_line_wrap_column(0),
@@ -127,6 +127,22 @@ cmt_reflow::~cmt_reflow()
 }
 
 
+
+void cmt_reflow::set_reflow_mode(int mode)
+{
+	switch (mode)
+	{
+	case CMT_REFLOW_MODE_DO_NOT_REFLOW:
+	case CMT_REFLOW_MODE_DO_ONLY_LINEWRAP:
+	case CMT_REFLOW_MODE_DO_FULL_REFLOW:
+		m_reflow_mode = (cmt_reflow::cmt_reflow_mode_t)mode;
+		break;
+
+	default:
+		m_reflow_mode = CMT_REFLOW_MODE_DO_NOT_REFLOW;
+		break;
+	}
+}
 
 
 
@@ -837,11 +853,10 @@ void cmt_reflow::set_deferred_cmt_config_params_phase1(void)
 {
 	chunk_t *pc = m_first_pc;
 
-#if defined(_MSC_VER)
-#pragma message(__FILE__ "(" STRING(__LINE__) ") : TODO: check why this assert and assignment are here and when the assert fires.")
-#endif
-	//UNC_ASSERT(m_comment_is_part_of_preproc_macro == ((pc->flags & PCF_IN_PREPROC) != 0));
-	m_comment_is_part_of_preproc_macro = ((pc->flags & PCF_IN_PREPROC) != 0);
+   /*
+   unfortunately, 'pc && (pc->flags & PCF_IN_PREPROC)' is also TRUE when inside a big #if 0 ... #endif chunk :-(
+   */
+   UNC_ASSERT((pc && (pc->flags & PCF_IN_PREPROC)) >= m_comment_is_part_of_preproc_macro);
 
 	//m_left_global_output_column = cpd.column;
 
@@ -849,7 +864,7 @@ void cmt_reflow::set_deferred_cmt_config_params_phase1(void)
       {
          if (!cpd.settings[UO_cmt_indent_multi].b)
          {
-			 m_reflow_mode = 1;
+			 m_reflow_mode = CMT_REFLOW_MODE_DO_NOT_REFLOW;
 			 // output_comment_multi_simple(pc);
          }
 		 m_is_cpp_comment = false;
@@ -863,8 +878,6 @@ void cmt_reflow::set_deferred_cmt_config_params_phase1(void)
 		 m_is_cpp_comment = false;
       }
 
-
-   m_brace_col = 1 + (pc->brace_level * cpd.settings[UO_output_tab_size].n);
 
 int cmt_col;
 int col_diff;
@@ -886,7 +899,7 @@ int col_diff;
    m_left_global_output_column = pc->column;
    //m_brace_col   = pc->column_indent;
    m_base_col    = pc->column_indent;
-   m_orig_startcolumn = pc->orig_col;
+   //m_orig_startcolumn = pc->orig_col;
 
    if ((pc->parent_type == CT_COMMENT_START) ||
        (pc->parent_type == CT_COMMENT_WHOLE))
@@ -897,7 +910,7 @@ int col_diff;
       {
          m_left_global_output_column = 1;
          m_base_col  = 1;
-         m_brace_col = 1;
+         //m_brace_col = 1;
       }
    }
    else if (pc->parent_type == CT_COMMENT_END)
@@ -969,6 +982,21 @@ int col_diff;
 }
 
 
+
+void cmt_reflow::infer_pre_and_post_star_spacing_from_input(int pre, int post)
+{
+	UNC_ASSERT(m_lead_marker);
+
+	if (m_extra_pre_star_indent < 0)
+	{
+		m_extra_pre_star_indent = pre;
+	}
+	if (m_extra_post_star_indent < 0)
+	{
+		m_extra_post_star_indent = post;
+	}
+}
+
 /*
 Set the parameters which depend on the entire input text being known.
 */
@@ -990,6 +1018,7 @@ void cmt_reflow::set_deferred_cmt_config_params_phase2(void)
 			*/
 		const char *text = m_comment;
 
+		lw = 0;
 		while (*text)
 		{
 			const char *eol = strchrnn(text, '\n');
@@ -1012,9 +1041,9 @@ void cmt_reflow::set_deferred_cmt_config_params_phase2(void)
 		lw += m_first_pc->column;
 	}
 
-	UNC_ASSERT(lw > m_left_global_output_column);
+	//UNC_ASSERT(lw >= m_left_global_output_column);
 	UNC_ASSERT(m_left_global_output_column > 0);
-	UNC_ASSERT(m_left_global_output_column >= m_first_pc->column);
+	//UNC_ASSERT(m_left_global_output_column >= m_first_pc->column);
 	const int heuristic_minimum_width = 16; // minimum allowed width
 	if (lw <= m_left_global_output_column + heuristic_minimum_width)
 	{
@@ -1036,27 +1065,9 @@ void cmt_reflow::set_deferred_cmt_config_params_phase2(void)
 		m_lead_marker = strdup("");
 	}
 
-	if (m_extra_pre_star_indent < 0)
-	{
-		m_extra_pre_star_indent = (m_is_cpp_comment
-			? 0
-			: (*m_lead_marker)
-				? 1
-				: 0);
-	}
-	if (m_extra_post_star_indent < 0)
-	{
-		m_extra_post_star_indent = (m_is_cpp_comment
-			? 1
-			: (*m_lead_marker)
-				? 1
-				: 0);
-	}
-
 	if (m_is_cpp_comment)
 	{
-		m_reflow_mode = cpd.settings[UO_cmt_reflow_mode_cpp].n;
-		UNC_ASSERT(m_is_cpp_comment == true);
+		set_reflow_mode(cpd.settings[UO_cmt_reflow_mode_cpp].n);
 		UNC_ASSERT(!*m_lead_marker);
 
 		if (cpd.settings[UO_cmt_cpp_to_c].b)
@@ -1067,63 +1078,137 @@ void cmt_reflow::set_deferred_cmt_config_params_phase2(void)
 			case TB_TRUE:
 				free((void *)m_lead_marker);
 				m_lead_marker = strdup("*");
-				m_extra_pre_star_indent = cpd.settings[UO_cmt_sp_before_star_cont].n;
-				m_extra_post_star_indent = cpd.settings[UO_cmt_sp_after_star_cont].n;
+				infer_pre_and_post_star_spacing_from_input(1, 1);
+				if (cpd.settings[UO_cmt_sp_before_star_cont].n >= 0)
+				{
+					m_extra_pre_star_indent = cpd.settings[UO_cmt_sp_before_star_cont].n;
+				}
+				UNC_ASSERT(m_extra_pre_star_indent >= 0);
+				if (cpd.settings[UO_cmt_sp_after_star_cont].n >= 0)
+				{
+					m_extra_post_star_indent = cpd.settings[UO_cmt_sp_after_star_cont].n;
+				}
+				UNC_ASSERT(m_extra_post_star_indent >= 0);
 				break;
 
 			case TB_FALSE:
 				*m_lead_marker = 0;
+				infer_pre_and_post_star_spacing_from_input(2, 1);
+#if 0
 				m_extra_pre_star_indent = 0;
 				m_extra_post_star_indent = 0;
+#else
+				if (cpd.settings[UO_cmt_sp_before_star_cont].n >= 0)
+				{
+					m_extra_pre_star_indent = cpd.settings[UO_cmt_sp_before_star_cont].n;
+				}
+				UNC_ASSERT(m_extra_pre_star_indent >= 0);
+				if (cpd.settings[UO_cmt_sp_after_star_cont].n >= 0)
+				{
+					m_extra_post_star_indent = cpd.settings[UO_cmt_sp_after_star_cont].n;
+				}
+				UNC_ASSERT(m_extra_post_star_indent >= 0);
+#endif
 				break;
 
 			case TB_NOCHANGE:
+				if (*m_lead_marker)
+				{
+					infer_pre_and_post_star_spacing_from_input(1, 1);
+				}
+				else
+				{
+					infer_pre_and_post_star_spacing_from_input(2, 1);
+				}
 				break;
 			}
 			m_is_cpp_comment = false;
 		}
 		else
 		{
-			/* Abuse^H^H^H^H^HRe-use the settings for the CPP comments: guestimate some sensible conversion here */
-			switch (cpd.settings[UO_cmt_star_cont].t)
+			int cmt_sp_after_cpp_start = cpd.settings[UO_cmt_sp_after_cpp_start].n;
+
+			if (cmt_sp_after_cpp_start < 0)
 			{
-			case TB_TRUE:
-				*m_lead_marker = 0;
-				m_extra_pre_star_indent = 0;
-				m_extra_post_star_indent = cpd.settings[UO_cmt_sp_after_star_cont].n;
+				cmt_sp_after_cpp_start = 1;
+			}
+
+			/* Configure the settings for the CPP comments */
+			*m_lead_marker = 0;
+			infer_pre_and_post_star_spacing_from_input(0, cmt_sp_after_cpp_start);
+			m_extra_pre_star_indent = 0;
+			switch (cpd.settings[UO_sp_cmt_cpp_start].a)
+			{
+			default:
+			case AV_IGNORE:
 				break;
 
-			case TB_FALSE:
-				*m_lead_marker = 0;
-				m_extra_pre_star_indent = 0;
+			case AV_REMOVE:
 				m_extra_post_star_indent = 0;
 				break;
 
-			case TB_NOCHANGE:
+			case AV_ADD:
+				m_extra_post_star_indent = max(cmt_sp_after_cpp_start, m_extra_post_star_indent);
+				break;
+
+			case AV_FORCE:
+				m_extra_post_star_indent = cmt_sp_after_cpp_start;
 				break;
 			}
+			UNC_ASSERT(m_extra_post_star_indent >= 0);
 		}
 	}
 	else if (m_is_single_line_comment)
 	{
-		m_reflow_mode = cpd.settings[UO_cmt_reflow_mode].n;
+		set_reflow_mode(cpd.settings[UO_cmt_reflow_mode].n);
 		UNC_ASSERT(m_is_cpp_comment == false);
 		switch (cpd.settings[UO_cmt_star_cont].t)
 		{
 		case TB_TRUE:
 			free((void *)m_lead_marker);
 			m_lead_marker = strdup("*");
-			m_extra_pre_star_indent = cpd.settings[UO_cmt_sp_before_star_cont].n;
-			m_extra_post_star_indent = cpd.settings[UO_cmt_sp_after_star_cont].n;
+			infer_pre_and_post_star_spacing_from_input(1, 1);
+			if (cpd.settings[UO_cmt_sp_before_star_cont].n >= 0)
+			{
+				m_extra_pre_star_indent = cpd.settings[UO_cmt_sp_before_star_cont].n;
+			}
+			UNC_ASSERT(m_extra_pre_star_indent >= 0);
+			if (cpd.settings[UO_cmt_sp_after_star_cont].n >= 0)
+			{
+				m_extra_post_star_indent = cpd.settings[UO_cmt_sp_after_star_cont].n;
+			}
+			UNC_ASSERT(m_extra_post_star_indent >= 0);
 			break;
 
 		case TB_FALSE:
 			*m_lead_marker = 0;
+			infer_pre_and_post_star_spacing_from_input(2, 1);
+#if 0
 			m_extra_pre_star_indent = 0;
 			m_extra_post_star_indent = 0;
+#else
+			if (cpd.settings[UO_cmt_sp_before_star_cont].n >= 0)
+			{
+				m_extra_pre_star_indent = cpd.settings[UO_cmt_sp_before_star_cont].n;
+			}
+			UNC_ASSERT(m_extra_pre_star_indent >= 0);
+			if (cpd.settings[UO_cmt_sp_after_star_cont].n >= 0)
+			{
+				m_extra_post_star_indent = cpd.settings[UO_cmt_sp_after_star_cont].n;
+			}
+			UNC_ASSERT(m_extra_post_star_indent >= 0);
+#endif
 			break;
 
 		case TB_NOCHANGE:
+			if (*m_lead_marker)
+			{
+				infer_pre_and_post_star_spacing_from_input(1, 1);
+			}
+			else
+			{
+				infer_pre_and_post_star_spacing_from_input(2, 1);
+			}
 			break;
 		}
 
@@ -1132,7 +1217,7 @@ void cmt_reflow::set_deferred_cmt_config_params_phase2(void)
 	else
 	{
 		/* multiline comment: */
-		m_reflow_mode = cpd.settings[UO_cmt_reflow_mode].n;
+		set_reflow_mode(cpd.settings[UO_cmt_reflow_mode].n);
 		UNC_ASSERT(m_is_cpp_comment == false);
 		tristate_t tb = cpd.settings[UO_cmt_star_cont].t;
 		if (!cpd.settings[UO_cmt_indent_multi].b)
@@ -1144,17 +1229,48 @@ void cmt_reflow::set_deferred_cmt_config_params_phase2(void)
 		case TB_TRUE:
 			free((void *)m_lead_marker);
 			m_lead_marker = strdup("*");
-			m_extra_pre_star_indent = cpd.settings[UO_cmt_sp_before_star_cont].n;
-			m_extra_post_star_indent = cpd.settings[UO_cmt_sp_after_star_cont].n;
+			infer_pre_and_post_star_spacing_from_input(1, 1);
+			if (cpd.settings[UO_cmt_sp_before_star_cont].n >= 0)
+			{
+				m_extra_pre_star_indent = cpd.settings[UO_cmt_sp_before_star_cont].n;
+			}
+			UNC_ASSERT(m_extra_pre_star_indent >= 0);
+			if (cpd.settings[UO_cmt_sp_after_star_cont].n >= 0)
+			{
+				m_extra_post_star_indent = cpd.settings[UO_cmt_sp_after_star_cont].n;
+			}
+			UNC_ASSERT(m_extra_post_star_indent >= 0);
 			break;
 
 		case TB_FALSE:
 			*m_lead_marker = 0;
+			infer_pre_and_post_star_spacing_from_input(2, 1);
+#if 0
 			m_extra_pre_star_indent = 0;
 			m_extra_post_star_indent = 0;
+#else
+			if (cpd.settings[UO_cmt_sp_before_star_cont].n >= 0)
+			{
+				m_extra_pre_star_indent = cpd.settings[UO_cmt_sp_before_star_cont].n;
+			}
+			UNC_ASSERT(m_extra_pre_star_indent >= 0);
+			if (cpd.settings[UO_cmt_sp_after_star_cont].n >= 0)
+			{
+				m_extra_post_star_indent = cpd.settings[UO_cmt_sp_after_star_cont].n;
+			}
+			UNC_ASSERT(m_extra_post_star_indent >= 0);
+#endif
 			break;
 
 		case TB_NOCHANGE:
+			if (*m_lead_marker)
+			{
+				infer_pre_and_post_star_spacing_from_input(1, 1);
+			}
+			else
+			{
+				infer_pre_and_post_star_spacing_from_input(2, 1);
+			}
 			break;
 		}
 
@@ -1170,7 +1286,7 @@ void cmt_reflow::set_deferred_cmt_config_params_phase3(void)
 {
 	if (!m_is_cpp_comment)
 	{
-		if ((m_first_pc->parent_type == CT_COMMENT_START && 00)
+		if ((m_first_pc->parent_type == CT_COMMENT_START)
 			|| m_first_pc->parent_type == CT_COMMENT_WHOLE)
 		{
 			if (!m_is_single_line_comment)
@@ -1290,11 +1406,11 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 	enum
 	{
 		REGULAR_PARSE_MODE,
-		IN_NONREFLOW_LINE,
-		IN_NONREFLOW_PARAGRAPH,
-		IN_NONREFLOW_COMMENT,
-		IN_NONREFLOW_SECTION,
-	} parse_mode = (m_reflow_mode != 2 ? IN_NONREFLOW_COMMENT : REGULAR_PARSE_MODE);
+		IN_NONREFLOW_LINE,				// this input line is treated as a single non-reflowable entity
+		IN_NONREFLOW_PARAGRAPH,			// this 'paragraph' (surrounded by paragraph markers, i.e. double newlines) is treated as a non-reflowable entity
+		IN_NONREFLOW_COMMENT,			// this entire comment, i.e. the complete text is treated as a non-reflowable entity
+		IN_NONREFLOW_SECTION,           // an entire section of text (i.e. possibly multiple 'paragraphs') is treated as a non-reflowable entity. A 'section' is terminated by a section delimiting character sequence, often quite similar to the character sequence which made the parser realize we're at the start of a 'section' after all.
+	} parse_mode = (m_reflow_mode == CMT_REFLOW_MODE_DO_NOT_REFLOW ? IN_NONREFLOW_COMMENT : REGULAR_PARSE_MODE);
 
 	/*
 	push a single non-printing box to ensure the box set is always at least count >= 1
@@ -1795,7 +1911,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 			/* the current line may NOT be reflown: treat as a single word and mark as non-reflowable. */
 			if (text < eol)
 			{
-				UNC_ASSERT(s < e);
+				UNC_ASSERT(s <= e);
 
 				UNC_ASSERT(!current_word->m_text);
 				UNC_ASSERT(newline_count == 0);
@@ -2862,7 +2978,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 #if defined(_MSC_VER)
 #pragma message(__FILE__ "(" STRING(__LINE__) ") : TODO: check why this assert fires.")
 #endif
-					//UNC_ASSERT(text == current_word->m_text);
+					UNC_ASSERT(text == current_word->m_text);
 
 					/*
 					accept any C escape sequence or escaped regex bit. Don't be too picky...
@@ -4187,6 +4303,7 @@ void cmt_reflow::expand_math_et_al_markers(words_collection &words)
 					else if (b->m_is_punctuation
 						&& in_set("({[", b->m_text[0]))
 					{
+						UNC_ASSERT(b->m_word_length > 0);
 						lh_reqd = false;
 						master_is_code |= in_set("{", b->m_text[0]);
 						continue;
@@ -4194,6 +4311,7 @@ void cmt_reflow::expand_math_et_al_markers(words_collection &words)
 					else if (b->m_is_punctuation
 						&& in_set("]})", b->m_text[0]))
 					{
+						UNC_ASSERT(b->m_word_length > 0);
 						lh_reqd = true;
 						master_is_code |= in_set("}", b->m_text[0]);
 						continue;
@@ -4301,6 +4419,7 @@ void cmt_reflow::expand_math_et_al_markers(words_collection &words)
 					else if (b->m_is_punctuation
 						&& in_set("({[", b->m_text[0]))
 					{
+						UNC_ASSERT(b->m_word_length > 0);
 						rh_reqd = false;
 
 						master_is_code |= in_set("{", b->m_text[0]);
@@ -4339,6 +4458,7 @@ void cmt_reflow::expand_math_et_al_markers(words_collection &words)
 							if (b->m_is_punctuation)
 							{
 								bool the_end = false;
+								UNC_ASSERT(b->m_word_length > 0);
 
 								switch(b->m_text[0])
 								{
@@ -4400,6 +4520,7 @@ void cmt_reflow::expand_math_et_al_markers(words_collection &words)
 					else if (b->m_is_punctuation
 						&& in_set("]})", b->m_text[0]))
 					{
+						UNC_ASSERT(b->m_word_length > 0);
 						rh_reqd = false;
 
 						master_is_code |= in_set("}", b->m_text[0]);
@@ -4438,6 +4559,7 @@ void cmt_reflow::expand_math_et_al_markers(words_collection &words)
 							if (b->m_is_punctuation)
 							{
 								bool the_end = false;
+								UNC_ASSERT(b->m_word_length > 0);
 
 								switch(b->m_text[0])
 								{
@@ -4942,7 +5064,7 @@ void cmt_reflow::fixup_paragraph_tree(paragraph_box *para)
 Scan the 'words' (the atomic text boxes) and detect the 'paragraph' hierarchy; store
 this hierarchy in the paragraph_collection as a tree, ready for traversal.
 */
-int cmt_reflow::grok_the_words(paragraph_box *root, words_collection &words)
+void cmt_reflow::grok_the_words(paragraph_box *root, words_collection &words)
 {
 	UNC_ASSERT(root);
 	UNC_ASSERT(words.count() >= 2);
@@ -5031,7 +5153,7 @@ int cmt_reflow::grok_the_words(paragraph_box *root, words_collection &words)
 	We can start the scan in a sequential fashion as we start to look at the
 	'paragraphs of text'. Depending on what we find, we'll take it from there.
 	*/
-	if (m_reflow_mode == 1)
+	if (m_reflow_mode == CMT_REFLOW_MODE_DO_NOT_REFLOW)
 	{
 		/* do not split the one 'paragraph' in many sub-paragraphs! */
 		root->m_is_non_reflowable = true;
@@ -5270,8 +5392,6 @@ int cmt_reflow::grok_the_words(paragraph_box *root, words_collection &words)
 		UNC_ASSERT(parent == root);
 		UNC_ASSERT(level == 0);
 	}
-
-	return 0;
 }
 
 
@@ -5453,7 +5573,8 @@ int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_colle
 			UNC_ASSERT(para->m_parent ? para->m_first_box >= para->m_parent->m_first_box : 1);
 			UNC_ASSERT(para->m_parent ? para->m_last_box <= para->m_parent->m_last_box : 1);
 
-			UNC_ASSERT(para->m_is_xhtml ? deferred_newlines >= 0 : deferred_newlines >= 1);
+			//UNC_ASSERT(para->m_is_xhtml ? deferred_newlines >= 0 : deferred_newlines >= 1);
+			UNC_ASSERT(para->m_is_xhtml ? deferred_newlines >= 0 : deferred_newlines >= 0);
 			para->m_min_required_linebreak_after = deferred_newlines;
 			next_para->m_min_required_linebreak_before = deferred_newlines;
 			deferred_newlines = 0;
@@ -6641,7 +6762,7 @@ public:
 
 		max_usable_linewidth = linewidth - cmt->m_extra_pre_star_indent
 			 - cmt->m_extra_post_star_indent
-			- cmt->m_lead_cnt;
+			 - (cmt->m_lead_marker ? (int)strlen(cmt->m_lead_marker) : 0);
 		if (!cmt->m_has_leading_nl)
 		{
 			firstline_extra_space = 1 /* TODO */ ;
@@ -7114,6 +7235,8 @@ int cmt_reflow::reflow_a_single_para_4_trial(paragraph_box *para, words_collecti
 			// regular processing ...
 			if (box->m_line_count > 0)
 			{
+				// if (m_reflow_mode == CMT_REFLOW_MODE_DO_ONLY_LINEWRAP 					// keep existing newlines in this mode???
+
 				if (deferred_whitespace == 0
 					&& content_printed_on_this_line > 0
 					&& deferred_nl == 0)
@@ -7726,7 +7849,7 @@ void cmt_reflow::render(void)
 	paragraph_box *root = new paragraph_box();
 
 	set_deferred_cmt_config_params_phase3();
-	int rv = grok_the_words(root, words);
+	grok_the_words(root, words);
 
 	UNC_ASSERT(m_comment_len == strlen(m_comment));
 #if 0
@@ -7762,7 +7885,7 @@ void cmt_reflow::render(void)
 #if 0
 	write2output("\n\n***PARAGRAPHS OUTPUT***\n");
 #endif
-	if (this->m_reflow_mode != 1)
+	if (m_reflow_mode != CMT_REFLOW_MODE_DO_NOT_REFLOW)
 	{
 		reflow_para_hierarchy(root, words);
 	}

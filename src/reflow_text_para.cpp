@@ -1,7 +1,7 @@
 /**
  * @file reflow_text_para.cpp
  *
- * A big honkin' text reflow engine, used to reformat comments in 'enhanced' mode 2.
+ * A big honkin' text reflow engine, used to reformat comments in 'enhanced' mode CMT_REFLOW_MODE_DO_FULL_REFLOW.
  *
  * This reflow engine works on a 'per-page' basis, where a 'page' here is one entire
  * comment. It does not work on a per-paragraph basis as that prevents the reflow

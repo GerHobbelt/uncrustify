@@ -1,7 +1,7 @@
 /**
  * @file reflow_text_utils.cpp
  *
- * A big honkin' text reflow engine, used to reformat comments in 'enhanced' mode 2.
+ * A big honkin' text reflow engine, used to reformat comments in 'enhanced' mode CMT_REFLOW_MODE_DO_FULL_REFLOW.
  *
  * This reflow engine works on a 'per-page' basis, where a 'page' here is one entire
  * comment. It does not work on a per-paragraph basis as that prevents the reflow
@@ -499,7 +499,8 @@ bool is_html_entity_name(const char *text, int *word_length)
 
 bool cmt_reflow::chunk_is_inline_comment(const chunk_t *pc)
 {
-	bool is_inline_comment = ((pc->flags & PCF_RIGHT_COMMENT) != 0);
+	//bool is_inline_comment = ((pc->flags & PCF_RIGHT_COMMENT) != 0);
+	bool is_inline_comment = ((pc->parent_type == CT_COMMENT_END) || (pc->parent_type == CT_COMMENT_EMBED));
 	UNC_ASSERT(is_inline_comment ? pc->column > 1 : true);
 	return is_inline_comment;
 }
@@ -913,6 +914,9 @@ Expand the TABs in the input text; the output buffer will be dimensioned properl
 
 Also clean any trailing whitespace.
 
+Extra: replace '/'+'*' and '*'+'/' by a different non-breaking sequence when the output
+       will be C comment, so we don't get nested C comment issues.
+
 Be aware that 'first_column' is 1-based!
 */
 size_t cmt_reflow::expand_tabs_and_clean(char **dst_ref, size_t *dstlen_ref, const char *src, size_t srclen, int first_column, bool part_of_preproc_continuation)
@@ -924,7 +928,8 @@ size_t cmt_reflow::expand_tabs_and_clean(char **dst_ref, size_t *dstlen_ref, con
 	size_t dstlen;
 	UNC_ASSERT(dst_ref);
 	UNC_ASSERT(dstlen_ref);
-	*dstlen_ref = dstlen = srclen + tab_count * (tabsize - 1) + first_column + 2;
+	/* also make sure you've got enough space to 'expand' '/'+'*', etc. sequences: 2 chars turns into 3 then. */
+	*dstlen_ref = dstlen = (srclen * 3) / 2 + tab_count * (tabsize - 1) + first_column + 2;
 	char *dst;
 	*dst_ref = dst = (char *)malloc(dstlen);
 	char *last_nonwhite_idx = dst;
@@ -967,16 +972,66 @@ size_t cmt_reflow::expand_tabs_and_clean(char **dst_ref, size_t *dstlen_ref, con
 				/* drop this one; it'll be regenerated on output anyway. */
 				break;
 			}
-			if (0)
-			{
+			goto default_case;
+
 		case '\n':
-				/* trim trailing whitespace right now: */
-				if (last_nonwhite_idx != dst)
-					dst = last_nonwhite_idx;
-				pos = -1;
-				/* fall through */
+			/* trim trailing whitespace right now: */
+			if (last_nonwhite_idx != dst)
+				dst = last_nonwhite_idx;
+			pos = -1;
+			/* fall through */
+			goto default_case;
+
+		case '/':
+			if (m_is_cpp_comment && cpd.settings[UO_cmt_cpp_to_c].b)
+			{
+				if (srclen > 1 && '*' == src[1])
+				{
+					/*
+					Inject another character so the '/'+'*' seqeunce gets broken.
+
+					As it is an inject, do NOT count it against POS? For now, we do NOT.
+					*/
+					UNC_ASSERT(dstlen > (size_t)(dst + 1 - *dst_ref));
+					*dst++ = *src;
+					pos++;
+					*dst++ = NONBREAKING_SPACE_CHAR;
+					last_nonwhite_idx = dst;
+					/*
+					do NOT fallthrough but run the loop on the next character so that
+					oddities like '/'+'*'+'/' don't screw us up when converting to C comments.
+					*/
+					continue;
+				}
 			}
+			goto default_case;
+
+		case '*':
+			if (m_is_cpp_comment && cpd.settings[UO_cmt_cpp_to_c].b)
+			{
+				if (srclen > 1 && '/' == src[1])
+				{
+					/*
+					Inject another character so the '*'+'/' seqeunce gets broken.
+
+					As it is an inject, do NOT count it against POS? For now, we do NOT.
+					*/
+					UNC_ASSERT(dstlen > (size_t)(dst + 1 - *dst_ref));
+					*dst++ = *src;
+					pos++;
+					*dst++ = NONBREAKING_SPACE_CHAR;
+					last_nonwhite_idx = dst;
+					/*
+					do NOT fallthrough but run the loop on the next character so that
+					oddities like '*'+'/'+'*' don't screw us up when converting to C comments.
+					*/
+					continue;
+				}
+			}
+			goto default_case;
+
 		default:
+default_case:
 			UNC_ASSERT(dstlen > (size_t)(dst - *dst_ref));
 			*dst++ = *src;
 			//dstlen--;
@@ -1079,6 +1134,7 @@ entire comment!
 int cmt_reflow::strip_nonboxed_lead_markers(char *text, int at_column)
 {
 	char *second_line = strchrnn(text, '\n');
+    int lead_cnt = 0; /* number of '*' lead characters used for each comment line [0..2] */
 	bool determine_leadin = (m_lead_marker == NULL);
 	int min_cnt = 0;
 	int horizontal_lead_index = 0;
@@ -1113,7 +1169,7 @@ int cmt_reflow::strip_nonboxed_lead_markers(char *text, int at_column)
 				}
 				if (determine_leadin)
 				{
-					m_lead_marker = strndup(second_line - 1, cnt);
+					m_lead_marker = strndup(second_line - cnt, cnt);
 				}
 			}
 			else if (min_cnt > cnt)
@@ -1134,7 +1190,7 @@ int cmt_reflow::strip_nonboxed_lead_markers(char *text, int at_column)
 				{
 					UNC_ASSERT(m_lead_marker);
 					UNC_ASSERT((int)strlen(m_lead_marker) > cnt);
-					memcpy(m_lead_marker, second_line - 1, cnt);
+					memcpy(m_lead_marker, second_line - cnt, cnt);
 					m_lead_marker[cnt] = 0;
 				}
 			}
@@ -1174,9 +1230,9 @@ int cmt_reflow::strip_nonboxed_lead_markers(char *text, int at_column)
 		last_nl = second_line;
 	}
 
-	if (m_lead_cnt == 0)
-		m_lead_cnt = min_cnt;
-	UNC_ASSERT(m_lead_cnt == (m_lead_marker ? (int)strlen(m_lead_marker) : 0));
+	if (lead_cnt == 0)
+		lead_cnt = min_cnt;
+	UNC_ASSERT(lead_cnt == (m_lead_marker ? (int)strlen(m_lead_marker) : 0));
 
 	if (min_cnt == 0)
 		return 0;
@@ -1210,7 +1266,7 @@ int cmt_reflow::strip_nonboxed_lead_markers(char *text, int at_column)
 		empty lines).
 		    */
 		UNC_ASSERT(min_cnt > 0);
-		bool maybe_boxed = (eol > second_line + max(min_cnt, m_lead_cnt) && 0 == strncmp(eol - m_lead_cnt, m_lead_marker, m_lead_cnt));
+		bool maybe_boxed = (eol > second_line + max(min_cnt, lead_cnt) && 0 == strncmp(eol - lead_cnt, m_lead_marker, lead_cnt));
 
 		if (maybe_boxed)
 		{
@@ -1237,7 +1293,7 @@ int cmt_reflow::strip_nonboxed_lead_markers(char *text, int at_column)
 				char *el = strchrnn(sl, '\n');
 				char *eol2 = el - strtaillen(sl, el, ' ');
 
-				bool maybe_boxed2 = (eol2 > sl + max(min_cnt, m_lead_cnt) && 0 == strncmp(eol2 - m_lead_cnt, m_lead_marker, m_lead_cnt));
+				bool maybe_boxed2 = (eol2 > sl + max(min_cnt, lead_cnt) && 0 == strncmp(eol2 - lead_cnt, m_lead_marker, lead_cnt));
 
 				if (eol2 == sl)
 				{
@@ -1337,7 +1393,16 @@ void cmt_reflow::push_chunk(chunk_t *pc)
    if (pc->type == CT_COMMENT_MULTI
 		  || pc->type == CT_COMMENT)
    {
-      push_text(pc->str + 2, pc->len - 4, false, 2, pc->orig_col, pc);
+	   /*
+	   make sure we only strip the tail marker off when it actually exists:
+
+	   when the input is BAD/CORRUPTED (e.g. test sample C++/30011), the trailing
+	   '*'+'/' or '+'+'/' (in the case of LANG_D) may be absent. Thsi condition takes
+	   care of that matter for us.
+	   */
+	   bool walkback = (pc->str[pc->len - 1] == pc->str[0]
+						&& pc->str[pc->len - 2] == pc->str[1]);
+		push_text(pc->str + 2, pc->len - (walkback ? 4 : 2), false, 2, pc->orig_col, pc);
    }
    else
    {
@@ -1374,12 +1439,9 @@ void cmt_reflow::push_text(const char *text, int len, bool esc_close, int first_
    /* apply initial indent: */
    if (at_column < 0)
    {
-	   at_column = m_orig_startcolumn;
+	   at_column = pc->orig_col;
    }
    UNC_ASSERT(at_column >= 1);
-   //UNC_ASSERT(at_column >= m_orig_startcolumn);
-
-   UNC_ASSERT(m_orig_startcolumn == at_column);
 
    /*
    before we go and 'position' the comment, we first check and remove any javadoc marker at the start as that
@@ -1431,12 +1493,12 @@ void cmt_reflow::push_text(const char *text, int len, bool esc_close, int first_
    */
    char *dst;
    size_t newlen;
-   bool in_pp = ((cpd.in_preproc != CT_NONE) && (cpd.in_preproc != CT_PP_DEFINE));
+	UNC_ASSERT(m_comment_is_part_of_preproc_macro == ((cpd.in_preproc != CT_NONE) && (cpd.in_preproc != CT_PP_DEFINE)));
    /*
    unfortunately, 'pc && (pc->flags & PCF_IN_PREPROC)' is also TRUE when inside a big #if 0 ... #endif chunk :-(
    */
-   UNC_ASSERT((pc && (pc->flags & PCF_IN_PREPROC)) >= in_pp);
-   len = (int)expand_tabs_and_clean(&dst, &newlen, text, len, first_extra_offset + at_column, in_pp);
+   UNC_ASSERT((pc && (pc->flags & PCF_IN_PREPROC)) >= m_comment_is_part_of_preproc_macro);
+   len = (int)expand_tabs_and_clean(&dst, &newlen, text, len, first_extra_offset + at_column, m_comment_is_part_of_preproc_macro);
 
    /*
    speed-up for heap manager: reserve [probably required] space for this comment up front.
@@ -1556,15 +1618,6 @@ void cmt_reflow::push_text(const char *text, int len, bool esc_close, int first_
 	  }
 	  else
       {
-#if 0
-		  /* Escape a C closure in a CPP comment */
-         if (esc_close &&
-             ((was_star && (*s == '/')) ||
-              (was_slash && (*s == '*'))))
-         {
-            push("+"); // was: ' '
-         }
-#endif
 		 if (!in_word && !unc_isspace(*s))
          {
             m_word_count++;
@@ -1774,9 +1827,10 @@ bool cmt_reflow::can_combine_comment(chunk_t *pc)
 				   (next->type == pc->type) &&
 				   chunk_is_inline_comment(pc) == chunk_is_inline_comment(next) &&
 				   detect_as_javadoc_chunk(next) /* && m_is_doxygen_comment */ &&
-				   (((next->column == 1) && (pc->column == 1)) ||
-				   ((next->column == m_brace_col) && (pc->column == m_brace_col)) ||
-				   ((next->column > m_brace_col) && (pc->parent_type == CT_COMMENT_END))))
+				   ((next->column == pc->column) ||
+				    ((next->column > 1 + pc->level * m_tab_width /* cpd.settings[UO_input_tab_size].n */ ) &&
+		             (pc->parent_type == CT_COMMENT_END || pc->parent_type == CT_COMMENT_WHOLE)
+					)))
 			   {
 				   return true;
 			   }
@@ -1793,11 +1847,12 @@ bool cmt_reflow::can_combine_comment(chunk_t *pc)
       next = chunk_get_next(next);
       if ((next != NULL) &&
           (next->type == pc->type) &&
-		   chunk_is_inline_comment(pc) == chunk_is_inline_comment(next) &&
+		   // chunk_is_inline_comment(pc) == chunk_is_inline_comment(next) &&
 		  !detect_as_javadoc_chunk(pc) && !m_is_doxygen_comment &&
-		   (((next->column == 1) && (pc->column == 1)) ||
-           ((next->column == m_brace_col) && (pc->column == m_brace_col)) ||
-           ((next->column > m_brace_col) && (pc->parent_type == CT_COMMENT_END))))
+		   ((next->column == pc->column) ||
+           ((next->column > 1 + pc->level * m_tab_width /* cpd.settings[UO_input_tab_size].n */ ) &&
+		     (pc->parent_type == CT_COMMENT_END || pc->parent_type == CT_COMMENT_WHOLE)
+		   )))
       {
          return true;
       }

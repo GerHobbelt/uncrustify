@@ -1116,6 +1116,8 @@ void register_options(void)
                   "The number of spaces to insert at the start of subsequent comment lines");
    unc_add_option("cmt_sp_after_star_cont", UO_cmt_sp_after_star_cont, AT_NUM,
                   "The number of spaces to insert after the star on subsequent comment lines");
+   unc_add_option("cmt_sp_after_cpp_start", UO_cmt_sp_after_cpp_start, AT_NUM,
+                  "The number of spaces to insert after the '//' on comment lines.");
 
    unc_add_option("cmt_multi_check_last", UO_cmt_multi_check_last, AT_BOOL,
                   "For multi-line comments with a '*' lead, remove leading spaces if the first and last lines of\n"
@@ -1965,7 +1967,7 @@ void set_option_defaults(void)
    cpd.settings[UO_cmt_star_cont].t = TB_NOCHANGE;
 	cpd.settings[UO_cmt_width].n = -1;
 	cpd.settings[UO_cmt_inline_width].n = -1;
-	cpd.settings[UO_cmt_reflow_mode].n = 2;
+	cpd.settings[UO_cmt_reflow_mode].n = 1;
 	cpd.settings[UO_cmt_reflow_mode_cpp].n = 1;
 	cpd.settings[UO_cmt_reflow_orphans].n = 4;
 	cpd.settings[UO_cmt_reflow_widows].n = 3;
@@ -1988,6 +1990,9 @@ void set_option_defaults(void)
 	cpd.settings[UO_cmt_reflow_no_reflow_end_tag].str = strdup("</pre>");
 	cpd.settings[UO_cmt_reflow_doxygen].b = true;
 	cpd.settings[UO_cmt_lead_markers].str = strdup("*#\\|+");
+   cpd.settings[UO_cmt_sp_before_star_cont].n = -1;
+   cpd.settings[UO_cmt_sp_after_star_cont].n = -1;
+   cpd.settings[UO_cmt_sp_after_cpp_start].n = -1;
 }
 
 

@@ -429,6 +429,10 @@ static chunk_t *output_comment(chunk_t *pc)
 void cmt_reflow::write(char ch)
 {
 	UNC_ASSERT(ch);
+	if (ch == NONBREAKING_SPACE_CHAR)
+	{
+		ch = ' ';
+	}
 	::add_char(ch);
 }
 
