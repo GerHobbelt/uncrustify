@@ -2472,20 +2472,18 @@ void do_blank_lines(void)
       }
 
       /* Change blanks between a function comment and body */
-      if ((cpd.settings[UO_nl_comment_func_def].n != 0) &&
+      if ((cpd.settings[UO_nl_comment_func_def].n > 0) &&
+		  (cpd.settings[UO_nl_comment_func_def].n != pc->nl_count) &&
           (pcmt->type == CT_COMMENT_MULTI) &&
           (pcmt->parent_type == CT_COMMENT_WHOLE) &&
           (next != NULL) && (next->parent_type == CT_FUNC_DEF))
       {
-         if (cpd.settings[UO_nl_comment_func_def].n != pc->nl_count)
-         {
             LOG_FMT(LCMTNL, "%s: nl_comment_func_def affected line %d\n", __func__, pc->orig_line);
             pc->nl_count = cpd.settings[UO_nl_comment_func_def].n;
-         }
       }
 
       /* Change blanks after a try-catch-finally block */
-      if ((cpd.settings[UO_nl_after_try_catch_finally].n != 0) &&
+      if ((cpd.settings[UO_nl_after_try_catch_finally].n > 0) &&
           (cpd.settings[UO_nl_after_try_catch_finally].n != pc->nl_count) &&
           (prev != NULL) && (next != NULL))
       {
@@ -2503,7 +2501,7 @@ void do_blank_lines(void)
       }
 
       /* Change blanks after a try-catch-finally block */
-      if ((cpd.settings[UO_nl_between_get_set].n != 0) &&
+      if ((cpd.settings[UO_nl_between_get_set].n > 0) &&
           (cpd.settings[UO_nl_between_get_set].n != pc->nl_count) &&
           (prev != NULL) && (next != NULL))
       {
@@ -2517,7 +2515,7 @@ void do_blank_lines(void)
       }
 
       /* Change blanks after a try-catch-finally block */
-      if ((cpd.settings[UO_nl_around_cs_property].n != 0) &&
+      if ((cpd.settings[UO_nl_around_cs_property].n > 0) &&
           (cpd.settings[UO_nl_around_cs_property].n != pc->nl_count) &&
           (prev != NULL) && (next != NULL))
       {
