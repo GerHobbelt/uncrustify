@@ -803,24 +803,34 @@ void register_options(void)
 
    unc_begin_group(UG_blankline, "Blank line options", "Note that it takes 2 newlines to get a blank line");
    unc_add_option("nl_max", UO_nl_max, AT_NUM,
-                  "The maximum consecutive newlines");
+	              "The maximum number of consecutive blank lines.\n"
+                  "0 = No limit.");
    unc_add_option("nl_after_func_proto", UO_nl_after_func_proto, AT_NUM,
-                  "The number of newlines after a function prototype, if followed by another function prototype");
+                  "The minimum number of newlines after a function prototype, if followed by\n"
+				  "another function prototype.\n"
+                  "0 = No change.");
    unc_add_option("nl_after_func_proto_group", UO_nl_after_func_proto_group, AT_NUM,
-                  "The number of newlines after a function prototype, if not followed by another function prototype");
+                  "The minimum number of newlines after a function prototype, if not followed\n"
+				  "by another function prototype.\n"
+                  "0 = No change.");
    unc_add_option("nl_after_func_body", UO_nl_after_func_body, AT_NUM,
-                  "The number of newlines after '}' of a multi-line function body");
+                  "The number of newlines after '}' of a multi-line function body.\n"
+                  "0 = No change.");
    unc_add_option("nl_after_func_body_one_liner", UO_nl_after_func_body_one_liner, AT_NUM,
-                  "The number of newlines after '}' of a single line function body");
+                  "The minimum number of newlines after '}' of a single line function body.\n"
+                  "0 = No change.");
    unc_add_option("nl_before_block_comment", UO_nl_before_block_comment, AT_NUM,
                   "The minimum number of newlines before a multi-line comment.\n"
-                  "Doesn't apply if after a brace open or another multi-line comment.");
+                  "Doesn't apply if after a brace open or another multi-line comment.\n"
+                  "0 = No change.");
    unc_add_option("nl_before_c_comment", UO_nl_before_c_comment, AT_NUM,
                   "The minimum number of newlines before a single-line C comment.\n"
-                  "Doesn't apply if after a brace open or other single-line C comments.");
+                  "Doesn't apply if after a brace open or other single-line C comments.\n"
+                  "0 = No change.");
    unc_add_option("nl_before_cpp_comment", UO_nl_before_cpp_comment, AT_NUM,
                   "The minimum number of newlines before a CPP comment.\n"
-                  "Doesn't apply if after a brace open or other CPP comments.");
+                  "Doesn't apply if after a brace open or other CPP comments.\n"
+                  "0 = No change.");
    unc_add_option("nl_after_multiline_comment", UO_nl_after_multiline_comment, AT_BOOL,
                   "Whether to force a newline after a multi-line comment.");
 
@@ -833,7 +843,8 @@ void register_options(void)
                   "0 = No change.");
 
    unc_add_option("nl_comment_func_def", UO_nl_comment_func_def, AT_NUM,
-                  "The number of newlines between a function def and the function comment.\n"
+                  "The minimum number of newlines between a function def and the function\n"
+				  "comment.\n"
                   "0 = No change.");
 
    unc_add_option("nl_after_try_catch_finally", UO_nl_after_try_catch_finally, AT_NUM,
@@ -907,7 +918,7 @@ void register_options(void)
    unc_add_option("align_var_def_thresh", UO_align_var_def_thresh, AT_NUM,
                   "The threshold for aligning variable definitions (0=no limit)", "", 0, 5000);
    unc_add_option("align_var_def_gap", UO_align_var_def_gap, AT_NUM,
-                  "The gap for aligning variable definitions");
+                  "The gap for aligning variable definitions", "", -5000, 5000);
    unc_add_option("align_var_def_colon", UO_align_var_def_colon, AT_BOOL,
                   "Whether to align the colon in struct bit fields");
    unc_add_option("align_var_def_attribute", UO_align_var_def_attribute, AT_BOOL,
@@ -927,11 +938,11 @@ void register_options(void)
    unc_add_option("align_var_struct_thresh", UO_align_var_struct_thresh, AT_NUM,
                   "The threshold for aligning struct/union member definitions (0=no limit)", "", 0, 5000);
    unc_add_option("align_var_struct_gap", UO_align_var_struct_gap, AT_NUM,
-                  "The gap for aligning struct/union member definitions");
+                  "The gap for aligning struct/union member definitions", "", -5000, 5000);
    unc_add_option("align_struct_init_span", UO_align_struct_init_span, AT_NUM,
                   "The span for aligning struct initializer values (0=don't align)", "", 0, 5000);
    unc_add_option("align_typedef_gap", UO_align_typedef_gap, AT_NUM,
-                  "The minimum space between the type and the synonym of a typedef");
+                  "The minimum space between the type and the synonym of a typedef", "", -5000, 5000);
    unc_add_option("align_typedef_span", UO_align_typedef_span, AT_NUM,
                   "The span for aligning single-line typedefs (0=don't align)");
    unc_add_option("align_typedef_func", UO_align_typedef_func, AT_NUM,
@@ -955,14 +966,14 @@ void register_options(void)
    unc_add_option("align_right_cmt_mix", UO_align_right_cmt_mix, AT_BOOL,
                   "If aligning comments, mix with comments after '}' and #endif with less than 3 spaces before the comment");
    unc_add_option("align_right_cmt_gap", UO_align_right_cmt_gap, AT_NUM,
-                  "If a trailing comment is more than this number of columns away from the text it follows,\n"
-                  "it will qualify for being aligned. This has to be > 0 to do anything.");
+                  "If a trailing comment is more than this number of columns away from\n"
+				  "the text it follows, it will qualify for being aligned.", "", -5000, 5000);
    unc_add_option("align_right_cmt_at_col", UO_align_right_cmt_at_col, AT_NUM,
                   "Align trailing comment at or beyond column N; 'pulls in' comments as a bonus side effect (0=ignore)", "", 0, 200);
    unc_add_option("align_func_proto_span", UO_align_func_proto_span, AT_NUM,
                   "The span for aligning function prototypes (0=don't align)", "", 0, 5000);
    unc_add_option("align_func_proto_gap", UO_align_func_proto_gap, AT_NUM,
-                  "Minimum gap between the return type and the function name.");
+                  "Minimum gap between the return type and the function name.", "", -5000, 5000);
    unc_add_option("align_on_operator", UO_align_on_operator, AT_BOOL,
                   "Align function protos on the 'operator' keyword instead of what follows");
    unc_add_option("align_mix_var_proto", UO_align_mix_var_proto, AT_BOOL,
@@ -974,14 +985,14 @@ void register_options(void)
                   "Aligning the open brace of single-line functions.\n"
                   "Requires align_single_line_func=true, uses align_func_proto_span");
    unc_add_option("align_single_line_brace_gap", UO_align_single_line_brace_gap, AT_NUM,
-                  "Gap for align_single_line_brace.\n");
+                  "Gap for align_single_line_brace.", "", -5000, 5000);
    unc_add_option("align_oc_msg_spec_span", UO_align_oc_msg_spec_span, AT_NUM,
                   "The span for aligning ObjC msg spec (0=don't align)", "", 0, 5000);
    unc_add_option("align_nl_cont", UO_align_nl_cont, AT_BOOL,
                   "Whether to align macros wrapped with a backslash and a newline.\n"
                   "This will not work right if the macro contains a multi-line comment.");
    unc_add_option("align_pp_define_gap", UO_align_pp_define_gap, AT_NUM,
-                  "The minimum space between label and value of a preprocessor define");
+                  "The minimum space between label and value of a preprocessor define", "", -5000, 5000);
    unc_add_option("align_pp_define_span", UO_align_pp_define_span, AT_NUM,
                   "The span for aligning on '#define' bodies (0=don't align)", "", 0, 5000);
    unc_add_option("align_left_shift", UO_align_left_shift, AT_BOOL,
