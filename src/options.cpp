@@ -2002,12 +2002,16 @@ void print_options(FILE *pfile, bool verbose)
 
    const char *names[] =
    {
-      "{ False, True }",
-      "{ Ignore, Add, Remove, Force }",
-      "Number",
-      "{ Auto, LF, CR, CRLF }",
-      "{ Ignore, Lead, Trail }",
-      "String",
+      "{ False, True }",                        /* AT_BOOL */
+      "{ False, True, NoChange }",              /* AT_TRISTATE_BOOL */
+      "{ Ignore, Add, Remove, Force }",			/* AT_IARF */
+      "Number",									/* AT_NUM */
+      "{ Auto, LF, CR, CRLF }",					/* AT_LINE */
+      "{ IGNORE,\n"
+	    "LEAD, LEAD_BREAK, LEAD_FORCE,\n"
+	    "TRAIL, TRAIL_BREAK, TRAIL_FORCE,\n"
+	    "BREAK, FORCE }",						/* AT_POS */
+      "String",									/* AT_STRING */
    };
 
    {
@@ -2039,11 +2043,23 @@ void print_options(FILE *pfile, bool verbose)
       for (option_list_it it = jt->second.options.begin(); it != jt->second.options.end(); it++)
       {
          const option_map_value *option = get_option_name(*it);
+		 char *value_set = strdup(names[option->type]);
+		 const char *value_set_part = strtok(value_set, "\n");
+
          cur_width = (int)strlen(option->name);
          fprintf(pfile, "%s%*c%s\n",
                  option->name,
                  max_width - cur_width, ' ',
-                 names[option->type]);
+                 value_set_part);
+
+		 for (value_set_part = strtok(NULL, "\n"); value_set_part; value_set_part = strtok(NULL, "\n"))
+		 {
+			 /* compensate for the initial "{ " in the large set string: add 2 additional spaces before the continued set */
+			 fprintf(pfile, "%*c  %s\n",
+					 max_width, ' ',
+					 value_set_part);
+		 }
+		 free((void *)value_set);
 
          text = option->short_desc;
 
