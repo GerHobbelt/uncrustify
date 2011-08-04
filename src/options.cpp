@@ -1109,16 +1109,34 @@ void register_options(void)
                   "Default is true.");
    unc_add_option("cmt_c_group", UO_cmt_c_group, AT_BOOL,
                   "Whether to group c-comments that look like they are in a block");
-   unc_add_option("cmt_c_nl_start", UO_cmt_c_nl_start, AT_BOOL,
-                  "Whether to put an empty '/*' on the first line of the combined c-comment");
-   unc_add_option("cmt_c_nl_end", UO_cmt_c_nl_end, AT_BOOL,
-                  "Whether to put a newline before the closing '*/' of the combined c-comment");
+   unc_add_option("cmt_c_nl_start", UO_cmt_c_nl_start, AT_IARF,
+                  "Whether to put an empty '/*' on the first line of the combined c-comment.\n"
+				  "  'force'  ~ yes, always\n"
+				  "  'add'    ~ yes\n"
+				  "  'remove' ~ no\n"
+				  "  'ignore' ~ do not change, i.e. keep it as it was");
+   unc_add_option("cmt_c_nl_end", UO_cmt_c_nl_end, AT_IARF,
+                  "Whether to put a newline before the closing '*/' of the combined c-comment\n"
+				  "  'force'  ~ yes, always\n"
+				  "  'add'    ~ yes, but only when the comment will also have a newline at\n"
+				  "             the start\n"
+				  "  'remove' ~ no\n"
+				  "  'ignore' ~ do not change, i.e. keep it as it was");
    unc_add_option("cmt_cpp_group", UO_cmt_cpp_group, AT_BOOL,
                   "Whether to group cpp-comments that look like they are in a block");
-   unc_add_option("cmt_cpp_nl_start", UO_cmt_cpp_nl_start, AT_BOOL,
-                  "Whether to put an empty '/*' on the first line of the combined cpp-comment");
-   unc_add_option("cmt_cpp_nl_end", UO_cmt_cpp_nl_end, AT_BOOL,
-                  "Whether to put a newline before the closing '*/' of the combined cpp-comment");
+   unc_add_option("cmt_cpp_nl_start", UO_cmt_cpp_nl_start, AT_IARF,
+                  "Whether to put an empty '/*' on the first line of the combined cpp-comment\n"
+				  "  'force'  ~ yes, always\n"
+				  "  'add'    ~ yes\n"
+				  "  'remove' ~ no\n"
+				  "  'ignore' ~ do not change, i.e. keep it as it was");
+   unc_add_option("cmt_cpp_nl_end", UO_cmt_cpp_nl_end, AT_IARF,
+                  "Whether to put a newline before the closing '*/' of the combined cpp-comment\n"
+				  "  'force'  ~ yes, always\n"
+				  "  'add'    ~ yes, but only when the comment will also have a newline at\n"
+				  "             the start\n"
+				  "  'remove' ~ no\n"
+				  "  'ignore' ~ do not change, i.e. keep it as it was");
    unc_add_option("cmt_cpp_to_c", UO_cmt_cpp_to_c, AT_BOOL,
                   "Whether to change cpp-comments into c-comments");
    unc_add_option("cmt_star_cont", UO_cmt_star_cont, AT_TRISTATE_BOOL,
