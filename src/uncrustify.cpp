@@ -1987,7 +1987,8 @@ struct file_lang languages[] =
    { ".mm",   "OC+",  LANG_OC | LANG_CPP },
    { ".sqc",  "",     LANG_C             }, // embedded SQL
    { ".es",   "ECMA", LANG_ECMA          },
-   { ".js",   "ECMA", LANG_ECMA          },
+   { ".as",   "ECMA", LANG_ECMA          }, // Adobe Flash ActionScript
+   { ".js",   "ECMA", LANG_ECMA          }, // JavaScript
    { ".php",  "",     LANG_PHP           },
 };
 
