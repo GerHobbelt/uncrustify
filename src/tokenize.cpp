@@ -350,12 +350,32 @@ static bool parse_comment(chunk_t *pc)
 }
 
 
-static void parse_suffix(chunk_t *pc)
+/**
+ * Parse any attached suffix, which may be a user-defined literal suffix.
+ * If for a string, explicitly exclude common format and scan specifiers, ie,
+ * PRIx32 and SCNx64.
+ */
+static void parse_suffix(chunk_t *pc, bool forstring = false)
 {
-   while (CharTable::IsKw1(pc->str[pc->len]))
+   if (CharTable::IsKw1(pc->str[pc->len]))
    {
-      pc->len++;
-      cpd.column++;
+      int        slen = 0;
+      const char *ptr = &pc->str[pc->len];
+
+      while (CharTable::IsKw2(pc->str[pc->len]))
+      {
+         slen++;
+         pc->len++;
+         cpd.column++;
+      }
+
+      if (forstring && (slen >= 4) &&
+          ((memcmp(ptr, "PRI", 3) == 0) ||
+           (memcmp(ptr, "SCN", 3) == 0)))
+      {
+         pc->len    -= slen;
+         cpd.column -= slen;
+      }
    }
 }
 
@@ -419,7 +439,7 @@ static bool parse_number(chunk_t *pc)
                   (pc->str[len] == '_'));
          break;
 
-      case '0':                /* octal */
+      case '0':                /* octal or decimal */
       case '1':
       case '2':
       case '3':
@@ -427,10 +447,12 @@ static bool parse_number(chunk_t *pc)
       case '5':
       case '6':
       case '7':
+      case '8':
+      case '9':
          do
          {
             len++;
-         } while (((pc->str[len] >= '0') && (pc->str[len] <= '7')) ||
+         } while (((pc->str[len] >= '0') && (pc->str[len] <= '9')) ||
                   (pc->str[len] == '_'));
          break;
 
@@ -591,7 +613,7 @@ static bool parse_string(chunk_t *pc, int quote_idx, bool allow_escape)
    }
 
    pc->len = len;
-   parse_suffix(pc);
+   parse_suffix(pc, true);
    return(true);
 }
 
@@ -694,11 +716,15 @@ static bool parse_cr_string(chunk_t *pc, int q_idx)
  */
 bool parse_word(chunk_t *pc, bool skipcheck)
 {
-   int               len = 1;
-   const chunk_tag_t *tag;
+   int len = 1;
 
-   while ((pc->str[len] < 127) && CharTable::IsKw2(pc->str[len]))
+   while (CharTable::IsKw2(pc->str[len]))
    {
+      /* HACK: Non-ASCII character are only allowed in identifiers */
+      if (pc->str[len] & 0x80)
+      {
+         skipcheck = true;
+      }
       len++;
    }
    cpd.column += len;
@@ -725,14 +751,10 @@ bool parse_word(chunk_t *pc, bool skipcheck)
    }
 
    /* Turn it into a keyword now */
-   tag = find_keyword(pc->str, len); /* [i_a] warning: will scan BEYOND 'len'! */
-   if (tag != NULL)
+   c_token_t tt = find_keyword_type(pc->str, len);
+   if (tt != CT_NONE)
    {
-      pc->type = tag->type;
-	// adjust length to match the 'keyword' found - as those can be 'keyPHRASES' rather, this must be done.
-   cpd.column -= pc->len;
-	pc->len     = (int)strlen(tag->tag);
-   cpd.column += pc->len;
+      pc->type = tt;
    }
    return(true);
 }
@@ -1140,7 +1162,7 @@ static bool parse_next(chunk_t *pc)
          {
             if (parse_string(pc, idx, true))
             {
-               parse_suffix(pc);
+               parse_suffix(pc, true);
                return(true);
             }
          }
@@ -1255,7 +1277,7 @@ static bool parse_next(chunk_t *pc)
  * All the tokens are inserted before ref. If ref is NULL, they are inserted
  * at the end of the list.  Line numbers are relative to the start of the data.
  */
-void tokenize(const char *data, int data_len, chunk_t *ref)
+void tokenize(const vector<char>& data, chunk_t *ref)
 {
    int                idx = 0;
    chunk_t            chunk;
@@ -1271,7 +1293,7 @@ void tokenize(const char *data, int data_len, chunk_t *ref)
    cpd.line_number = 1;
    cpd.column      = 1;
 
-   while (idx < data_len)
+   while (idx < (int)data.size() - 1)
    {
       chunk.str = &data[idx];
       if (!parse_next(&chunk))

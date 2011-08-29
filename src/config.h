@@ -4,19 +4,11 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
 
-/* Define to 1 if your system has a GNU libc compatible `malloc' function, and
-   to 0 otherwise. */
-#define HAVE_MALLOC 1
-
 /* Define to 1 if you have the <memory.h> header file. */
 #define HAVE_MEMORY_H 1
 
 /* Define to 1 if you have the `memset' function. */
 #define HAVE_MEMSET 1
-
-/* Define to 1 if your system has a GNU libc compatible `realloc' function,
-   and to 0 otherwise. */
-#define HAVE_REALLOC 1
 
 /* Define to 1 if stdbool.h conforms to C99. */
 #define HAVE_STDBOOL_H 1
@@ -91,7 +83,7 @@
 #define PACKAGE_NAME "uncrustify"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "uncrustify 0.57+git"
+#define PACKAGE_STRING "uncrustify 0.58"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "uncrustify"
@@ -100,7 +92,7 @@
 #define PACKAGE_URL "http://uncrustify.sourceforge.net/"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.57+git"
+#define PACKAGE_VERSION "0.58"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -131,17 +123,7 @@
 
 
 /* Version number of package */
-#define VERSION "0.57+git"
-
-/* Define to 1 if on MINIX. */
-/* #undef _MINIX */
-
-/* Define to 2 if the system does not provide POSIX.1 features except with
-   this defined. */
-/* #undef _POSIX_1_SOURCE */
-
-/* Define to 1 if you need to in order for `stat' and other things to work. */
-/* #undef _POSIX_SOURCE */
+#define VERSION "0.58"
 
 /* Define to appropriate substitute if compiler doesnt have __func__ */
 /* #undef __func__ */
@@ -154,9 +136,3 @@
 #ifndef __cplusplus
 /* #undef inline */
 #endif
-
-/* Define to rpl_malloc if the replacement function should be used. */
-/* #undef malloc */
-
-/* Define to rpl_realloc if the replacement function should be used. */
-/* #undef realloc */

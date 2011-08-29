@@ -335,6 +335,7 @@ enum uncrustify_options
    UO_sp_range,
    UO_sp_cmt_cpp_start,
    UO_sp_endif_cmt,
+   UO_sp_after_new,
 
    /*
     * Line splitting options (for long lines)
@@ -534,11 +535,14 @@ enum uncrustify_options
    UO_nl_before_c_comment,
    UO_nl_after_multiline_comment,    // NL after multiline comment
    UO_nl_after_func_body,            // after the closing brace of a function body
+   UO_nl_after_func_body_class,
    UO_nl_after_func_body_one_liner,  // after the closing brace of a single line function body
    UO_nl_after_func_proto,           // after each prototype
    UO_nl_after_func_proto_group,     // after a block of prototypes
    //UO_nl_after_var_def_group,        // after a group of variable defs at top of proc
    //UO_nl_after_ifdef,                // after #if or #ifdef - but not if covers whole file
+   UO_nl_after_struct,
+   UO_nl_after_class,
    UO_nl_max,                        // maximum consecutive newlines (3 = 2 blank lines)
    UO_nl_before_access_spec,         // number of newlines before "private:", "public:" (0=no change)
    UO_nl_after_access_spec,          // number of newlines after "private:", "public:" (0=no change)
@@ -546,6 +550,7 @@ enum uncrustify_options
    UO_nl_after_try_catch_finally,
    UO_nl_between_get_set,
    UO_nl_around_cs_property,
+   UO_nl_property_brace,
 
    UO_eat_blanks_after_open_brace,   // remove blank lines after {
    UO_eat_blanks_before_close_brace, // remove blank lines before }
@@ -629,6 +634,7 @@ enum uncrustify_options
    UO_cmt_insert_file_footer,
    UO_cmt_insert_func_header,
    UO_cmt_insert_class_header,
+   UO_cmt_insert_oc_msg_header,
    UO_cmt_insert_before_preproc,
 
    UO_string_escape_char,       // the string escape char to use
@@ -640,10 +646,10 @@ enum uncrustify_options
 
 struct group_map_value
 {
-   uncrustify_groups             id;
-   const char                    *short_desc;
-   const char                    *long_desc;
-   std::list<uncrustify_options> options;
+   uncrustify_groups        id;
+   const char               *short_desc;
+   const char               *long_desc;
+   list<uncrustify_options> options;
 };
 
 struct option_map_value
@@ -659,10 +665,10 @@ struct option_map_value
 };
 
 
-typedef std::map<std::string, option_map_value>::iterator        option_name_map_it;
-typedef std::map<uncrustify_groups, group_map_value>::iterator   group_map_it;
-typedef std::list<uncrustify_options>::iterator                  option_list_it;
-typedef std::list<uncrustify_options>::const_iterator            option_list_cit;
+typedef map<string, option_map_value>::iterator        option_name_map_it;
+typedef map<uncrustify_groups, group_map_value>::iterator   group_map_it;
+typedef list<uncrustify_options>::iterator                  option_list_it;
+typedef list<uncrustify_options>::const_iterator            option_list_cit;
 
 
 #endif   /* OPTIONS_H_INCLUDED */

@@ -28,8 +28,8 @@
 #include "unc_ctype.h"
 
 
-static std::map<std::string, option_map_value>      option_name_map;
-static std::map<uncrustify_groups, group_map_value> group_map;
+static map<string, option_map_value>      option_name_map;
+static map<uncrustify_groups, group_map_value> group_map;
 static uncrustify_groups current_group;
 
 
@@ -307,7 +307,7 @@ void register_options(void)
    unc_add_option("sp_before_squares", UO_sp_before_squares, AT_IARF,
                   "Add or remove space before '[]'");
    unc_add_option("sp_inside_square", UO_sp_inside_square, AT_IARF,
-                  "Add or remove space inside '[' and ']'");
+                  "Add or remove space inside a non-empty '[' and ']'");
    unc_add_option("sp_after_comma", UO_sp_after_comma, AT_IARF,
                   "Add or remove space after ','");
    unc_add_option("sp_before_comma", UO_sp_before_comma, AT_IARF,
@@ -499,6 +499,8 @@ void register_options(void)
                   "Control the space after the opening of a C++ comment '// A' vs '//A'");
    unc_add_option("sp_endif_cmt", UO_sp_endif_cmt, AT_IARF,
                   "Controls the spaces between #else or #endif and a trailing comment");
+   unc_add_option("sp_after_new", UO_sp_after_new, AT_IARF,
+                  "Controls the spaces after 'new', 'delete', and 'delete[]'");
 
    unc_begin_group(UG_indent, "Indenting");
    unc_add_option("indent_columns", UO_indent_columns, AT_NUM,
@@ -670,7 +672,8 @@ void register_options(void)
                   "Add or remove newline after '= [' (D only). Will also affect the newline\n"
 				  "before the ']'");
    unc_add_option("nl_func_var_def_blk", UO_nl_func_var_def_blk, AT_NUM,
-                  "The number of blank lines after a block of variable definitions");
+                  "The number of blank lines after a block of variable definitions at the top of a function body.\n"
+                  "0=no change (default)");
    unc_add_option("nl_fcall_brace", UO_nl_fcall_brace, AT_IARF,
                   "Add or remove newline between a function call's ')' and '{', as in:\n"
                   "list_for_each(item, &list) { }");
@@ -864,6 +867,8 @@ void register_options(void)
    unc_add_option("nl_after_func_body", UO_nl_after_func_body, AT_NUM,
                   "The number of newlines after '}' of a multi-line function body.\n"
                   "0 = No change.");
+   unc_add_option("nl_after_func_body_class", UO_nl_after_func_body_class, AT_NUM,
+                  "The number of newlines after '}' of a multi-line function body in a class declaration");
    unc_add_option("nl_after_func_body_one_liner", UO_nl_after_func_body_one_liner, AT_NUM,
                   "The minimum number of newlines after '}' of a single line function body.\n"
                   "0 = No change.");
@@ -881,6 +886,11 @@ void register_options(void)
                   "0 = No change.");
    unc_add_option("nl_after_multiline_comment", UO_nl_after_multiline_comment, AT_BOOL,
                   "Whether to force a newline after a multi-line comment.");
+
+   unc_add_option("nl_after_struct", UO_nl_after_struct, AT_NUM,
+                  "The number of newlines after '}' or ';' of a struct/enum/union definition");
+   unc_add_option("nl_after_class", UO_nl_after_class, AT_NUM,
+                  "The number of newlines after '}' or ';' of a class definition");
 
    unc_add_option("nl_before_access_spec", UO_nl_before_access_spec, AT_NUM,
                   "The number of newlines before a 'private:', 'public:', 'protected:',\n"
@@ -907,6 +917,8 @@ void register_options(void)
    unc_add_option("nl_between_get_set", UO_nl_between_get_set, AT_NUM,
                   "The number of newlines between the get/set/add/remove handlers in C#.\n"
                   "0 = No change.");
+   unc_add_option("nl_property_brace", UO_nl_property_brace, AT_IARF,
+                  "Add or remove newline between C# property and the '{'");
 
    unc_add_option("eat_blanks_after_open_brace", UO_eat_blanks_after_open_brace, AT_BOOL,
                   "Whether to remove blank lines after '{'");
@@ -1232,10 +1244,13 @@ void register_options(void)
                   "The filename that contains text to insert before a class if the class isn't\n"
 				  "preceded with a C/C++ comment.\n"
                   "Will substitute $(class) with the class name.");
+   unc_add_option("cmt_insert_oc_msg_header", UO_cmt_insert_oc_msg_header, AT_STRING,
+                  "The filename that contains text to insert before a Obj-C message specification if the method isn't preceeded with a C/C++ comment.\n"
+                  "Will substitute $(message) with the function name and $(javaparam) with the javadoc @param and @return stuff.");
    unc_add_option("cmt_insert_before_preproc", UO_cmt_insert_before_preproc, AT_BOOL,
                   "If a preprocessor is encountered when stepping backwards from a function\n"
 				  "name, then this option decides whether the comment should be inserted.\n"
-                  "Affects cmt_insert_func_header and cmt_insert_class_header.");
+                  "Affects cmt_insert_oc_msg_header, cmt_insert_func_header and cmt_insert_class_header.");
 
    unc_begin_group(UG_codemodify, "Code modifying options (non-whitespace)");
    unc_add_option("mod_full_brace_do", UO_mod_full_brace_do, AT_IARF,
@@ -1273,11 +1288,11 @@ void register_options(void)
                   "If a switch body exceeds the specified number of newlines and doesn't have\n"
 				  "a comment after the close brace, a comment will be added.", "", 0, 5000);
    unc_add_option("mod_add_long_ifdef_endif_comment", UO_mod_add_long_ifdef_endif_comment, AT_NUM,
-                  "If an #ifdef body exceeds the specified number of newlines and doesn't\n"
-				  "have a comment after the #else, a comment will be added.", "", 0, 5000);
+                  "If an #ifdef body exceeds the specified number of newlines and doesn't have a comment after\n"
+                  "the #endif, a comment will be added.");
    unc_add_option("mod_add_long_ifdef_else_comment", UO_mod_add_long_ifdef_else_comment, AT_NUM,
-                  "If an #ifdef or #else body exceeds the specified number of newlines and\n"
-				  "doesn't have a comment after the #endif, a comment will be added.", "", 0, 5000);
+                  "If an #ifdef or #else body exceeds the specified number of newlines and doesn't have a comment after\n"
+                  "the #else, a comment will be added.");
    unc_add_option("mod_sort_import", UO_mod_sort_import, AT_BOOL,
                   "If TRUE, will sort consecutive single-line 'import' statements [Java, D]");
    unc_add_option("mod_sort_using", UO_mod_sort_using, AT_BOOL,
@@ -1763,7 +1778,7 @@ int load_option_file(const char *filename)
       {
          for (idx = 1; idx < argc; idx++)
          {
-            add_keyword(args[idx], CT_TYPE, LANG_ALL);
+            add_keyword(args[idx], CT_TYPE);
          }
       }
       else if (strcasecmp(args[0], "define") == 0)
@@ -1772,15 +1787,15 @@ int load_option_file(const char *filename)
       }
       else if (strcasecmp(args[0], "macro-open") == 0)
       {
-         add_keyword(args[1], CT_MACRO_OPEN, LANG_ALL);
+         add_keyword(args[1], CT_MACRO_OPEN);
       }
       else if (strcasecmp(args[0], "macro-close") == 0)
       {
-         add_keyword(args[1], CT_MACRO_CLOSE, LANG_ALL);
+         add_keyword(args[1], CT_MACRO_CLOSE);
       }
       else if (strcasecmp(args[0], "macro-else") == 0)
       {
-         add_keyword(args[1], CT_MACRO_ELSE, LANG_ALL);
+         add_keyword(args[1], CT_MACRO_ELSE);
       }
       else if (strcasecmp(args[0], "set") == 0)
       {
@@ -1798,7 +1813,7 @@ int load_option_file(const char *filename)
                for (idx = 2; idx < argc; idx++)
                {
                   LOG_FMT(LNOTE, " '%s'", args[idx]);
-                  add_keyword(args[idx], id, LANG_ALL);
+                  add_keyword(args[idx], id);
                }
                LOG_FMT(LNOTE, "\n");
             }
@@ -1829,11 +1844,11 @@ int load_option_file(const char *filename)
 
 int save_option_file(FILE *pfile, bool withDoc)
 {
-   std::string val_string;
-   const char  *val_str;
-   int         val_len;
-   int         name_len;
-   int         idx;
+   string     val_string;
+   const char *val_str;
+   int        val_len;
+   int        name_len;
+   int        idx;
 
    fprintf(pfile, "# Uncrustify %s\n", UNCRUSTIFY_VERSION);
 
@@ -1947,47 +1962,10 @@ int save_option_file(FILE *pfile, bool withDoc)
    }
 
    /* Print custom keywords */
-   const chunk_tag_t *ct;
-   idx = 0;
-   while ((ct = get_custom_keyword_idx(idx)) != NULL)
-   {
-      if (ct->type == CT_TYPE)
-      {
-         fprintf(pfile, "type %*.s%s\n",
-                 cpd.max_option_name_len - 4, " ", ct->tag);
-      }
-      else if (ct->type == CT_MACRO_OPEN)
-      {
-         fprintf(pfile, "macro-open %*.s%s\n",
-                 cpd.max_option_name_len - 11, " ", ct->tag);
-      }
-      else if (ct->type == CT_MACRO_CLOSE)
-      {
-         fprintf(pfile, "macro-close %*.s%s\n",
-                 cpd.max_option_name_len - 12, " ", ct->tag);
-      }
-      else if (ct->type == CT_MACRO_ELSE)
-      {
-         fprintf(pfile, "macro-else %*.s%s\n",
-                 cpd.max_option_name_len - 11, " ", ct->tag);
-      }
-      else
-      {
-         const char *tn = get_token_name(ct->type);
-
-         fprintf(pfile, "set %s %*.s%s\n", tn,
-                 int(cpd.max_option_name_len - (4 + strlen(tn))), " ", ct->tag);
-      }
-   }
+   print_keywords(pfile);
 
    /* Print custom defines */
-   const define_tag_t *dt;
-   idx = 0;
-   while ((dt = get_define_idx(idx)) != NULL)
-   {
-      fprintf(pfile, "define %*.s%s \"%s\"\n",
-              cpd.max_option_name_len - 6, " ", dt->tag, dt->value);
-   }
+   print_defines(pfile);
 
    fclose(pfile);
    return(0);
@@ -2141,6 +2119,7 @@ void set_option_defaults(void)
    cpd.settings[UO_sp_pp_concat].a         = AV_ADD;
    cpd.settings[UO_sp_pp_stringify].a      = AV_ADD;
    cpd.settings[UO_sp_angle_shift].a       = AV_ADD;
+
    cpd.settings[UO_tok_split_gte].b        = true;
 
    cpd.settings[UO_pos_arith].tp		= TP_IGNORE;
@@ -2184,7 +2163,7 @@ void set_option_defaults(void)
 }
 
 
-std::string argtype_to_string(argtype_e argtype)
+string argtype_to_string(argtype_e argtype)
 {
    switch (argtype)
    {
@@ -2216,7 +2195,7 @@ std::string argtype_to_string(argtype_e argtype)
 }
 
 
-std::string tristate_to_string(tristate_t val)
+string tristate_to_string(tristate_t val)
 {
    switch (val)
    {
@@ -2235,7 +2214,7 @@ std::string tristate_to_string(tristate_t val)
    }
 }
 
-std::string bool_to_string(bool val)
+string bool_to_string(bool val)
 {
    if (val)
    {
@@ -2248,7 +2227,7 @@ std::string bool_to_string(bool val)
 }
 
 
-std::string argval_to_string(argval_t argval)
+string argval_to_string(argval_t argval)
 {
    switch (argval)
    {
@@ -2271,7 +2250,7 @@ std::string argval_to_string(argval_t argval)
 }
 
 
-std::string number_to_string(int number)
+string number_to_string(int number)
 {
    char buffer[12]; // 11 + 1
 
@@ -2284,7 +2263,7 @@ std::string number_to_string(int number)
 }
 
 
-std::string lineends_to_string(lineends_e linends)
+string lineends_to_string(lineends_e linends)
 {
    switch (linends)
    {
@@ -2307,7 +2286,7 @@ std::string lineends_to_string(lineends_e linends)
 }
 
 
-std::string tokenpos_to_string(tokenpos_e tokenpos)
+string tokenpos_to_string(tokenpos_e tokenpos)
 {
    switch (tokenpos)
    {
@@ -2345,7 +2324,7 @@ std::string tokenpos_to_string(tokenpos_e tokenpos)
 }
 
 
-std::string op_val_to_string(argtype_e argtype, op_val_t op_val)
+string op_val_to_string(argtype_e argtype, op_val_t op_val)
 {
    switch (argtype)
    {

@@ -1,7 +1,7 @@
 #
 # Test cases specifically for the C++ language.
-# $Id: cpp.test 1641 2009-10-16 01:29:30Z bengardner $
 #
+# Range: 30000 - 39999
 # test.name  config.file  input.file
 
 30000 ben.cfg                          cpp/cout.cpp
@@ -65,6 +65,8 @@
 30075 empty.cfg                        cpp/goto.cpp
 
 30080 nl_brace_brace-a.cfg             cpp/nl_brace_brace.cpp
+
+30085 nSolve.cfg                       cpp/align_class.cpp
 
 30100 nl_template_class-force.cfg      cpp/templates.cpp
 30101 nl_template_class-remove.cfg     cpp/templates.cpp
@@ -165,3 +167,4 @@
 30935 ben.cfg                          cpp/indent-misc.cpp
 30936 indent_braces_no.cfg             cpp/indent_braces_no.h
 
+30940 mod_case_brace_rm.cfg            cpp/case-brace-remove.cpp

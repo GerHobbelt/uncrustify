@@ -7,22 +7,20 @@
  */
 
 #include "uncrustify_types.h"
+#include "prototypes.h"
 #include "char_table.h"
 #include "args.h"
 #include <cstring>
 #include <cerrno>
 #include <cstdlib>
+#include <map>
 #include "unc_ctype.h"
 
-typedef struct
-{
-   chunk_tag_t *p_tags;
-   int         total;            /* number of items at p_tags */
-   int         active;           /* number of valid entries */
-} dynamic_word_list_t;
+using namespace std;
 
-/* A dynamic list of keywords - add via add_keyword() */
-static dynamic_word_list_t wl = {0};
+/* Dynamic keyword map */
+typedef map<string, c_token_t> dkwmap;
+static dkwmap dkwm;
 
 
 /**
@@ -41,8 +39,8 @@ static const chunk_tag_t keywords[] =
    { "@private",         CT_PRIVATE,      LANG_OC | LANG_CPP | LANG_C                                                 },
    { "@property",        CT_OC_PROPERTY,  LANG_OC | LANG_CPP | LANG_C                                                 },
    { "@protocol",        CT_OC_PROTOCOL,  LANG_OC | LANG_CPP | LANG_C                                                 },
-   { "@synthesize",      CT_OC_DYNAMIC,   LANG_OC | LANG_CPP | LANG_C                                                 },
    { "@selector",        CT_OC_SEL,       LANG_OC | LANG_CPP | LANG_C                                                 },
+   { "@synthesize",      CT_OC_DYNAMIC,   LANG_OC | LANG_CPP | LANG_C                                                 },
    { "@try",             CT_TRY,          LANG_OC | LANG_CPP | LANG_C                                                 },
    { "_Bool",            CT_TYPE,         LANG_CPP                                                                    },
    { "_Complex",         CT_TYPE,         LANG_CPP                                                                    },
@@ -61,10 +59,11 @@ static const chunk_tag_t keywords[] =
    { "alias",            CT_QUALIFIER,    LANG_D                                                                      },
    { "align",            CT_ALIGN,        LANG_D                                                                      },
    { "alignof",          CT_SIZEOF,       LANG_C | LANG_CPP                                                           },
-   { "and",              CT_SBOOL,        LANG_C | LANG_CPP                                                           },
+   { "and",              CT_SBOOL,        LANG_C | LANG_CPP | FLAG_PP                                                 },
    { "and_eq",           CT_SASSIGN,      LANG_C | LANG_CPP                                                           },
    { "as",               CT_AS,           LANG_CS                                                                     },
    { "asm",              CT_ASM,          LANG_C | LANG_CPP | LANG_D                                                  },
+   { "assert",           CT_ASSERT,       LANG_JAVA                                                                   },
    { "assert",           CT_FUNCTION,     LANG_D | LANG_PAWN                                                          }, // PAWN
    { "assert",           CT_PP_ASSERT,    LANG_PAWN | FLAG_PP                                                         }, // PAWN
    { "auto",             CT_QUALIFIER,    LANG_C | LANG_CPP | LANG_D                                                  },
@@ -91,6 +90,7 @@ static const chunk_tag_t keywords[] =
    { "compl",            CT_ARITH,        LANG_C | LANG_CPP                                                           },
    { "const",            CT_QUALIFIER,    LANG_ALL                                                                    }, // PAWN
    { "const_cast",       CT_TYPE_CAST,    LANG_CPP                                                                    },
+   { "constexpr",        CT_QUALIFIER,    LANG_CPP                                                                    },
    { "construct",        CT_CONSTRUCT,    LANG_VALA                                                                   },
    { "continue",         CT_CONTINUE,     LANG_ALL                                                                    }, // PAWN
    { "creal",            CT_TYPE,         LANG_D                                                                      },
@@ -176,7 +176,7 @@ static const chunk_tag_t keywords[] =
    { "null",             CT_TYPE,         LANG_CS | LANG_D | LANG_JAVA | LANG_VALA                                    },
    { "object",           CT_TYPE,         LANG_CS                                                                     },
    { "operator",         CT_OPERATOR,     LANG_CPP | LANG_CS | LANG_PAWN                                              }, // PAWN
-   { "or",               CT_SBOOL,        LANG_C | LANG_CPP                                                           },
+   { "or",               CT_SBOOL,        LANG_C | LANG_CPP | FLAG_PP                                                 },
    { "or_eq",            CT_SASSIGN,      LANG_C | LANG_CPP                                                           },
    { "out",              CT_QUALIFIER,    LANG_CS | LANG_D | LANG_VALA                                                },
    { "override",         CT_QUALIFIER,    LANG_CS | LANG_D | LANG_VALA                                                },
@@ -259,7 +259,7 @@ static const chunk_tag_t keywords[] =
 
 
 /*
-MSVC
+MSVC TODO:
 
 __abstract 2
 abstract
@@ -448,6 +448,9 @@ while
 
 */
 
+void init_keywords()
+{
+}
 
 /**
  * Compares two chunk_tag_t entries using strcmp on the strings
@@ -520,28 +523,23 @@ bool keywords_are_sorted(void)
  *
  * @param tag        The tag (string) must be zero terminated
  * @param type       The type, usually CT_TYPE
- * @param lang_flags Language flags, typically LANG_ALL
  */
-void add_keyword(const char *tag, c_token_t type, int lang_flags)
+void add_keyword(const char *tag, c_token_t type)
 {
-   /* Do we need to allocate more memory? */
-   if ((wl.total == wl.active) || (wl.p_tags == NULL))
-   {
-      wl.total += 16;
-      wl.p_tags = (chunk_tag_t *)realloc(wl.p_tags, sizeof(chunk_tag_t) * wl.total);
-   }
-   if (wl.p_tags != NULL)
-   {
-      wl.p_tags[wl.active].tag        = strdup(tag);
-      wl.p_tags[wl.active].type       = type;
-      wl.p_tags[wl.active].lang_flags = lang_flags;
-      wl.active++;
+   string ss = tag;
 
-      /* Todo: add in sorted order instead of resorting the whole list? */
-      qsort(wl.p_tags, wl.active, sizeof(chunk_tag_t), kw_compare);
-
-      LOG_FMT(LDYNKW, "%s: added '%s'\n", __func__, tag);
+   /* See if the keyword has already been added */
+   dkwmap::iterator it = dkwm.find(ss);
+   if (it != dkwm.end())
+   {
+      LOG_FMT(LDYNKW, "%s: changed '%s' to %d\n", __func__, tag, type);
+      (*it).second = type;
+      return;
    }
+
+   /* Insert the keyword */
+   dkwm.insert(dkwmap::value_type(ss, type));
+   LOG_FMT(LDYNKW, "%s: added '%s' as %d\n", __func__, tag, type);
 }
 
 
@@ -595,62 +593,34 @@ static const chunk_tag_t *kw_static_match(const chunk_tag_t *tag)
  *                user-specified 'keywords' to a maximum width of strlen(word)!)
  * @return        NULL (no match) or the keyword entry
  */
-const chunk_tag_t *find_keyword(const char *word, int len)
+c_token_t find_keyword_type(const char *word, int len)
 {
-   chunk_tag_t       tag;
-   char              buf[128];
+   string            ss(word, len);
+   chunk_tag_t       key;
    const chunk_tag_t *p_ret;
 
-   if (len == 0)
+   if (len <= 0)
    {
-	   return NULL;
+      return(CT_NONE);
    }
-
-   if (len > (int)(sizeof(buf) - 1))
-   {
-      LOG_FMT(LNOTE, "%s: keyword too long at %d char (%d max) : %.*s\n",
-              __func__, len, (int)sizeof(buf), len, word);
-      return(NULL);
-   }
-#if 0 /* [i_a] */
-   memcpy(buf, word, len);
-   buf[len] = 0;
-
-   tag.tag = buf;
-#else
-   tag.tag = word; /* allow the tail end to be compared as well! */
-#endif
 
    /* check the dynamic word list first */
-   p_ret = NULL;
-   if (wl.p_tags)
+   dkwmap::iterator it = dkwm.find(ss);
+   if (it != dkwm.end())
    {
-      p_ret = (const chunk_tag_t *)bsearch(&tag, wl.p_tags, wl.active,
-#if 0 /* [i_a] */
-                                           sizeof(chunk_tag_t), kw_compare);
-#else
-                                           sizeof(chunk_tag_t), kw_compare_ex);
-#endif
+      return((*it).second);
    }
 
-   if (p_ret == NULL)
+   key.tag = ss.c_str();
+
+   /* check the static word list */
+   p_ret = (const chunk_tag_t *)bsearch(&key, keywords, ARRAY_SIZE(keywords),
+                                        sizeof(keywords[0]), kw_compare);
+   if (p_ret != NULL)
    {
-	memcpy(buf, word, len); /* [i_a] */
-	buf[len] = 0;
-
-	tag.tag = buf; /* just plain keyword match from here */
-
-      /* check the static word list */
-      p_ret = (const chunk_tag_t *)bsearch(&tag, keywords, ARRAY_SIZE(keywords),
-                                           sizeof(keywords[0]), kw_compare);
-      if (p_ret != NULL)
-      {
-         //fprintf(stderr, "%s: match %s -", __func__, p_ret->tag);
-         p_ret = kw_static_match(p_ret);
-         //fprintf(stderr, "\n");
-      }
+      p_ret = kw_static_match(p_ret);
    }
-   return(p_ret);
+   return((p_ret != NULL) ? p_ret->type : CT_NONE);
 }
 
 
@@ -695,7 +665,7 @@ int load_keyword_file(const char *filename)
       {
          if ((argc == 1) && CharTable::IsKw1(*args[0]))
          {
-            add_keyword(args[0], CT_TYPE, LANG_ALL);
+            add_keyword(args[0], CT_TYPE);
          }
          else
          {
@@ -713,46 +683,56 @@ int load_keyword_file(const char *filename)
 
 void output_types(FILE *pfile)
 {
-   int idx;
-
-   if (wl.active > 0)
+   if (dkwm.size() > 0)
    {
       fprintf(pfile, "-== User Types ==-\n");
-   }
-   for (idx = 0; idx < wl.active; idx++)
-   {
-      fprintf(pfile, "%s\n", wl.p_tags[idx].tag);
+      for (dkwmap::iterator it = dkwm.begin(); it != dkwm.end(); ++it)
+      {
+         fprintf(pfile, "%s\n", (*it).first.c_str());
+      }
    }
 }
 
 
-const chunk_tag_t *get_custom_keyword_idx(int& idx)
+void print_keywords(FILE *pfile)
 {
-   const chunk_tag_t *ct = NULL;
-
-   if ((idx >= 0) && (idx < wl.active))
+   for (dkwmap::iterator it = dkwm.begin(); it != dkwm.end(); ++it)
    {
-      ct = &wl.p_tags[idx];
+      c_token_t tt = (*it).second;
+      if (tt == CT_TYPE)
+      {
+         fprintf(pfile, "type %*.s%s\n",
+                 cpd.max_option_name_len - 4, " ", (*it).first.c_str());
+      }
+      else if (tt == CT_MACRO_OPEN)
+      {
+         fprintf(pfile, "macro-open %*.s%s\n",
+                 cpd.max_option_name_len - 11, " ", (*it).first.c_str());
+      }
+      else if (tt == CT_MACRO_CLOSE)
+      {
+         fprintf(pfile, "macro-close %*.s%s\n",
+                 cpd.max_option_name_len - 12, " ", (*it).first.c_str());
+      }
+      else if (tt == CT_MACRO_ELSE)
+      {
+         fprintf(pfile, "macro-else %*.s%s\n",
+                 cpd.max_option_name_len - 11, " ", (*it).first.c_str());
+      }
+      else
+      {
+         const char *tn = get_token_name(tt);
+
+         fprintf(pfile, "set %s %*.s%s\n", tn,
+                 int(cpd.max_option_name_len - (4 + strlen(tn))), " ", (*it).first.c_str());
+      }
    }
-   idx++;
-   return(ct);
 }
 
 
 void clear_keyword_file(void)
 {
-   if (wl.p_tags != NULL)
-   {
-      for (int idx = 0; idx < wl.active; idx++)
-      {
-         free((void *)wl.p_tags[idx].tag);
-         wl.p_tags[idx].tag = NULL;
-      }
-      free(wl.p_tags);
-      wl.p_tags = NULL;
-   }
-   wl.total  = 0;
-   wl.active = 0;
+   dkwm.clear();
 }
 
 

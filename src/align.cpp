@@ -750,18 +750,18 @@ static void align_func_params()
 }
 
 
-static int align_params(chunk_t *start, chunk_t *chunks[], int num_chunks)
+static void align_params(chunk_t *start, deque<chunk_t *>& chunks)
 {
-   int     count     = 0;
    chunk_t *pc       = start;
    bool    hit_comma = true;
+
+   chunks.clear();
 
    pc = chunk_get_next_type(start, CT_FPAREN_OPEN, start->level);
 
    while ((pc = chunk_get_next(pc)) != NULL)
    {
       if (chunk_is_newline(pc) ||
-          (count >= num_chunks) ||
           (pc->type == CT_SEMICOLON) ||
           ((pc->type == CT_FPAREN_CLOSE) && (pc->level == start->level)))
       {
@@ -772,8 +772,8 @@ static int align_params(chunk_t *start, chunk_t *chunks[], int num_chunks)
       {
          if (hit_comma)
          {
-            chunks[count++] = pc;
-            hit_comma       = false;
+            chunks.push_back(pc);
+            hit_comma = false;
          }
          else if (pc->type == CT_COMMA)
          {
@@ -781,23 +781,20 @@ static int align_params(chunk_t *start, chunk_t *chunks[], int num_chunks)
          }
       }
    }
-   return(count);
 }
 
 
 static void align_same_func_call_params()
 {
-   chunk_t    *pc;
-   chunk_t    *align_root = NULL;
-   chunk_t    *align_cur  = NULL;
-   int        align_len   = 0;
-   chunk_t    *chunks[16];
-   AlignStack as[16];
-   AlignStack fcn_as;
-   int        max_idx = -1;
-   int        cur_as;
-   int        idx;
-   const char *add_str = NULL;
+   chunk_t           *pc;
+   chunk_t           *align_root = NULL;
+   chunk_t           *align_cur  = NULL;
+   int               align_len   = 0;
+   deque<chunk_t *>  chunks;
+   deque<AlignStack> as;
+   AlignStack        fcn_as;
+   int               idx;
+   const char        *add_str;
 
    fcn_as.Start(3);
 
@@ -807,7 +804,7 @@ static void align_same_func_call_params()
       {
          if (chunk_is_newline(pc))
          {
-            for (idx = 0; idx <= max_idx; idx++)
+            for (idx = 0; idx <= (int)as.size(); idx++)
             {
                as[idx].NewLines(pc->nl_count);
             }
@@ -822,14 +819,13 @@ static void align_same_func_call_params()
          continue;
       }
 
-      fcn_as.Add(pc);
       add_str = NULL;
-
       if (align_root != NULL)
       {
          if ((pc->len == align_root->len) &&
              (memcmp(pc->str, align_root->str, pc->len) == 0))
          {
+            fcn_as.Add(pc);
             align_cur->align.next = pc;
             align_cur             = pc;
             align_len++;
@@ -841,15 +837,17 @@ static void align_same_func_call_params()
 
             /* Flush it all! */
             fcn_as.Flush();
-            for (idx = 0; idx <= max_idx; idx++)
+            for (idx = 0; idx < (int)as.size(); idx++)
             {
                as[idx].Flush();
             }
             align_root = NULL;
          }
       }
+
       if (align_root == NULL)
       {
+         fcn_as.Add(pc);
          align_root = pc;
          align_cur  = pc;
          align_len  = 1;
@@ -860,14 +858,15 @@ static void align_same_func_call_params()
       {
          LOG_FMT(LASFCP, "%s '%.*s' on line %d -",
                  add_str, pc->len, pc->str, pc->orig_line);
-         cur_as = align_params(pc, chunks, ARRAY_SIZE(chunks));
-         LOG_FMT(LASFCP, " %d items:", cur_as);
+         align_params(pc, chunks);
+         LOG_FMT(LASFCP, " %d items:", (int)chunks.size());
 
-         for (idx = 0; idx < cur_as; idx++)
+         for (idx = 0; idx < (int)chunks.size(); idx++)
          {
             LOG_FMT(LASFCP, " [%.*s]", chunks[idx]->len, chunks[idx]->str);
-            if (idx > max_idx)
+            if (idx >= (int)as.size())
             {
+               as.resize(idx + 1);
                as[idx].Start(3);
                if (!cpd.settings[UO_align_number_left].b)
                {
@@ -879,18 +878,37 @@ static void align_same_func_call_params()
                      as[idx].m_right_align = !cpd.settings[UO_align_on_tabstop].b;
                   }
                }
-               max_idx = idx;
             }
             as[idx].Add(chunks[idx]);
          }
          LOG_FMT(LASFCP, "\n");
       }
    }
-   fcn_as.End();
-   for (idx = 0; idx <= max_idx; idx++)
+
+   if (align_len > 1)
    {
-      as[idx].End();
+      LOG_FMT(LASFCP, "  ++ Ended with %d fcns\n", align_len);
+      fcn_as.End();
+      for (idx = 0; idx < (int)as.size(); idx++)
+      {
+         as[idx].End();
+      }
    }
+}
+
+
+chunk_t *step_back_over_member(chunk_t *pc)
+{
+   chunk_t *tmp;
+
+   /* Skip over any class stuff: bool CFoo::bar() */
+   while (((tmp = chunk_get_prev_ncnl(pc)) != NULL) &&
+          (tmp->type == CT_DC_MEMBER))
+   {
+      /* TODO: verify that we are pointing at something sane? */
+      pc = chunk_get_prev_ncnl(tmp);
+   }
+   return(pc);
 }
 
 
@@ -900,6 +918,7 @@ static void align_same_func_call_params()
 static void align_func_proto(int span)
 {
    chunk_t    *pc;
+   chunk_t    *toadd;
    bool       look_bro = false;
    AlignStack as;
    AlignStack as_br;
@@ -926,12 +945,13 @@ static void align_func_proto(int span)
          if ((pc->parent_type == CT_OPERATOR) &&
              cpd.settings[UO_align_on_operator].b)
          {
-            as.Add(chunk_get_prev_ncnl(pc));
+            toadd = chunk_get_prev_ncnl(pc);
          }
          else
          {
-            as.Add(pc);
+            toadd = pc;
          }
+         as.Add(step_back_over_member(toadd));
          look_bro = (pc->type == CT_FUNC_DEF) &&
                     cpd.settings[UO_align_single_line_brace].b;
       }
@@ -1124,7 +1144,7 @@ static chunk_t *align_var_def_brace(chunk_t *start, int span, int *p_nl_count)
             LOG_FMT(LAVDB, "    add=[%.*s] line=%d col=%d level=%d\n",
                     pc->len, pc->str, pc->orig_line, pc->orig_col, pc->level);
 
-            as.Add(pc);
+            as.Add(step_back_over_member(pc));
 
             if (cpd.settings[UO_align_var_def_colon].b)
             {

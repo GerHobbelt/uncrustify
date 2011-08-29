@@ -68,11 +68,17 @@ if os.name == "nt":	# windoze doesn't support ansi sequences
 	FAIL_COLOR     = ""
 	PASS_COLOR     = ""
 	MISMATCH_COLOR = ""
+	UNSTABLE_COLOR = ""
 else:
 	FAIL_COLOR     = UNDERSCORE
 	PASS_COLOR     = FG_GREEN
 	MISMATCH_COLOR = FG_RED #REVERSE
+	UNSTABLE_COLOR = FGB_CYAN
 
+# log_levels:
+# bit 0: show a diff on unstable or failures
+# bit 1: show passes
+# bit 2: show commands
 log_level = 0
 
 def usage_exit():
@@ -97,7 +103,7 @@ def run_tests(test_name, config_name, input_name, lang):
 		pass
 
 	cmd = "%s/uncrustify -q -c %s -f input/%s %s > %s" % (os.path.abspath('../src'), config_name, input_name, lang, resultname)
-	if log_level >= 2:
+	if log_level & 2:
 		print "RUN: " + cmd
 	a = os.system(cmd)
 	if a != 0:
@@ -107,7 +113,7 @@ def run_tests(test_name, config_name, input_name, lang):
 	try:
 		if not filecmp.cmp(resultname, outputname):
 			print MISMATCH_COLOR + "MISMATCH: " + NORMAL + test_name
-			if log_level >= 3:
+			if log_level & 1:
 				cmd = "diff -u %s %s" % (outputname, resultname)
 				os.system(cmd)
 			return -1
@@ -115,7 +121,29 @@ def run_tests(test_name, config_name, input_name, lang):
 		print MISMATCH_COLOR + "MISSING: " + NORMAL + test_name
 		return -1
 
-	if log_level >= 1:
+	# The file in results matches the file in output.
+	# Re-run with the output file as the input to check stability.
+	cmd = "%s/uncrustify -q -c %s -f %s %s > %s" % (os.path.abspath('../src'), config_name, outputname, lang, resultname)
+	if log_level & 2:
+		print "RUN: " + cmd
+	a = os.system(cmd)
+	if a != 0:
+		print FAIL_COLOR + "FAILED2: " + NORMAL + test_name
+		return -1
+
+	try:
+		if not filecmp.cmp(resultname, outputname):
+			print UNSTABLE_COLOR + "UNSTABLE: " + NORMAL + test_name
+			if log_level & 1:
+				cmd = "diff -u %s %s" % (outputname, resultname)
+				os.system(cmd)
+			return -2
+	except:
+		# impossible
+		print UNSTABLE_COLOR + "MISSING: " + NORMAL + test_name
+		return -1
+
+	if log_level & 4:
 		print PASS_COLOR + "PASSED: " + NORMAL + test_name
 	return 0
 
@@ -127,6 +155,7 @@ def process_test_file(filename):
 	print "Processing " + filename
 	pass_count = 0
 	fail_count = 0
+	unst_count = 0
 	for line in fd:
 		line = string.rstrip(string.lstrip(line))
 		parts = string.split(line)
@@ -135,11 +164,15 @@ def process_test_file(filename):
 		lang = ""
 		if len(parts) > 3:
 			lang = "-l " + parts[3]
-		if run_tests(parts[0], parts[1], parts[2], lang) < 0:
-			fail_count += 1
+		rt = run_tests(parts[0], parts[1], parts[2], lang)
+		if rt < 0:
+			if rt == -1:
+				fail_count += 1
+			else:
+				unst_count += 1
 		else:
 			pass_count += 1
-	return [pass_count, fail_count]
+	return [pass_count, fail_count, unst_count]
 
 #
 # entry point
@@ -149,10 +182,16 @@ if __name__ == '__main__':
 	args = []
 	the_tests = []
 	for arg in sys.argv[1:]:
-		if arg.startswith('-v'):
-			for ch in arg[1:]:
-				if ch == 'v':
-					log_level += 1
+		if arg.startswith('-'):
+			for cc in arg[1:]:
+				if cc == 'd':       # show diff on failure
+					log_level |= 1
+				elif cc == 'c':     # show commands
+					log_level |= 2
+				elif cc == 'p':     # show passes
+					log_level |= 4
+				else:
+					sys.exit('Unknown option "%s"' % (cc))
 		else:
 			args.append(arg)
 
@@ -165,18 +204,23 @@ if __name__ == '__main__':
 	print "Tests: " + str(the_tests)
 	pass_count = 0
 	fail_count = 0
+	unst_count = 0
 
 	for item in the_tests:
 		passfail = process_test_file(item + '.test')
 		if passfail != None:
 			pass_count += passfail[0]
 			fail_count += passfail[1]
+			unst_count += passfail[2]
 
 	print "Passed %d / %d tests" % (pass_count, pass_count + fail_count)
 	if fail_count > 0:
 		print BOLD + "Failed %d test(s)" % (fail_count) + NORMAL
 		sys.exit(1)
 	else:
-		print BOLD + "All tests passed" + NORMAL
+		txt = BOLD + "All tests passed" + NORMAL
+		if unst_count > 0:
+			txt += ", but some files were unstable"
+		print txt
 		sys.exit(0)
 

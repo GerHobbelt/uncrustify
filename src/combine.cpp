@@ -46,6 +46,7 @@ static void handle_cs_property(chunk_t *pc);
 static void handle_template(chunk_t *pc);
 static void handle_wrap(chunk_t *pc);
 static bool is_oc_block(chunk_t *pc);
+static void handle_java_assert(chunk_t *pc);
 
 void make_type(chunk_t *pc)
 {
@@ -371,6 +372,11 @@ void do_symbol_check(chunk_t *prev, chunk_t *pc, chunk_t *next)
             break;
          }
       }
+   }
+
+   if (pc->type == CT_ASSERT)
+   {
+      handle_java_assert(pc);
    }
 
    /* A [] in C# and D only follows a type */
@@ -757,6 +763,11 @@ void do_symbol_check(chunk_t *prev, chunk_t *pc, chunk_t *next)
       }
    }
 
+   if ((pc->type == CT_DELETE) && (next->type == CT_TSQUARE))
+   {
+      next->parent_type = CT_DELETE;
+   }
+
    /* Change CT_STAR to CT_PTR_TYPE or CT_ARITH or SYM_DEREF */
    if (pc->type == CT_STAR)
    {
@@ -779,7 +790,11 @@ void do_symbol_check(chunk_t *prev, chunk_t *pc, chunk_t *next)
          pc->type = CT_DEREF;
       }
       else if (((prev->type == CT_WORD) && chunk_ends_type(prev)) ||
-               (prev->type == CT_DC_MEMBER))
+               (prev->type == CT_DC_MEMBER) || (prev->type == CT_PTR_TYPE))
+      {
+         pc->type = CT_PTR_TYPE;
+      }
+      else if (next->type == CT_SQUARE_OPEN)
       {
          pc->type = CT_PTR_TYPE;
       }
@@ -798,10 +813,13 @@ void do_symbol_check(chunk_t *prev, chunk_t *pc, chunk_t *next)
 
    if (pc->type == CT_AMP)
    {
-      if ((prev->type == CT_DELETE) ||
-          (prev->type == CT_TYPE))
+      if (prev->type == CT_DELETE)
       {
          pc->type = CT_ADDR;
+      }
+      else if (prev->type == CT_TYPE)
+      {
+         pc->type = CT_BYREF;
       }
       else
       {
@@ -1485,6 +1503,7 @@ static void fix_type_cast(chunk_t *start)
  *
  * tag { ... } [*] word [, [*]word] ;
  * tag [word/type] { ... } [*] word [, [*]word] ;
+ * enum [word/type [: int_type]] { ... } [*] word [, [*]word] ;
  * tag [word/type] [word]; -- this gets caught later.
  * fcn(tag [word/type] [word])
  * a = (tag [word/type] [*])&b;
@@ -1505,18 +1524,33 @@ static void fix_enum_struct_union(chunk_t *pc)
 
    /* the next item is either a type or open brace */
    next = chunk_get_next_ncnl(pc);
-   if (next->type == CT_TYPE)
+   if (next && (next->type == CT_TYPE))
    {
       next->parent_type = pc->type;
       next = chunk_get_next_ncnl(next);
 
-      if (((cpd.lang_flags & LANG_PAWN) != 0) &&
-          (next->type == CT_PAREN_OPEN))
+      /* next up is either a colon, open brace, or open paren (pawn) */
+      if (!next)
+      {
+         return;
+      }
+      else if (((cpd.lang_flags & LANG_PAWN) != 0) &&
+               (next->type == CT_PAREN_OPEN))
       {
          next = set_paren_parent(next, CT_ENUM);
       }
+      else if ((pc->type == CT_ENUM) && (next->type == CT_COLON))
+      {
+         /* enum TYPE : INT_TYPE { */
+         next = chunk_get_next_ncnl(next);
+         if (next)
+         {
+            make_type(next);
+            next = chunk_get_next_ncnl(next);
+         }
+      }
    }
-   if (next->type == CT_BRACE_OPEN)
+   if (next && (next->type == CT_BRACE_OPEN))
    {
       flag_parens(next, (pc->type == CT_ENUM) ? PCF_IN_ENUM : PCF_IN_STRUCT,
                   CT_NONE, CT_NONE, false);
@@ -1587,6 +1621,11 @@ static void fix_enum_struct_union(chunk_t *pc)
       }
 
       next = chunk_get_next_ncnl(next);
+   }
+
+   if (next && (next->type == CT_SEMICOLON))
+   {
+      next->parent_type = pc->type;
    }
 }
 
@@ -1892,6 +1931,10 @@ void combine_labels(void)
             else if (cur->parent_type == CT_SQL_EXEC)
             {
                /* ignore it - SQL variable name */
+            }
+            else if (next->parent_type == CT_ASSERT)
+            {
+               /* ignore it - Java assert thing */
             }
             else
             {
@@ -2281,7 +2324,10 @@ static bool can_be_full_param(chunk_t *start, chunk_t *end)
       else if ((pc->type == CT_MEMBER) ||
                (pc->type == CT_DC_MEMBER))
       {
-         word_cnt--;
+         if (word_cnt > 0)
+         {
+            word_cnt--;
+         }
       }
       else if ((pc != start) && (chunk_is_star(pc) ||
                                  chunk_is_addr(pc)))
@@ -2404,8 +2450,14 @@ static void mark_function(chunk_t *pc)
          tmp = pc;
          while ((tmp = chunk_get_prev_ncnl(tmp)) != NULL)
          {
-            if (tmp->type == CT_BRACE_CLOSE)
+            if ((tmp->type == CT_BRACE_CLOSE) ||
+                (tmp->type == CT_SEMICOLON))
             {
+               break;
+            }
+            if (tmp->type == CT_ASSIGN)
+            {
+               pc->type = CT_FUNC_CALL;
                break;
             }
             if (tmp->type == CT_TEMPLATE)
@@ -2657,10 +2709,13 @@ static void mark_function(chunk_t *pc)
             prev = chunk_get_prev_ncnlnp(prev);
             if ((prev == NULL) ||
                 ((prev->type != CT_WORD) &&
-                 (prev->type != CT_TYPE)))
+                 (prev->type != CT_TYPE) &&
+                 (prev->type != CT_THIS)))
             {
                LOG_FMT(LFCN, " --? Skipped MEMBER and landed on %s\n",
                        (prev == NULL) ? "<null>" : get_token_name(prev->type));
+               pc->type = CT_FUNC_CALL;
+               isa_def = false;
                break;
             }
             LOG_FMT(LFCN, " <skip %.*s>", prev->len, prev->str);
@@ -2749,7 +2804,11 @@ static void mark_function(chunk_t *pc)
               get_token_name(pc->type),
               pc->len, pc->str, pc->orig_line, pc->orig_col);
 
-      flag_parens(next, PCF_IN_FCN_CALL, CT_FPAREN_OPEN, CT_NONE, false);
+      tmp = flag_parens(next, PCF_IN_FCN_CALL, CT_FPAREN_OPEN, CT_NONE, false);
+      if ((tmp != NULL) && (tmp->type == CT_BRACE_OPEN))
+      {
+         set_paren_parent(tmp, pc->type);
+      }
       return;
    }
 
@@ -3097,6 +3156,11 @@ static void mark_class_ctor(chunk_t *start)
       if ((pc->type == CT_BRACE_CLOSE) && (pc->brace_level < level))
       {
          LOG_FMT(LFTOR, "%s: %d] Hit brace close\n", __func__, pc->orig_line);
+         pc = chunk_get_next_ncnl(pc, CNAV_PREPROC);
+         if (pc && (pc->type == CT_SEMICOLON))
+         {
+            pc->parent_type = start->type;
+         }
          return;
       }
 
@@ -3123,27 +3187,28 @@ static void mark_namespace(chunk_t *pns)
    chunk_t *br_close;
 
    pc = chunk_get_next_ncnl(pns);
-   if (pc != NULL)
+   while (pc != NULL)
    {
+      pc->parent_type = CT_NAMESPACE;
       if (pc->type != CT_BRACE_OPEN)
       {
          pc = chunk_get_next_ncnl(pc);
+         continue;
       }
-      if ((pc != NULL) && (pc->type == CT_BRACE_OPEN))
-      {
-         if ((cpd.settings[UO_indent_namespace_limit].n > 0) &&
-             ((br_close = chunk_skip_to_match(pc)) != NULL))
-         {
-            int diff = br_close->orig_line - pc->orig_line;
 
-            if (diff > cpd.settings[UO_indent_namespace_limit].n)
-            {
-               pc->flags       |= PCF_LONG_BLOCK;
-               br_close->flags |= PCF_LONG_BLOCK;
-            }
+      if ((cpd.settings[UO_indent_namespace_limit].n > 0) &&
+          ((br_close = chunk_skip_to_match(pc)) != NULL))
+      {
+         int diff = br_close->orig_line - pc->orig_line;
+
+         if (diff > cpd.settings[UO_indent_namespace_limit].n)
+         {
+            pc->flags       |= PCF_LONG_BLOCK;
+            br_close->flags |= PCF_LONG_BLOCK;
          }
-         flag_parens(pc, PCF_IN_NAMESPACE, CT_NONE, CT_NAMESPACE, false);
       }
+      flag_parens(pc, PCF_IN_NAMESPACE, CT_NONE, CT_NAMESPACE, false);
+      return;
    }
 }
 
@@ -4157,6 +4222,33 @@ static void handle_wrap(chunk_t *pc)
          chunk_del(opp);
          chunk_del(name);
          chunk_del(clp);
+      }
+   }
+}
+
+/**
+ * Java assert statments are: "assert EXP1 [: EXP2] ;"
+ * Mark the parent of the colon and semicolon
+ */
+static void handle_java_assert(chunk_t *pc)
+{
+   bool did_colon = false;
+
+   chunk_t *tmp = pc;
+   while ((tmp = chunk_get_next(tmp)) != NULL)
+   {
+      if (tmp->level == pc->level)
+      {
+         if (!did_colon && (tmp->type == CT_COLON))
+         {
+            did_colon = true;
+            tmp->parent_type = pc->type;
+         }
+         if (tmp->type == CT_SEMICOLON)
+         {
+            tmp->parent_type = pc->type;
+            break;
+         }
       }
    }
 }

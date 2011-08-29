@@ -10,6 +10,7 @@
 #ifndef UNCRUSTIFY_TYPES_H_INCLUDED
 #define UNCRUSTIFY_TYPES_H_INCLUDED
 
+using namespace std;
 
 #include "base_types.h"
 #include "options.h"
@@ -23,6 +24,7 @@
 #elif defined(HAVE_SYS_UTIME_H)
 #include <sys/utime.h>
 #endif
+#include <vector>
 
 #define UNCRUSTIFY_OFF_TEXT    " *INDENT-OFF*"
 #define UNCRUSTIFY_ON_TEXT     " *INDENT-ON*"
@@ -252,27 +254,20 @@ enum pattern_class
    PATCLS_ELSE,     // Special case of PATCLS_BRACED for handling CT_IF
 };
 
-typedef struct
+struct chunk_tag_t
 {
    const char *tag;
    c_token_t  type;
    int        lang_flags;
-} chunk_tag_t;
+};
 
-typedef struct
+struct lookup_entry_t
 {
    char              ch;
    char              left_in_group;
    UINT16            next_idx;
    const chunk_tag_t *tag;
-} lookup_entry_t;
-
-typedef struct
-{
-   const char *tag;
-   const char *value;
-} define_tag_t;
-
+};
 
 struct align_t
 {
@@ -281,24 +276,10 @@ struct align_t
    int       len;    // of the token + space
 };
 
-typedef struct
-{
-   chunk_t *pc;
-   int     seqnum;
-} chunk_stack_entry_t;
-
-typedef struct chunk_stack
-{
-   chunk_stack_entry_t *cse;
-   int                 len;
-   int                 size;
-} chunk_stack_t;
-
 struct file_mem
 {
-   char           *data;
-   int            length;
-#if defined(HAVE_STRUCT_UTIMBUF_ACTIME)
+   vector<char>   data;
+#ifdef HAVE_UTIME_H
    struct utimbuf utb;
 #endif
 };
@@ -313,6 +294,7 @@ struct cp_data
    file_mem           file_hdr;   /* for cmt_insert_file_header */
    file_mem           file_ftr;   /* for cmt_insert_file_footer */
    file_mem           func_hdr;   /* for cmt_insert_func_header */
+   file_mem           oc_msg_hdr; /* for cmt_insert_oc_msg_header */
    file_mem           class_hdr;  /* for cmt_insert_class_header */
 
    int                lang_flags; // LANG_xxx

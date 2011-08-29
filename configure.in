@@ -1,7 +1,8 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([uncrustify], [0.57+git],,, [http://uncrustify.sourceforge.net/])
+AC_PREREQ([2.59])
+AC_INIT([uncrustify], [0.58],,,[http://uncrustify.sourceforge.net/])
 enable_silent_rules=${enable_silent_rules-yes}
 
 # Must come before AM_INIT_AUTOMAKE.
@@ -52,9 +53,7 @@ AC_INCLUDES_DEFAULT()
 ]])
 
 # Checks for library functions.
-AC_FUNC_MALLOC
 AC_FUNC_MEMCMP
-AC_FUNC_REALLOC
 AC_CHECK_FUNCS([memset strcasecmp strchr strdup strerror strtol strtoul])
 AC_CHECK_FUNCS([utime])
 AC_CHECK_FUNCS([strndup strnchr])

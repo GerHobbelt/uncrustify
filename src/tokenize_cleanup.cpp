@@ -88,26 +88,38 @@ void tokenize_cleanup(void)
    chunk_t *tmp2;
    bool    in_type_cast = false;
 
+   /* Since [] is expected to be TSQUARE for the 'operator', we need to make
+    * this change in the first pass.
+    */
+   for (pc = chunk_get_head(); pc != NULL; pc = chunk_get_next_ncnl(pc))
+   {
+      if (pc->type == CT_SQUARE_OPEN)
+      {
+         next = chunk_get_next_ncnl(pc);
+         if (chunk_is_token(next, CT_SQUARE_CLOSE))
+         {
+            /* Change '[' + ']' into '[]' */
+            pc->type = CT_TSQUARE;
+            pc->str  = "[]";
+            pc->len  = 2;
+            chunk_del(next);
+            pc->orig_col_end += 1;
+         }
+      }
+      if ((pc->type == CT_SEMICOLON) &&
+          (pc->flags & PCF_IN_PREPROC) &&
+          !chunk_get_next_ncnl(pc, CNAV_PREPROC))
+      {
+         LOG_FMT(LWARN, "%s:%d Detected a macro that ends with a semicolon. Expect failures if used.\n",
+                 cpd.filename, pc->orig_line);
+      }
+   }
+
+   /* We can handle everything else in the second pass */
    pc   = chunk_get_head();
    next = chunk_get_next_ncnl(pc);
    while ((pc != NULL) && (next != NULL))
    {
-      /* Change '[' + ']' into '[]' */
-      if ((pc->type == CT_SQUARE_OPEN) && (next->type == CT_SQUARE_CLOSE))
-      {
-         pc->type = CT_TSQUARE;
-         pc->str  = "[]";
-         pc->len  = 2;
-#if 0
-         chunk_del(next);
-         pc->orig_col_end += 1;
-#else
-         pc->orig_col_end = next->orig_col_end;
-         chunk_del(next);
-#endif
-         next = chunk_get_next_ncnl(pc);
-      }
-
       if ((pc->type == CT_DOT) && ((cpd.lang_flags & LANG_ALLC) != 0))
       {
          pc->type = CT_MEMBER;
@@ -446,6 +458,31 @@ void tokenize_cleanup(void)
                if ((tmp->len > 0) && unc_isalpha(*tmp->str))
                {
                   tmp->type = CT_SQL_WORD;
+               }
+               tmp = chunk_get_next_ncnl(tmp);
+            }
+         }
+      }
+
+      /* handle MS abomination 'for each' */
+      if ((pc->type == CT_FOR) && chunk_is_str(next, "each", 4) &&
+          (next == chunk_get_next(pc)))
+      {
+         /* merge the two */
+         pc->len = next->orig_col_end - pc->orig_col;
+         pc->orig_col_end = next->orig_col_end;
+         chunk_del(next);
+         next = chunk_get_next_ncnl(pc);
+         /* label the 'in' */
+         if (next && (next->type == CT_PAREN_OPEN))
+         {
+            tmp = chunk_get_next_ncnl(next);
+            while (tmp && (tmp->type != CT_PAREN_CLOSE))
+            {
+               if (chunk_is_str(tmp, "in", 2))
+               {
+                  tmp->type = CT_IN;
+                  break;
                }
                tmp = chunk_get_next_ncnl(tmp);
             }
