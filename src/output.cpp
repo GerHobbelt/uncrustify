@@ -148,6 +148,48 @@ static void output_to_column(int column, bool allow_tabs, int max_tabbed_column 
 }
 
 
+/**
+ * Output a comment to the column using indent_with_tabs and
+ * indent_cmt_with_tabs as the rules.
+ * base_col is the indent of the first line of the comment.
+ * On the first line, column == base_col.
+ * On subsequnet lines, column >= base_col.
+ *
+ * @param brace_col the brace-level indent of the comment
+ * @param base_col  the indent of the start of the comment (multiline)
+ * @param column    the column that we should end up in
+ */
+static void cmt_output_indent(int brace_col, int base_col, int column)
+{
+   int iwt;
+   int tab_col;
+
+   iwt = cpd.settings[UO_indent_cmt_with_tabs].b ? 2 :
+         (cpd.settings[UO_indent_with_tabs].n ? 1 : 0);
+
+   tab_col = (iwt == 0) ? 0 : ((iwt == 1) ? brace_col : base_col);
+
+   //LOG_FMT(LSYS, "%s(brace=%d base=%d col=%d iwt=%d) tab=%d cur=%d\n",
+   //        __func__, brace_col, base_col, column, iwt, tab_col, cpd.column);
+
+   cpd.did_newline = 0;
+   if ((iwt == 2) || ((cpd.column == 1) && (iwt == 1)))
+   {
+      /* tab out as far as possible and then use spaces */
+      while (next_tab_column(cpd.column) <= tab_col)
+      {
+         add_text("\t");
+      }
+   }
+
+   /* space out the rest */
+   while (cpd.column < column)
+   {
+      add_text(" ");
+   }
+}
+
+
 void output_parsed(FILE *pfile)
 {
    chunk_t *pc;
