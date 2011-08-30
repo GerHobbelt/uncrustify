@@ -1,0 +1,14 @@
+#
+# Test cases specifically for the PHP language.
+#
+# Range: A0000 - A9999
+# test.name  config.file  input.file  output.file
+
+A0000  php-nil.cfg                  php/FileManager.php
+A0001  php-nil.cfg                  php/FileManagerWithAliasSupport.php
+A0002  php-nil.cfg                  php/Image.class.php
+A0003  php-nil.cfg                  php/Tooling.php
+
+A0004  ger-full-cmt-reflow.cfg      php/Tooling.php
+A0005  ger-full-cmt-reflow.cfg      php/FileManager.php
+
