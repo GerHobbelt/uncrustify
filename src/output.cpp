@@ -17,6 +17,7 @@
 
 static chunk_t *output_comment(chunk_t *pc);
 
+
 /**
  * All output text is sent here, one char at a time.
  */
