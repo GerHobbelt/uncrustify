@@ -196,7 +196,7 @@ if __name__ == '__main__':
 			args.append(arg)
 
 	if len(args) == 0:
-		the_tests += "c-sharp c cpp d java pawn objective-c vala ecma".split()
+		the_tests += "c-sharp c cpp d java pawn objective-c vala ecma php".split()
 	else:
 		the_tests += args
 

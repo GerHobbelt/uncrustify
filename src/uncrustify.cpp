@@ -40,12 +40,6 @@
 #ifdef HAVE_STRINGS_H
 #include <strings.h>  /* strcasecmp() */
 #endif
-#if defined(TIME_WITH_SYS_TIME)
-#include <time.h>
-#include <sys/time.h>
-#else
-#include <time.h>
-#endif
 #include <vector>
 #include <deque>
 
@@ -167,9 +161,8 @@ static void usage_exit(const char *msg, const char *argv0, int code)
            " --suffix SFX : Append SFX to the output filename. The default is '.uncrustify'\n"
            " --prefix PFX : Prepend PFX to the output filename path.\n"
            " --replace    : replace source files (creates a backup)\n"
-           " --no-backup  : replace files, no backup. Useful if files are under source\n"
-		   "                control\n"
-#if defined(HAVE_UTIME)
+           " --no-backup  : replace files, no backup. Useful if files are under source control\n"
+#ifdef HAVE_UTIME_H
            " --mtime      : preserve mtime on replaced files\n"
 #endif
            " -l           : language override: C, CPP, D, CS, JAVA, PAWN, OC, OC+\n"
@@ -1148,7 +1141,7 @@ static int load_mem_file(const char *filename, file_mem& fm)
       return(-1);
    }
 
-#if defined(HAVE_STRUCT_UTIMBUF_ACTIME) && defined(HAVE_UTIME)
+#ifdef HAVE_UTIME_H
    /* Save off mtime */
    fm.utb.modtime = my_stat.st_mtime;
 #endif
@@ -1446,7 +1439,7 @@ static void do_source_file(const char *filename_in,
          }
       }
 
-#if defined(HAVE_STRUCT_UTIMBUF_ACTIME) && defined(HAVE_UTIME)
+#ifdef HAVE_UTIME_H
       if (keep_mtime)
       {
          /* update mtime -- don't care if it fails */
