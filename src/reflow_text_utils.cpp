@@ -788,6 +788,34 @@ int cmt_reflow::add_kw(const char *text) /* [i_a] */
       return(0);
    }
 
+   if (strncmp(text, "$(message)", 10) == 0)
+   {
+      push(fcn->str, fcn->len);
+      chunk_t *tmp = chunk_get_next_ncnl(fcn);
+      chunk_t *word = NULL;
+      while (tmp)
+      {
+         if ((tmp->type == CT_BRACE_OPEN) || (tmp->type == CT_SEMICOLON))
+         {
+            break;
+         }
+         if (tmp->type == CT_OC_COLON)
+         {
+            if (word != NULL)
+            {
+               push(word->str, word->len);
+               word = NULL;
+            }
+            push(":");
+         }
+         if (tmp->type == CT_WORD)
+         {
+            word = tmp;
+         }
+         tmp = chunk_get_next_ncnl(tmp);
+      }
+      return(10);
+   }
    if (strncmp(text, "$(function)", 11) == 0)
    {
       if (fcn->parent_type == CT_OPERATOR)

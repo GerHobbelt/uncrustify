@@ -17,7 +17,6 @@
 
 static chunk_t *output_comment(chunk_t *pc);
 
-
 /**
  * All output text is sent here, one char at a time.
  */
@@ -143,48 +142,6 @@ static void output_to_column(int column, bool allow_tabs, int max_tabbed_column 
    }
    /* space out the final bit */
    while ((int)cpd.column < column)
-   {
-      add_text(" ");
-   }
-}
-
-
-/**
- * Output a comment to the column using indent_with_tabs and
- * indent_cmt_with_tabs as the rules.
- * base_col is the indent of the first line of the comment.
- * On the first line, column == base_col.
- * On subsequnet lines, column >= base_col.
- *
- * @param brace_col the brace-level indent of the comment
- * @param base_col  the indent of the start of the comment (multiline)
- * @param column    the column that we should end up in
- */
-static void cmt_output_indent(int brace_col, int base_col, int column)
-{
-   int iwt;
-   int tab_col;
-
-   iwt = cpd.settings[UO_indent_cmt_with_tabs].b ? 2 :
-         (cpd.settings[UO_indent_with_tabs].n ? 1 : 0);
-
-   tab_col = (iwt == 0) ? 0 : ((iwt == 1) ? brace_col : base_col);
-
-   //LOG_FMT(LSYS, "%s(brace=%d base=%d col=%d iwt=%d) tab=%d cur=%d\n",
-   //        __func__, brace_col, base_col, column, iwt, tab_col, cpd.column);
-
-   cpd.did_newline = 0;
-   if ((iwt == 2) || ((cpd.column == 1) && (iwt == 1)))
-   {
-      /* tab out as far as possible and then use spaces */
-      while (next_tab_column(cpd.column) <= tab_col)
-      {
-         add_text("\t");
-      }
-   }
-
-   /* space out the rest */
-   while (cpd.column < column)
    {
       add_text(" ");
    }
@@ -352,7 +309,7 @@ void output_text(FILE *pfile)
       {
          pc = output_comment(pc);
       }
-      else if (pc->type == CT_JUNK)
+      else if ((pc->type == CT_JUNK) || (pc->type == CT_IGNORED))
       {
          /* do not adjust the column for junk */
          add_text_len(pc->str, pc->len);
@@ -435,9 +392,295 @@ void output_text(FILE *pfile)
 }
 
 
-
-
 #if 0
+
+/**
+ * Checks for and updates the lead chars.
+ *
+ * @param line the comment line
+ * @return 0=not present, >0=number of chars that are part of the lead
+ */
+static int cmt_parse_lead(const char *line, int is_last)
+{
+   int len = 0;
+
+   while ((len < 32) && (line[len] != 0))
+   {
+      if ((len > 0) && (line[len] == '/'))
+      {
+         /* ignore combined comments */
+         int tmp = len + 1;
+         while (unc_isspace(line[tmp]))
+         {
+            tmp++;
+         }
+         if (line[tmp] == '/')
+         {
+            return 1;
+         }
+         break;
+      }
+      else if (strchr("*|\\#+", line[len]) == NULL)
+      {
+         break;
+      }
+      len++;
+   }
+
+   if (len > 30)
+   {
+      return 1;
+   }
+
+   if ((len > 0) && ((line[len] == 0) || unc_isspace(line[len])))
+   {
+      return len;
+   }
+   if (is_last && (len > 0))
+   {
+      return len;
+   }
+   return 0;
+}
+
+/**
+ * Scans a multiline comment to determine the following:
+ *  - the extra indent of the non-first line (0 or 1)
+ *  - the continuation text ('' or '* ')
+ *
+ * The decision is based on:
+ *  - cmt_indent_multi
+ *  - cmt_star_cont
+ *  - the first line length
+ *  - the second line leader length
+ *  - the last line length
+ *
+ * If the first and last line are the same length and don't contain any alnum
+ * chars and (the first line len > 2 or the second leader is the same as the
+ * first line length), then the indent is 0.
+ *
+ * If the leader on the second line is 1 wide or missing, then the indent is 1.
+ *
+ * Otherwise, the indent is 0.
+ *
+ * @param str       The comment string
+ * @param len       Length of the comment
+ * @param start_col Starting column
+ * @return 0 or 1
+ */
+static void calculate_comment_body_indent(cmt_reflow &cmt, const char *str, int len)
+{
+   int idx       = 0;
+   int first_len = 0;
+   int last_len  = 0;
+   int width     = 0;
+
+   cmt.xtra_indent = 0;
+
+   if (!cpd.settings[UO_cmt_indent_multi].b)
+   {
+      return;
+   }
+
+   if (cpd.settings[UO_cmt_multi_check_last].b)
+   {
+      /* find the last line length */
+      for (idx = len - 1; idx > 0; idx--)
+      {
+         if ((str[idx] == '\n') || (str[idx] == '\r'))
+         {
+            idx++;
+            while ((idx < len) && ((str[idx] == ' ') || (str[idx] == '\t')))
+            {
+               idx++;
+            }
+            last_len = len - idx;
+            break;
+         }
+      }
+   }
+
+   /* find the first line length */
+   for (idx = 0; idx < len; idx++)
+   {
+      if ((str[idx] == '\n') || (str[idx] == '\r'))
+      {
+         first_len = idx;
+         while ((str[first_len - 1] == ' ') || (str[first_len - 1] == '\t'))
+         {
+            first_len--;
+         }
+
+         /* handle DOS endings */
+         if ((str[idx] == '\r') && (str[idx + 1] == '\n'))
+         {
+            idx++;
+         }
+         idx++;
+         break;
+      }
+   }
+
+   /* Scan the second line */
+   width = 0;
+   for (/* nada */; idx < len - 1; idx++)
+   {
+      if ((str[idx] == ' ') || (str[idx] == '\t'))
+      {
+         if (width > 0)
+         {
+            break;
+         }
+         continue;
+      }
+      if ((str[idx] == '\n') || (str[idx] == '\r'))
+      {
+         /* Done with second line */
+         break;
+      }
+
+      /* Count the leading chars */
+      if ((str[idx] == '*') ||
+          (str[idx] == '|') ||
+          (str[idx] == '\\') ||
+          (str[idx] == '#') ||
+          (str[idx] == '+'))
+      {
+         width++;
+      }
+      else
+      {
+         width = 0;
+         break;
+      }
+   }
+
+   //LOG_FMT(LSYS, "%s: first=%d last=%d width=%d\n", __func__, first_len, last_len, width);
+
+   /*TODO: make the first_len minimum (4) configurable? */
+   if ((first_len == last_len) && ((first_len > 4) || (first_len == width)))
+   {
+      return;
+   }
+
+   cmt.xtra_indent = ((width == 2) ? 0 : 1);
+}
+
+
+static chunk_t *get_next_function(chunk_t *pc)
+{
+   while ((pc = chunk_get_next(pc)) != NULL)
+   {
+      if ((pc->type == CT_FUNC_DEF) ||
+          (pc->type == CT_OC_MSG_DECL) ||
+          (pc->type == CT_FUNC_PROTO))
+      {
+         return(pc);
+      }
+   }
+   return(NULL);
+}
+
+
+static chunk_t *get_next_class(chunk_t *pc)
+{
+   while ((pc = chunk_get_next(pc)) != NULL)
+   {
+      if (pc->type == CT_CLASS)
+      {
+         return(chunk_get_next(pc));
+      }
+   }
+   return(NULL);
+}
+
+
+/**
+ * Adds the javadoc-style @param and @return stuff, based on the params and
+ * return value for pc.
+ * If the arg list is '()' or '(void)', then no @params are added.
+ * Likewise, if the return value is 'void', then no @return is added.
+ */
+static void add_comment_javaparam(chunk_t *pc, cmt_reflow& cmt)
+{
+   chunk_t *fpo;
+   chunk_t *fpc;
+   chunk_t *tmp;
+   chunk_t *prev;
+   bool    has_param = true;
+   bool    need_nl   = false;
+
+   fpo = chunk_get_next_type(pc, CT_FPAREN_OPEN, pc->level);
+   if (fpo == NULL)
+   {
+      return;
+   }
+   fpc = chunk_get_next_type(fpo, CT_FPAREN_CLOSE, pc->level);
+   if (fpc == NULL)
+   {
+      return;
+   }
+
+   /* Check for 'foo()' and 'foo(void)' */
+   if (chunk_get_next_ncnl(fpo) == fpc)
+   {
+      has_param = false;
+   }
+   else
+   {
+      tmp = chunk_get_next_ncnl(fpo);
+      if ((tmp == chunk_get_prev_ncnl(fpc)) &&
+          chunk_is_str(tmp, "void", 4))
+      {
+         has_param = false;
+      }
+   }
+
+   if (has_param)
+   {
+      tmp  = fpo;
+      prev = NULL;
+      while ((tmp = chunk_get_next(tmp)) != NULL)
+      {
+         if ((tmp->type == CT_COMMA) || (tmp == fpc))
+         {
+            if (need_nl)
+            {
+               add_comment_text("\n ", 2, cmt, false);
+            }
+            need_nl = true;
+            add_text("@param");
+            if (prev != NULL)
+            {
+               add_text(" ");
+               add_text_len(prev->str, prev->len);
+               add_text(" TODO");
+            }
+            prev = NULL;
+            if (tmp == fpc)
+            {
+               break;
+            }
+         }
+         if (tmp->type == CT_WORD)
+         {
+            prev = tmp;
+         }
+      }
+   }
+
+   /* Do the return stuff */
+   tmp = chunk_get_prev_ncnl(pc);
+   if ((tmp != NULL) && !chunk_is_str(tmp, "void", 4))
+   {
+      if (need_nl)
+      {
+         add_comment_text("\n ", 2, cmt, false);
+      }
+      add_text("@return TODO");
+   }
+}
+
 
 /**
  * text starts with '$('. see if this matches a keyword and add text based
@@ -916,6 +1159,15 @@ void cmt_reflow::output_to_column(int column, bool allow_tabs, int max_tabbed_co
    delete line;
 }
 
+#else
+
+void cmt_reflow::output_to_column(int column, bool allow_tabs, int max_tabbed_column)
+{
+	::output_to_column(column, allow_tabs, max_tabbed_column);
+}
+
+#endif
+
 
 /**
  * This renders the #if condition to a string buffer.
@@ -1068,7 +1320,7 @@ void add_long_preprocessor_conditional_block_comment(void)
                           txt, nl_min, nl_count, txt, str.c_str());
 
                   /* Add a comment after the close brace */
-                  insert_comment_after(br_close, style, str.size(), str.c_str());
+                  insert_comment_after(br_close, style, (int)str.length(), str.c_str());   // vanilla had: str.size() here!
                }
             }
 
@@ -1081,13 +1333,3 @@ void add_long_preprocessor_conditional_block_comment(void)
       }
    }
 }
-
-#else
-
-void cmt_reflow::output_to_column(int column, bool allow_tabs, int max_tabbed_column)
-{
-	::output_to_column(column, allow_tabs, max_tabbed_column);
-}
-
-#endif
-
