@@ -25,14 +25,14 @@
 
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-#undef HAVE_INTTYPES_H 
+#undef HAVE_INTTYPES_H
 
 /* Define to 1 if your system has a GNU libc compatible `malloc' function, and
    to 0 otherwise. */
 #define HAVE_MALLOC 1
 
 /* Define to 1 if you have the <memory.h> header file. */
-#undef HAVE_MEMORY_H 
+#undef HAVE_MEMORY_H
 
 /* Define to 1 if you have the `memset' function. */
 #define HAVE_MEMSET 1
@@ -42,16 +42,16 @@
 #define HAVE_REALLOC 1
 
 /* Define to 1 if stdbool.h conforms to C99. */
-#undef HAVE_STDBOOL_H 
+#undef HAVE_STDBOOL_H
 
 /* Define to 1 if you have the <stdint.h> header file. */
-#undef HAVE_STDINT_H 
+#undef HAVE_STDINT_H
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #define HAVE_STDLIB_H 1
 
 /* Define to 1 if you have the `strcasecmp' function. */
-#undef HAVE_STRCASECMP 
+#undef HAVE_STRCASECMP
 
 /* Define to 1 if you have the `strchr' function. */
 #define HAVE_STRCHR 1
@@ -63,7 +63,7 @@
 #define HAVE_STRERROR 1
 
 /* Define to 1 if you have the <strings.h> header file. */
-#undef HAVE_STRINGS_H 
+#undef HAVE_STRINGS_H
 
 /* Define to 1 if you have the <string.h> header file. */
 #define HAVE_STRING_H 1
@@ -72,7 +72,7 @@
 /* #undef HAVE_STRNCHR */
 
 /* Define to 1 if you have the `strndup' function. */
-#undef HAVE_STRNDUP 
+#undef HAVE_STRNDUP
 
 /* Define to 1 if you have the `strtol' function. */
 #define HAVE_STRTOL 1
@@ -93,22 +93,22 @@
 #define HAVE_SYS_UTIME_H 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
-#undef HAVE_UNISTD_H 
+#undef HAVE_UNISTD_H
 
 /* Define to 1 if you have the `utime' function. */
 #define HAVE_UTIME 1
 
 /* Define to 1 if you have the <utime.h> header file. */
-#undef HAVE_UTIME_H 
+#undef HAVE_UTIME_H
 
 /* Define to 1 if the system has the type `_Bool'. */
 #define HAVE__BOOL 1
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
-																   
+
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
-#undef TIME_WITH_SYS_TIME 
+#undef TIME_WITH_SYS_TIME
 
 
 /* Define to appropriate substitute if compiler doesnt have __func__ */
