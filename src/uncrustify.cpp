@@ -1437,7 +1437,7 @@ static void do_source_file(const char *filename_in,
          else
          {
             /* Change - rename filename_tmp to filename_out */
-            if (rename(filename_tmp.c_str(), filename_out) != 0)
+            if (unc_rename(filename_tmp.c_str(), filename_out) != 0)
             {
                LOG_FMT(LERR, "%s: Unable to rename '%s' to '%s'\n",
                        __func__, filename_tmp.c_str(), filename_out);
