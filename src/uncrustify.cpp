@@ -706,7 +706,6 @@ int main(int argc, char *argv[])
       /* Handled later */
    }
 
-#if !defined(WIN32) || 01
    /* Try to file a config at an alternate location */
    char buf[1024];
    if (cfg_file == NULL)
@@ -728,7 +727,6 @@ int main(int argc, char *argv[])
          }
       }
    }
-#endif
 
    /* Get the parsed file name */
    if (((parsed_file = arg.Param("--parsed")) != NULL) ||
@@ -913,12 +911,8 @@ int main(int argc, char *argv[])
     */
    if (cfg_file == NULL)
    {
-#if defined(WIN32) && 0
-      usage_exit("Specify the config file: -c file", argv[0], 58);
-#else
       usage_exit("Specify the config file with '-c file' or set UNCRUSTIFY_CONFIG",
                  argv[0], 58);
-#endif
    }
 
    /*
