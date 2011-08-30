@@ -279,7 +279,7 @@ struct align_t
 struct file_mem
 {
    vector<char>   data;
-#ifdef HAVE_UTIME_H
+#if defined(HAVE_STRUCT_UTIMBUF_ACTIME) && defined(HAVE_UTIME)
    struct utimbuf utb;
 #endif
 };

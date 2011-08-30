@@ -1148,7 +1148,7 @@ static int load_mem_file(const char *filename, file_mem& fm)
       return(-1);
    }
 
-#if defined(HAVE_STRUCT_UTIMBUF_ACTIME)
+#if defined(HAVE_STRUCT_UTIMBUF_ACTIME) && defined(HAVE_UTIME)
    /* Save off mtime */
    fm.utb.modtime = my_stat.st_mtime;
 #endif
@@ -1451,7 +1451,7 @@ static void do_source_file(const char *filename_in,
       {
          /* update mtime -- don't care if it fails */
          fm.utb.actime = time(NULL);
-         utime(filename_in, &fm.utb);
+         (void)utime(filename_in, &fm.utb);
       }
 #endif
    }
