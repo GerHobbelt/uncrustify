@@ -31,7 +31,6 @@ src/stamp-h1
 src/uncrustify_version.h
 *.exe
 *~
-*.bak
 config.log
 config.status
 *.vtg

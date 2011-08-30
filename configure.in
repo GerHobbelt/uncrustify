@@ -1,7 +1,6 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.59])
 AC_INIT([uncrustify], [0.58],,,[http://uncrustify.sourceforge.net/])
 enable_silent_rules=${enable_silent_rules-yes}
 
@@ -9,7 +8,7 @@ enable_silent_rules=${enable_silent_rules-yes}
 # AC_CONFIG_AUX_DIR([m4])
 AC_CONFIG_MACRO_DIR([m4])
 
-AM_INIT_AUTOMAKE([1.10 -Wall silent-rules])
+AM_INIT_AUTOMAKE([1.11 -Wall silent-rules])
 
 # Minimum Autoconf version required.
 AC_PREREQ([2.62])

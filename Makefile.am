@@ -13,7 +13,12 @@ testdir = tests
 TESTS = run_tests.sh
 
 EXTRA_DIST = etc m4 scripts run_tests.sh make_token_names.sh $(pkgdata_DATA) \
-		tests/*.test tests/*.sh tests/*.py tests/config tests/input \
+		tests/*.test \
+		tests/*.sh \
+		tests/*.py \
+		tests/config \
+		tests/input/ \
+		tests/output/ \
 		win32/Uncrustify_Win32_2003.sln \
 		win32/Uncrustify_Win32_2003.vcproj \
 		win32/Uncrustify_Win32_2005.sln \
@@ -21,13 +26,14 @@ EXTRA_DIST = etc m4 scripts run_tests.sh make_token_names.sh $(pkgdata_DATA) \
 		win32/Uncrustify_Win32_2008.sln \
 		win32/Uncrustify_Win32_2008.vcproj \
 		win32/Uncrustify_Win32_2010.sln \
-		win32/Uncrustify_Win32_2010.vcproj \
+		win32/Uncrustify_Win32_2010.vcxproj \
+		win32/Uncrustify_Win32_2010.vcxproj.filters \
 		win32/Uncrustify_Win32.sln \
 		win32/Uncrustify_Win32.vcproj \
 		win32/Uncrustify_Win32.dsw \
 		win32/Uncrustify_Win32.dsp \
 		win32/windows_compat.h \
-		tests/output uncrustify.xcodeproj osx make_win32.sh documentation \
+		uncrustify.xcodeproj osx make_win32.sh documentation \
 		ChangeLog \
 		BUGS AUTHORS aclocal.m4 autogen.sh COPYING do-c.sh do-d.sh extras.vpj HELP INSTALL \
 		install-sh make_token_names.sh mk_all_distros.sh \
