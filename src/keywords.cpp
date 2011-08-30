@@ -593,7 +593,7 @@ static const chunk_tag_t *kw_static_match(const chunk_tag_t *tag)
  *                user-specified 'keywords' to a maximum width of strlen(word)!)
  * @return        NULL (no match) or the keyword entry
  */
-c_token_t find_keyword_type(const char *word, int len)
+const chunk_tag_t *find_keyword(const char *word, int len)
 {
    string            ss(word, len);
    chunk_tag_t       key;
@@ -601,14 +601,60 @@ c_token_t find_keyword_type(const char *word, int len)
 
    if (len <= 0)
    {
-      return(CT_NONE);
+      return NULL;
    }
+
+#if 0 // this was the old code with special support for macro def's in the config file (whitespaces!)
+
+   if (len > (int)(sizeof(buf) - 1))
+   {
+      LOG_FMT(LNOTE, "%s: keyword too long at %d char (%d max) : %.*s\n",
+              __func__, len, (int)sizeof(buf), len, word);
+      return(NULL);
+   }
+   tag.tag = word; /* allow the tail end to be compared as well! */
+
+   /* check the dynamic word list first */
+   p_ret = NULL;
+   if (wl.p_tags)
+   {
+      p_ret = (const chunk_tag_t *)bsearch(&tag, wl.p_tags, wl.active,
+                                           sizeof(chunk_tag_t), kw_compare_ex);
+   }
+
+   if (p_ret == NULL)
+   {
+	memcpy(buf, word, len); /* [i_a] */
+	buf[len] = 0;
+
+	tag.tag = buf; /* just plain keyword match from here */
+
+      /* check the static word list */
+      p_ret = (const chunk_tag_t *)bsearch(&tag, keywords, ARRAY_SIZE(keywords),
+                                           sizeof(keywords[0]), kw_compare);
+      if (p_ret != NULL)
+      {
+         //fprintf(stderr, "%s: match %s -", __func__, p_ret->tag);
+         p_ret = kw_static_match(p_ret);
+         //fprintf(stderr, "\n");
+      }
+   }
+
+   return(p_ret);
+ #endif
 
    /* check the dynamic word list first */
    dkwmap::iterator it = dkwm.find(ss);
    if (it != dkwm.end())
    {
-      return((*it).second);
+	   static chunk_tag_t tt = {0};
+	   static string cts;
+
+	   cts = ss.c_str();  // make sure the string is cloned!
+	   tt.tag = cts.c_str();
+	   tt.lang_flags = LANG_ALL;
+	   tt.type = ((*it).second);
+	   return &tt;
    }
 
    key.tag = ss.c_str();
@@ -620,7 +666,7 @@ c_token_t find_keyword_type(const char *word, int len)
    {
       p_ret = kw_static_match(p_ret);
    }
-   return((p_ret != NULL) ? p_ret->type : CT_NONE);
+   return p_ret;
 }
 
 

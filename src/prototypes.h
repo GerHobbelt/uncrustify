@@ -204,7 +204,7 @@ void brace_cleanup(void);
  */
 
 int load_keyword_file(const char *filename);
-c_token_t find_keyword_type(const char *word, int len);
+const chunk_tag_t *find_keyword(const char *word, int len);
 void add_keyword(const char *tag, c_token_t type);
 void output_types(FILE *pfile);
 void print_keywords(FILE *pfile);
