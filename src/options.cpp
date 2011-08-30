@@ -868,7 +868,8 @@ void register_options(void)
                   "The number of newlines after '}' of a multi-line function body.\n"
                   "0 = No change.");
    unc_add_option("nl_after_func_body_class", UO_nl_after_func_body_class, AT_NUM,
-                  "The number of newlines after '}' of a multi-line function body in a class declaration");
+                  "The number of newlines after '}' of a multi-line function body in a class declaration.\n"
+                  "0 = No change.");
    unc_add_option("nl_after_func_body_one_liner", UO_nl_after_func_body_one_liner, AT_NUM,
                   "The minimum number of newlines after '}' of a single line function body.\n"
                   "0 = No change.");
@@ -888,9 +889,11 @@ void register_options(void)
                   "Whether to force a newline after a multi-line comment.");
 
    unc_add_option("nl_after_struct", UO_nl_after_struct, AT_NUM,
-                  "The number of newlines after '}' or ';' of a struct/enum/union definition");
+                  "The number of newlines after '}' or ';' of a struct/enum/union definition.\n"
+                  "0 = No change.");
    unc_add_option("nl_after_class", UO_nl_after_class, AT_NUM,
-                  "The number of newlines after '}' or ';' of a class definition");
+                  "The number of newlines after '}' or ';' of a class definition.\n"
+                  "0 = No change.");
 
    unc_add_option("nl_before_access_spec", UO_nl_before_access_spec, AT_NUM,
                   "The number of newlines before a 'private:', 'public:', 'protected:',\n"
@@ -918,7 +921,8 @@ void register_options(void)
                   "The number of newlines between the get/set/add/remove handlers in C#.\n"
                   "0 = No change.");
    unc_add_option("nl_property_brace", UO_nl_property_brace, AT_IARF,
-                  "Add or remove newline between C# property and the '{'");
+                  "Add or remove newline between C# property and the '{'.\n"
+                  "0 = No change.");
 
    unc_add_option("eat_blanks_after_open_brace", UO_eat_blanks_after_open_brace, AT_BOOL,
                   "Whether to remove blank lines after '{'");
@@ -1250,7 +1254,8 @@ void register_options(void)
    unc_add_option("cmt_insert_before_preproc", UO_cmt_insert_before_preproc, AT_BOOL,
                   "If a preprocessor is encountered when stepping backwards from a function\n"
 				  "name, then this option decides whether the comment should be inserted.\n"
-                  "Affects cmt_insert_oc_msg_header, cmt_insert_func_header and cmt_insert_class_header.");
+                  "Affects cmt_insert_oc_msg_header, cmt_insert_func_header and\n"
+				  "cmt_insert_class_header.");
 
    unc_begin_group(UG_codemodify, "Code modifying options (non-whitespace)");
    unc_add_option("mod_full_brace_do", UO_mod_full_brace_do, AT_IARF,
@@ -1288,11 +1293,11 @@ void register_options(void)
                   "If a switch body exceeds the specified number of newlines and doesn't have\n"
 				  "a comment after the close brace, a comment will be added.", "", 0, 5000);
    unc_add_option("mod_add_long_ifdef_endif_comment", UO_mod_add_long_ifdef_endif_comment, AT_NUM,
-                  "If an #ifdef body exceeds the specified number of newlines and doesn't have a comment after\n"
-                  "the #endif, a comment will be added.");
+                  "If an #ifdef body exceeds the specified number of newlines and doesn't\n"
+				  "have a comment after the #endif, a comment will be added.", "", 0, 5000);
    unc_add_option("mod_add_long_ifdef_else_comment", UO_mod_add_long_ifdef_else_comment, AT_NUM,
-                  "If an #ifdef or #else body exceeds the specified number of newlines and doesn't have a comment after\n"
-                  "the #else, a comment will be added.");
+                  "If an #ifdef or #else body exceeds the specified number of newlines and\n"
+				  "doesn't have a comment after the #else, a comment will be added.", "", 0, 5000);
    unc_add_option("mod_sort_import", UO_mod_sort_import, AT_BOOL,
                   "If TRUE, will sort consecutive single-line 'import' statements [Java, D]");
    unc_add_option("mod_sort_using", UO_mod_sort_using, AT_BOOL,
