@@ -1347,9 +1347,6 @@ chunk_t *align_trailing_comments(chunk_t *start)
            min_orig, intended_col, min_col, col);
    align_stack(cs, col, (intended_col != 0), LALTC);
 
-#if 0
-log_set_mask(&old_log);
-#endif
    return(chunk_get_next(pc));
 }
 

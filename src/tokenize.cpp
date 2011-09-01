@@ -1201,7 +1201,7 @@ static bool parse_next(chunk_t *pc)
       }
    }
 
-   /**
+   /*
     *  Parse strings and character constants
     */
 

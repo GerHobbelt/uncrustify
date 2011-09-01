@@ -467,6 +467,8 @@ static int kw_compare(const void *p1, const void *p2)
 }
 
 
+#if 0
+
 /**
  * Compares two chunk_tag_t entries using strncmp on the strings;
  * where a full match is one where the entire length of the probe
@@ -498,6 +500,8 @@ static int kw_compare_ex(const void *p1, const void *p2) /* [i_a] */
 #endif
 	return ret;
 }
+
+#endif
 
 
 bool keywords_are_sorted(void)

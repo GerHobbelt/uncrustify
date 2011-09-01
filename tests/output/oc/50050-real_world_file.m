@@ -43,7 +43,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * Copyright (C) 2009 Apple Inc. All Rights Reserved.
- *
  */
 
 #import "ATColorTableController.h"
