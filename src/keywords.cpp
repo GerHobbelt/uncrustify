@@ -42,18 +42,6 @@ static const chunk_tag_t keywords[] =
    { "@selector",        CT_OC_SEL,       LANG_OC | LANG_CPP | LANG_C                                                 },
    { "@synthesize",      CT_OC_DYNAMIC,   LANG_OC | LANG_CPP | LANG_C                                                 },
    { "@try",             CT_TRY,          LANG_OC | LANG_CPP | LANG_C                                                 },
-   { "_Bool",            CT_TYPE,         LANG_CPP                                                                    },
-   { "_Complex",         CT_TYPE,         LANG_CPP                                                                    },
-   { "_Imaginary",       CT_TYPE,         LANG_CPP                                                                    },
-   { "__attribute__",    CT_ATTRIBUTE,    LANG_C | LANG_CPP                                                           },
-   { "__const__",        CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
-   { "__inline__",       CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
-   { "__inline",         CT_QUALIFIER,    LANG_C | LANG_CPP                                                           }, /* MSVC */
-   { "__restrict",       CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
-   { "__signed__",       CT_TYPE,         LANG_C | LANG_CPP                                                           },
-   { "__traits",         CT_QUALIFIER,    LANG_D                                                                      },
-   { "__typeof__",       CT_SIZEOF,       LANG_C | LANG_CPP                                                           },
-   { "__volatile__",     CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
    { "abstract",         CT_QUALIFIER,    LANG_CS | LANG_D | LANG_JAVA | LANG_VALA | LANG_ECMA                        },
    { "add",              CT_GETSET,       LANG_CS                                                                     },
    { "alias",            CT_QUALIFIER,    LANG_D                                                                      },
@@ -89,9 +77,9 @@ static const chunk_tag_t keywords[] =
    { "class",            CT_CLASS,        LANG_CPP | LANG_CS | LANG_D | LANG_JAVA | LANG_VALA | LANG_ECMA | LANG_PHP  },
    { "compl",            CT_ARITH,        LANG_C | LANG_CPP                                                           },
    { "const",            CT_QUALIFIER,    LANG_ALL                                                                    }, // PAWN
-   { "const_cast",       CT_TYPE_CAST,    LANG_CPP                                                                    },
    { "constexpr",        CT_QUALIFIER,    LANG_CPP                                                                    },
    { "construct",        CT_CONSTRUCT,    LANG_VALA                                                                   },
+   { "const_cast",       CT_TYPE_CAST,    LANG_CPP                                                                    },
    { "continue",         CT_CONTINUE,     LANG_ALL                                                                    }, // PAWN
    { "creal",            CT_TYPE,         LANG_D                                                                      },
    { "dchar",            CT_TYPE,         LANG_D                                                                      },
@@ -255,6 +243,18 @@ static const chunk_tag_t keywords[] =
    { "with",             CT_D_WITH,       LANG_D | LANG_ECMA                                                          },
    { "xor",              CT_SARITH,       LANG_C | LANG_CPP                                                           },
    { "xor_eq",           CT_SASSIGN,      LANG_C | LANG_CPP                                                           },
+   { "_Bool",            CT_TYPE,         LANG_CPP                                                                    },
+   { "_Complex",         CT_TYPE,         LANG_CPP                                                                    },
+   { "_Imaginary",       CT_TYPE,         LANG_CPP                                                                    },
+   { "__attribute__",    CT_ATTRIBUTE,    LANG_C | LANG_CPP                                                           },
+   { "__const__",        CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
+   { "__inline",         CT_QUALIFIER,    LANG_C | LANG_CPP                                                           }, /* MSVC */
+   { "__inline__",       CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
+   { "__restrict",       CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
+   { "__signed__",       CT_TYPE,         LANG_C | LANG_CPP                                                           },
+   { "__traits",         CT_QUALIFIER,    LANG_D                                                                      },
+   { "__typeof__",       CT_SIZEOF,       LANG_C | LANG_CPP                                                           },
+   { "__volatile__",     CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
 };
 
 
