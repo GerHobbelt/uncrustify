@@ -42,14 +42,17 @@ static const chunk_tag_t keywords[] =
    { "@selector",        CT_OC_SEL,       LANG_OC | LANG_CPP | LANG_C                                                 },
    { "@synthesize",      CT_OC_DYNAMIC,   LANG_OC | LANG_CPP | LANG_C                                                 },
    { "@try",             CT_TRY,          LANG_OC | LANG_CPP | LANG_C                                                 },
-   { "abstract",         CT_QUALIFIER,    LANG_CS | LANG_D | LANG_JAVA | LANG_VALA | LANG_ECMA                        },
+   { "abstract",         CT_QUALIFIER,    LANG_CS | LANG_D | LANG_JAVA | LANG_VALA | LANG_ECMA | LANG_PHP             },
    { "add",              CT_GETSET,       LANG_CS                                                                     },
    { "alias",            CT_QUALIFIER,    LANG_D                                                                      },
    { "align",            CT_ALIGN,        LANG_D                                                                      },
    { "alignof",          CT_SIZEOF,       LANG_C | LANG_CPP                                                           },
-   { "and",              CT_SBOOL,        LANG_C | LANG_CPP | FLAG_PP                                                 },
+   { "and",              CT_SBOOL,        LANG_C | LANG_CPP | FLAG_PP			                                      },
+   { "and",              CT_SBOOL,        LANG_PHP																	  },
    { "and_eq",           CT_SASSIGN,      LANG_C | LANG_CPP                                                           },
-   { "as",               CT_AS,           LANG_CS                                                                     },
+   { "array",            CT_PHP_ARRAY,    LANG_PHP																	  },
+   { "array",            CT_CS_ARRAY,     LANG_CS																	  },
+   { "as",               CT_AS,           LANG_CS | LANG_PHP                                                          },
    { "asm",              CT_ASM,          LANG_C | LANG_CPP | LANG_D                                                  },
    { "assert",           CT_ASSERT,       LANG_JAVA                                                                   },
    { "assert",           CT_FUNCTION,     LANG_D | LANG_PAWN                                                          }, // PAWN
@@ -68,13 +71,16 @@ static const chunk_tag_t keywords[] =
    { "case",             CT_CASE,         LANG_ALL                                                                    }, // PAWN
    { "cast",             CT_D_CAST,       LANG_D                                                                      },
    { "catch",            CT_CATCH,        LANG_CPP | LANG_CS | LANG_D | LANG_JAVA | LANG_ECMA | LANG_PHP              },
+   { "cdecl",            CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
    { "cdouble",          CT_TYPE,         LANG_D                                                                      },
    { "cent",             CT_TYPE,         LANG_D                                                                      },
    { "cfloat",           CT_TYPE,         LANG_D                                                                      },
+   { "cfunction",        CT_CFUNCTION,    LANG_PHP																	  },
    { "char",             CT_CHAR,         LANG_PAWN                                                                   }, // PAWN
    { "char",             CT_TYPE,         LANG_ALLC                                                                   },
    { "checked",          CT_QUALIFIER,    LANG_CS                                                                     },
    { "class",            CT_CLASS,        LANG_CPP | LANG_CS | LANG_D | LANG_JAVA | LANG_VALA | LANG_ECMA | LANG_PHP  },
+   { "clone",            CT_CLONE,        LANG_PHP																	  },
    { "compl",            CT_ARITH,        LANG_C | LANG_CPP                                                           },
    { "const",            CT_QUALIFIER,    LANG_ALL                                                                    }, // PAWN
    { "constexpr",        CT_QUALIFIER,    LANG_CPP                                                                    },
@@ -85,6 +91,7 @@ static const chunk_tag_t keywords[] =
    { "dchar",            CT_TYPE,         LANG_D                                                                      },
    { "debug",            CT_DEBUG,        LANG_D                                                                      },
    { "debugger",         CT_DEBUGGER,     LANG_ECMA                                                                   },
+   { "declare",          CT_DECLARE,      LANG_PHP																	  },
    { "default",          CT_DEFAULT,      LANG_ALL                                                                    }, // PAWN
    { "define",           CT_PP_DEFINE,    LANG_ALLC | FLAG_PP                                                         }, // PAWN
    { "defined",          CT_DEFINED,      LANG_PAWN | LANG_PHP                                                        }, // PAWN, PHP
@@ -92,39 +99,55 @@ static const chunk_tag_t keywords[] =
    { "delegate",         CT_DELEGATE,     LANG_CS | LANG_D                                                            },
    { "delete",           CT_DELETE,       LANG_CPP | LANG_D | LANG_ECMA                                               },
    { "deprecated",       CT_QUALIFIER,    LANG_D                                                                      },
+   { "die",				 CT_FUNCTION,     LANG_PHP																	  },
    { "do",               CT_DO,           LANG_ALL                                                                    }, // PAWN
    { "double",           CT_TYPE,         LANG_ALLC                                                                   },
    { "dynamic_cast",     CT_TYPE_CAST,    LANG_CPP                                                                    },
+   //{ "each",             CT_EACH,         LANG_CPP | LANG_CS                                                          },
+   { "echo",			 CT_FUNCTION,     LANG_PHP																	  },
    { "elif",             CT_PP_ELSE,      LANG_ALLC | FLAG_PP                                                         },
    { "else",             CT_ELSE,         LANG_ALL                                                                    }, // PAWN
    { "else",             CT_PP_ELSE,      LANG_ALLC | FLAG_PP                                                         }, // PAWN
    { "elseif",           CT_PP_ELSE,      LANG_PAWN | FLAG_PP                                                         }, // PAWN
+   { "elseif",           CT_ELSE,         LANG_PHP																	  },
    { "emit",             CT_PP_EMIT,      LANG_PAWN | FLAG_PP                                                         }, // PAWN
+   { "empty",			 CT_FUNCTION,	  LANG_PHP																	  },
+   { "enddeclare",		 CT_ENDDECLARE,	  LANG_PHP																	  },
+   { "endfor",			 CT_ENDFOR,		  LANG_PHP																	  },
+   { "endforeach",		 CT_ENDFOREACH,	  LANG_PHP																	  },
+   { "endif",			 CT_ENDIF,		  LANG_PHP																	  },
    { "endif",            CT_PP_ENDIF,     LANG_ALL | FLAG_PP                                                          }, // PAWN
    { "endinput",         CT_PP_ENDINPUT,  LANG_PAWN | FLAG_PP                                                         }, // PAWN
    { "endregion",        CT_PP_ENDREGION, LANG_ALL | FLAG_PP                                                          },
    { "endscript",        CT_PP_ENDINPUT,  LANG_PAWN | FLAG_PP                                                         }, // PAWN
+   { "endswitch",		 CT_ENDSWITCH,	  LANG_PHP																	  },
+   { "endwhile",		 CT_ENDWHILE,	  LANG_PHP																	  },
    { "enum",             CT_ENUM,         LANG_ALL                                                                    }, // PAWN
    { "error",            CT_PP_ERROR,     LANG_PAWN | FLAG_PP                                                         }, // PAWN
+   { "eval",			 CT_FUNCTION,	  LANG_PHP																	  },
    { "event",            CT_TYPE,         LANG_CS                                                                     },
-   { "exit",             CT_FUNCTION,     LANG_PAWN                                                                   }, // PAWN
+   { "exit",             CT_FUNCTION,     LANG_PAWN | LANG_PHP                                                        }, // PAWN
    { "explicit",         CT_TYPE,         LANG_C | LANG_CPP | LANG_CS                                                 },
    { "export",           CT_EXPORT,       LANG_C | LANG_CPP | LANG_D | LANG_ECMA                                      },
-   { "extends",          CT_QUALIFIER,    LANG_JAVA | LANG_ECMA                                                       },
+   { "extends",          CT_QUALIFIER,    LANG_JAVA | LANG_ECMA | LANG_PHP                                            },
    { "extern",           CT_EXTERN,       LANG_C | LANG_CPP | LANG_CS | LANG_D | LANG_VALA                            },
    { "false",            CT_WORD,         LANG_CPP | LANG_CS | LANG_D | LANG_JAVA | LANG_VALA                         },
    { "file",             CT_PP_FILE,      LANG_PAWN | FLAG_PP                                                         }, // PAWN
-   { "final",            CT_QUALIFIER,    LANG_D | LANG_ECMA                                                          },
+   { "final",            CT_QUALIFIER,    LANG_D | LANG_ECMA | LANG_PHP                                               },
    { "finally",          CT_FINALLY,      LANG_D | LANG_CS | LANG_ECMA                                                },
    { "flags",            CT_TYPE,         LANG_VALA                                                                   },
    { "float",            CT_TYPE,         LANG_ALLC                                                                   },
    { "for",              CT_FOR,          LANG_ALL                                                                    }, // PAWN
-   { "foreach",          CT_FOR,          LANG_CS | LANG_D | LANG_VALA                                                },
+   { "foreach",          CT_FOR,          LANG_CS | LANG_D | LANG_VALA | LANG_PHP                                     },
    { "foreach_reverse",  CT_FOR,          LANG_D                                                                      },
    { "forward",          CT_FORWARD,      LANG_PAWN                                                                   }, // PAWN
    { "friend",           CT_FRIEND,       LANG_CPP                                                                    },
+   { "as_friend",        CT_AS_FRIEND,    LANG_CS																	  },
    { "function",         CT_FUNCTION,     LANG_D | LANG_ECMA | LANG_PHP                                               },
+   { "gcnew",            CT_GCNEW,        LANG_CPPNET																  },
+   { "generic",          CT_GENERIC,      LANG_CPPNET | LANG_CS														  },
    { "get",              CT_GETSET,       LANG_CS | LANG_VALA                                                         },
+   { "global",			 CT_GLOBAL,	      LANG_PHP																	  },
    { "goto",             CT_GOTO,         LANG_ALL                                                                    }, // PAWN
    { "idouble",          CT_TYPE,         LANG_D                                                                      },
    { "if",               CT_IF,           LANG_ALL                                                                    }, // PAWN
@@ -132,57 +155,71 @@ static const chunk_tag_t keywords[] =
    { "ifdef",            CT_PP_IF,        LANG_ALLC | FLAG_PP                                                         },
    { "ifloat",           CT_TYPE,         LANG_D                                                                      },
    { "ifndef",           CT_PP_IF,        LANG_ALLC | FLAG_PP                                                         },
-   { "implements",       CT_QUALIFIER,    LANG_JAVA | LANG_ECMA                                                       },
+   { "implements",       CT_QUALIFIER,    LANG_JAVA | LANG_ECMA | LANG_PHP                                            },
    { "implicit",         CT_QUALIFIER,    LANG_CS                                                                     },
    { "import",           CT_IMPORT,       LANG_D | LANG_JAVA | LANG_ECMA                                              }, // fudged to get indenting
    { "import",           CT_PP_INCLUDE,   LANG_OC | FLAG_PP                                                           }, // ObjectiveC version of include
-   { "in",               CT_IN,           LANG_D | LANG_CS | LANG_VALA | LANG_ECMA                                    },
+   { "in",               CT_IN,           LANG_D | LANG_CPP | LANG_CS | LANG_VALA | LANG_ECMA                         },
+   { "include",			 CT_INCLUDE,      LANG_PHP																	  },
    { "include",          CT_PP_INCLUDE,   LANG_C | LANG_CPP | LANG_PAWN | FLAG_PP                                     }, // PAWN
+   { "include_once",     CT_INCLUDE_ONCE, LANG_PHP																	  },
+   { "initonly",         CT_INITONLY,     LANG_CPPNET        														  },
    { "inline",           CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
    { "inout",            CT_QUALIFIER,    LANG_D                                                                      },
-   { "instanceof",       CT_SIZEOF,       LANG_JAVA | LANG_ECMA                                                       },
+   { "instanceof",       CT_SIZEOF,       LANG_JAVA | LANG_ECMA | LANG_PHP                                            },
    { "int",              CT_TYPE,         LANG_ALLC                                                                   },
-   { "interface",        CT_CLASS,        LANG_CS | LANG_D | LANG_JAVA | LANG_VALA | LANG_ECMA                        },
+   { "interface",        CT_CLASS,        LANG_CS | LANG_D | LANG_JAVA | LANG_VALA | LANG_ECMA | LANG_PHP             },
+   { "interior_ptr",     CT_INTERIOR_PTR, LANG_CPPNET																  },
    { "internal",         CT_QUALIFIER,    LANG_CS                                                                     },
    { "invariant",        CT_INVARIANT,    LANG_D                                                                      },
    { "ireal",            CT_TYPE,         LANG_D                                                                      },
    { "is",               CT_SCOMPARE,     LANG_D | LANG_CS | LANG_VALA                                                },
+   { "isset",			 CT_FUNCTION,	  LANG_PHP																	  },
    { "lazy",             CT_LAZY,         LANG_D                                                                      },
    { "line",             CT_PP_LINE,      LANG_PAWN | FLAG_PP                                                         }, // PAWN
+   { "list",			 CT_FUNCTION,     LANG_PHP																	  },
+   { "literal",          CT_LITERAL,      LANG_CPPNET																  },
    { "lock",             CT_LOCK,         LANG_CS | LANG_VALA                                                         },
    { "long",             CT_TYPE,         LANG_ALLC                                                                   },
    { "macro",            CT_D_MACRO,      LANG_D                                                                      },
    { "mixin",            CT_CLASS,        LANG_D                                                                      }, // may need special handling
    { "module",           CT_D_MODULE,     LANG_D                                                                      },
    { "mutable",          CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
-   { "namespace",        CT_NAMESPACE,    LANG_C | LANG_CPP | LANG_CS | LANG_VALA                                     },
+   { "namespace",        CT_NAMESPACE,    LANG_C | LANG_CPP | LANG_CS | LANG_VALA | LANG_PHP                          },
    { "native",           CT_NATIVE,       LANG_PAWN                                                                   }, // PAWN
    { "native",           CT_QUALIFIER,    LANG_JAVA | LANG_ECMA                                                       },
-   { "new",              CT_NEW,          LANG_CPP | LANG_CS | LANG_D | LANG_JAVA | LANG_PAWN | LANG_VALA | LANG_ECMA }, // PAWN
+   { "new",              CT_NEW,          LANG_CPP | LANG_CS | LANG_D | LANG_JAVA | LANG_PAWN | LANG_VALA | LANG_ECMA | LANG_PHP }, // PAWN
    { "not",              CT_SARITH,       LANG_C | LANG_CPP                                                           },
    { "not_eq",           CT_SCOMPARE,     LANG_C | LANG_CPP                                                           },
    { "null",             CT_TYPE,         LANG_CS | LANG_D | LANG_JAVA | LANG_VALA                                    },
+   { "nullptr",          CT_NULLPTR,      LANG_CPPNET																  },
    { "object",           CT_TYPE,         LANG_CS                                                                     },
+   { "old_function",     CT_OLD_FUNCTION, LANG_PHP																	  },
    { "operator",         CT_OPERATOR,     LANG_CPP | LANG_CS | LANG_PAWN                                              }, // PAWN
    { "or",               CT_SBOOL,        LANG_C | LANG_CPP | FLAG_PP                                                 },
+   { "or",               CT_SBOOL,        LANG_PHP																	  },
    { "or_eq",            CT_SASSIGN,      LANG_C | LANG_CPP                                                           },
    { "out",              CT_QUALIFIER,    LANG_CS | LANG_D | LANG_VALA                                                },
    { "override",         CT_QUALIFIER,    LANG_CS | LANG_D | LANG_VALA                                                },
    { "package",          CT_NAMESPACE,    LANG_D | LANG_JAVA | LANG_ECMA                                              },
    { "params",           CT_TYPE,         LANG_CS                                                                     },
    { "pragma",           CT_PP_PRAGMA,    LANG_ALL | FLAG_PP                                                          }, // PAWN
-   { "private",          CT_PRIVATE,      LANG_ALLC                                                                   }, // not C
-   { "protected",        CT_PRIVATE,      LANG_ALLC                                                                   }, // not C
-   { "public",           CT_PRIVATE,      LANG_ALL                                                                    }, // PAWN // not C
+   { "print",			 CT_FUNCTION,	  LANG_PHP																	  },
+   { "private",          CT_PRIVATE,      LANG_ALLC | LANG_PHP                                                        }, // not C
+   { "protected",        CT_PRIVATE,      LANG_ALLC | LANG_PHP                                                        }, // not C
+   { "public",           CT_PRIVATE,      LANG_ALL & ~LANG_C                                                          }, // PAWN // not C
    { "readonly",         CT_QUALIFIER,    LANG_CS                                                                     },
    { "real",             CT_TYPE,         LANG_D                                                                      },
-   { "ref",              CT_QUALIFIER,    LANG_CS | LANG_VALA                                                         },
+   { "ref",              CT_QUALIFIER,    LANG_CPPNET | LANG_CS | LANG_VALA                                           },
    { "region",           CT_PP_REGION,    LANG_ALL | FLAG_PP                                                          },
    { "register",         CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
    { "reinterpret_cast", CT_TYPE_CAST,    LANG_C | LANG_CPP                                                           },
    { "remove",           CT_GETSET,       LANG_CS                                                                     },
+   { "require",          CT_REQUIRE,      LANG_PHP																	  },
+   { "require_once",     CT_REQUIRE_ONCE, LANG_PHP																	  },
    { "restrict",         CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
    { "return",           CT_RETURN,       LANG_ALL                                                                    }, // PAWN
+   { "safe_cast",        CT_TYPE_CAST,    LANG_CPPNET																  },
    { "sbyte",            CT_TYPE,         LANG_CS                                                                     },
    { "scope",            CT_D_SCOPE,      LANG_D                                                                      },
    { "sealed",           CT_QUALIFIER,    LANG_CS                                                                     },
@@ -208,11 +245,11 @@ static const chunk_tag_t keywords[] =
    { "tagof",            CT_TAGOF,        LANG_PAWN                                                                   }, // PAWN
    { "template",         CT_TEMPLATE,     LANG_CPP | LANG_D                                                           },
    { "this",             CT_THIS,         LANG_CPP | LANG_CS | LANG_D | LANG_JAVA | LANG_VALA | LANG_ECMA             },
-   { "throw",            CT_THROW,        LANG_CPP | LANG_CS | LANG_D | LANG_JAVA | LANG_ECMA                         },
+   { "throw",            CT_THROW,        LANG_CPP | LANG_CS | LANG_D | LANG_JAVA | LANG_ECMA | LANG_PHP              },
    { "throws",           CT_QUALIFIER,    LANG_JAVA | LANG_ECMA                                                       },
    { "transient",        CT_QUALIFIER,    LANG_JAVA | LANG_ECMA                                                       },
    { "true",             CT_WORD,         LANG_CPP | LANG_CS | LANG_D | LANG_JAVA | LANG_VALA                         },
-   { "try",              CT_TRY,          LANG_CPP | LANG_CS | LANG_D | LANG_JAVA | LANG_ECMA                         },
+   { "try",              CT_TRY,          LANG_CPP | LANG_CS | LANG_D | LANG_JAVA | LANG_ECMA | LANG_PHP              },
    { "tryinclude",       CT_PP_INCLUDE,   LANG_PAWN | FLAG_PP                                                         }, // PAWN
    { "typedef",          CT_TYPEDEF,      LANG_C | LANG_CPP | LANG_D                                                  },
    { "typeid",           CT_SIZEOF,       LANG_C | LANG_CPP | LANG_D                                                  },
@@ -227,10 +264,12 @@ static const chunk_tag_t keywords[] =
    { "union",            CT_UNION,        LANG_C | LANG_CPP | LANG_D                                                  },
    { "unittest",         CT_UNITTEST,     LANG_D                                                                      },
    { "unsafe",           CT_UNSAFE,       LANG_CS                                                                     },
+   { "unset",            CT_FUNCTION,     LANG_PHP																	  },
    { "unsigned",         CT_TYPE,         LANG_C | LANG_CPP                                                           },
+   { "use",				 CT_USE,		  LANG_PHP																	  },
    { "ushort",           CT_TYPE,         LANG_CS | LANG_D                                                            },
    { "using",            CT_USING,        LANG_CPP | LANG_CS | LANG_VALA                                              },
-   { "var",              CT_TYPE,         LANG_VALA | LANG_ECMA                                                       },
+   { "var",              CT_TYPE,         LANG_VALA | LANG_ECMA | LANG_PHP                                            },
    { "version",          CT_D_VERSION,    LANG_D                                                                      },
    { "virtual",          CT_QUALIFIER,    LANG_CPP | LANG_CS | LANG_VALA                                              },
    { "void",             CT_TYPE,         LANG_ALLC                                                                   },
@@ -240,213 +279,80 @@ static const chunk_tag_t keywords[] =
    { "wchar_t",          CT_TYPE,         LANG_C | LANG_CPP                                                           },
    { "weak",             CT_QUALIFIER,    LANG_VALA                                                                   },
    { "while",            CT_WHILE,        LANG_ALL                                                                    }, // PAWN
+   { "where",            CT_WHERE,        LANG_CPPNET | LANG_CS                                                       },
    { "with",             CT_D_WITH,       LANG_D | LANG_ECMA                                                          },
-   { "xor",              CT_SARITH,       LANG_C | LANG_CPP                                                           },
+   { "xor",              CT_SARITH,       LANG_C | LANG_CPP | LANG_PHP                                                },
    { "xor_eq",           CT_SASSIGN,      LANG_C | LANG_CPP                                                           },
    { "_Bool",            CT_TYPE,         LANG_CPP                                                                    },
    { "_Complex",         CT_TYPE,         LANG_CPP                                                                    },
    { "_Imaginary",       CT_TYPE,         LANG_CPP                                                                    },
+   { "__abstract",		 CT_QUALIFIER,    LANG_CPPNET | LANG_CS														  },
+   { "__alignof",		 CT_SIZEOF,       LANG_C | LANG_CPP | LANG_CS			                                      }, // PAWN
+   { "__asm",			 CT_ASM,          LANG_C | LANG_CPP															  },
+   { "__assume",         CT_FUNCTION,     LANG_C | LANG_CPP															  },
    { "__attribute__",    CT_ATTRIBUTE,    LANG_C | LANG_CPP                                                           },
+   { "__based",          CT_BASED,        LANG_C | LANG_CPP															  },
+   { "__box",			 CT_BOX,		  LANG_CPPNET																  },
+   { "__cdecl",			 CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
+   { "__CLASS__",        CT_WORD,         LANG_PHP																	  },
    { "__const__",        CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
+   { "__declspec",		 CT_DECLSPEC,     LANG_C | LANG_CPP															  },
+   { "__delegate",       CT_DELEGATE,     LANG_CPPNET																  },
+   { "__DIR__",			 CT_WORD,         LANG_PHP																	  },
+   { "__event",          CT_EVENT,        LANG_CPP | LANG_CPPNET													  },
+   { "__except",         CT_EXCEPT,       LANG_C | LANG_CPP															  },
+   { "__fastcall",       CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
+   { "__FILE__",         CT_WORD,         LANG_PHP																	  },
+   { "__finally",        CT_FINALLY,      LANG_C | LANG_CPP															  },
+   { "__forceinline",    CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
+   { "__FUNCTION__",     CT_WORD,         LANG_PHP																	  },
+   { "__gc",			 CT_GC,			  LANG_CPPNET																  },
+   { "__hook",			 CT_HOOK,         LANG_CPP | LANG_CPPNET													  },
+   { "__identifier",	 CT_IDENTIFIER,	  LANG_CPPNET																  },
+   { "__if_exists",      CT_IF_EXISTS,    LANG_CPP																	  },
+   { "__if_not_exists",  CT_IF_EXISTS,    LANG_CPP																	  },
    { "__inline",         CT_QUALIFIER,    LANG_C | LANG_CPP                                                           }, /* MSVC */
    { "__inline__",       CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
+   { "__int16",			 CT_TYPE,         LANG_C | LANG_CPP                                                           },
+   { "__int32",			 CT_TYPE,         LANG_C | LANG_CPP                                                           },
+   { "__int64",			 CT_TYPE,         LANG_C | LANG_CPP                                                           },
+   { "__int8",			 CT_TYPE,         LANG_C | LANG_CPP                                                           },
+   { "__interface",		 CT_INTERFACE,    LANG_CPP | LANG_CPPNET													  },
+   { "__leave",			 CT_LEAVE,        LANG_C | LANG_CPP															  },
+   { "__LINE__",         CT_WORD,         LANG_PHP																	  },
+   { "__m128",			 CT_TYPE,         LANG_C | LANG_CPP                                                           },
+   { "__m128d",			 CT_TYPE,         LANG_C | LANG_CPP                                                           },
+   { "__m128i",			 CT_TYPE,         LANG_C | LANG_CPP                                                           },
+   { "__m64",			 CT_TYPE,         LANG_C | LANG_CPP                                                           },
+   { "__METHOD__",       CT_WORD,         LANG_PHP																	  },
+   { "__multiple_inheritance", CT_INHERITANCE, LANG_CPP																  },
+   { "__NAMESPACE__",    CT_WORD,         LANG_PHP																	  },
+   { "__nogc",           CT_NOGC,		  LANG_CPPNET																  },
+   { "__noop",           CT_FUNCTION,     LANG_C | LANG_CPP                                                           },
+   { "__pin",			 CT_PIN,	      LANG_CPPNET																  },
+   { "__property",       CT_PROPERTY,	  LANG_CPPNET																  },
+   { "__raise",          CT_RAISE,		  LANG_CPP | LANG_CPPNET													  },
    { "__restrict",       CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
+   { "__sealed",         CT_SEALED,       LANG_CPPNET																  },
    { "__signed__",       CT_TYPE,         LANG_C | LANG_CPP                                                           },
+   { "__single_inheritance", CT_INHERITANCE, LANG_CPP																  },
+   { "__stdcall",        CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
+   { "__super",			 CT_SUPER,		  LANG_CPP																	  },
    { "__traits",         CT_QUALIFIER,    LANG_D                                                                      },
+   { "__try",            CT_TRY,          LANG_C | LANG_CPP															  },
+   { "__try_cast",       CT_TYPE_CAST,    LANG_CPPNET																  },
    { "__typeof__",       CT_SIZEOF,       LANG_C | LANG_CPP                                                           },
+   { "__unaligned",      CT_UNALIGNED,    LANG_C | LANG_CPP                                                           },
+   { "__unhook",		 CT_UNHOOK,       LANG_CPP | LANG_CPPNET													  },
+   { "__uuidof",		 CT_UUIDOF,       LANG_CPP | LANG_CPPNET													  },
+   { "__value",		     CT_VALUE,        LANG_CPPNET																  },
+   { "__virtual_inheritance", CT_INHERITANCE, LANG_CPP																  },
    { "__volatile__",     CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
+   { "__w64",			 CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
+   { "__wchar_t",		 CT_TYPE,         LANG_C | LANG_CPP                                                           },
 };
 
 
-/*
-MSVC TODO:
-
-__abstract 2
-abstract
-__alignof Operator
-array
-
-__asm
-__assume
-__based
-bool
-
-__box 2
-break
-case
-catch
-
-__cdecl
-char
-class
-const
-
-const_cast
-continue
-__declspec
-default
-
-__delegate 2
-delegate
-delete
-deprecated 1
-
-dllexport 1
-dllimport 1
-do
-double
-
-dynamic_cast
-else
-enum
-enum class
-
-enum struct
-event
-__event
-__except
-
-explicit
-extern
-false
-__fastcall
-
-__finally
-finally
-float
-for
-
-for each, in
-__forceinline
-friend
-friend_as
-
-__gc 2
-gcnew
-generic
-goto
-
-__hook 3
-__identifier
-if
-__if_exists
-
-__if_not_exists
-initonly
-__inline
-inline
-
-int
-__int8
-__int16
-__int32
-
-__int64
-__interface
-interface class
-interface struct
-
-interior_ptr
-__leave
-literal
-long
-
-__m64
-__m128
-__m128d
-__m128i
-
-__multiple_inheritance
-mutable
-naked 1
-namespace
-
-new
-new
-__nogc
-noinline
-
-__noop
-noreturn
-nothrow
-novtable
-
-nullptr
-operator
-__pin 2
-private
-
-__property 2
-property
-property 1
-protected
-
-public
-__raise
-ref struct
-ref class
-
-register
-reinterpret_cast
-return
-safecast
-
-__sealed 2
-sealed
-selectany 1
-short
-
-signed
-__single_inheritance
-sizeof
-static
-
-static_cast
-__stdcall
-struct
-__super
-
-switch
-template
-this
-thread 1
-
-throw
-true
-try
-__try/__except, __try/__finally
-
-__try_cast 2
-typedef
-typeid
-typeid
-
-typename
-__unaligned
-__unhook 3
-union
-
-unsigned
-using declaration, using directive
-uuid 1
-__uuidof
-
-value struct
-value class
-__value 2
-virtual
-
-__virtual_inheritance
-void
-volatile
-__w64
-
-__wchar_t, wchar_t
-while
-
-
-
-*/
 
 void init_keywords()
 {

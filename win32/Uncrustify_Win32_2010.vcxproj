@@ -155,7 +155,7 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2010.$(Configuration)\$(
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <EnablePREfast>true</EnablePREfast>
+      <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -495,6 +495,11 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2010.$(Configuration)\$(
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Makefile.am" />
+    <None Include="..\scripts\check_options.py" />
+    <None Include="..\scripts\cmpcfg.pl" />
+    <None Include="..\scripts\punc.py" />
+    <None Include="..\scripts\tokenize.py" />
+    <None Include="..\scripts\update-defaults.sh" />
     <None Include="..\src\config.h.in" />
     <None Include="..\src\Makefile.am" />
     <None Include="..\src\uncrustify_version.h.in" />
@@ -519,7 +524,20 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2010.$(Configuration)\$(
     <None Include="..\release-steps.txt" />
     <None Include="..\run_tests.sh" />
     <None Include="..\documentation\theory.txt" />
+    <None Include="..\tests\c-sharp.test" />
+    <None Include="..\tests\c.test" />
+    <None Include="..\tests\cpp.test" />
+    <None Include="..\tests\d.test" />
+    <None Include="..\tests\difftest.sh" />
+    <None Include="..\tests\ecma.test" />
+    <None Include="..\tests\fixtest.sh" />
+    <None Include="..\tests\java.test" />
+    <None Include="..\tests\objective-c.test" />
+    <None Include="..\tests\pawn.test" />
+    <None Include="..\tests\php.test" />
     <None Include="..\tests\run_tests.py" />
+    <None Include="..\tests\tests.vpj" />
+    <None Include="..\tests\vala.test" />
     <None Include="..\todo.txt" />
     <None Include="..\update-default-cfg.sh" />
     <None Include="..\working.txt" />

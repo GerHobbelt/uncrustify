@@ -24,7 +24,7 @@ EOF
 
 # Print lines from infile that contain CT_, stripping everything after ','
 # and formating the result as a quoted C string.
-sed -n '/ *CT_/s/CT_\([^,]*\),.*/"\1",/p' $infile >> $outfile
+sed -n '/ *CT_/s/CT_\([^= ,]*\)\( *=[^,]*\)\?,.*/"\1",/p' $infile >> $outfile
 
 cat >> $outfile <<EOF
 };

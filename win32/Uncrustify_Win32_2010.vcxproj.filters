@@ -37,6 +37,18 @@
     <Filter Include="Extras\GNU autotools">
       <UniqueIdentifier>{15ff7443-bd67-447c-8356-62e89b5d27fb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Extras\Tests">
+      <UniqueIdentifier>{fea5fc11-593d-4522-93f7-6a1da9ff714d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extras\Tests\C">
+      <UniqueIdentifier>{b4ee2061-341d-46b0-9cdd-013e1c855a75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extras\Tests\CPP">
+      <UniqueIdentifier>{aa9ee2dd-a0a4-40ef-b0c7-2d8dade95013}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extras\Tests\PHP">
+      <UniqueIdentifier>{bee3f9b2-dda0-4612-ba4c-49fdb5d920c5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\align.cpp">
@@ -348,6 +360,60 @@
     </None>
     <None Include="..\tests\run_tests.py">
       <Filter>Extras\Scripts</Filter>
+    </None>
+    <None Include="..\scripts\check_options.py">
+      <Filter>Extras\Scripts</Filter>
+    </None>
+    <None Include="..\scripts\cmpcfg.pl">
+      <Filter>Extras\Scripts</Filter>
+    </None>
+    <None Include="..\scripts\punc.py">
+      <Filter>Extras\Scripts</Filter>
+    </None>
+    <None Include="..\scripts\tokenize.py">
+      <Filter>Extras\Scripts</Filter>
+    </None>
+    <None Include="..\scripts\update-defaults.sh">
+      <Filter>Extras\Scripts</Filter>
+    </None>
+    <None Include="..\tests\difftest.sh">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\fixtest.sh">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\c.test">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\cpp.test">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\c-sharp.test">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\d.test">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\ecma.test">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\java.test">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\objective-c.test">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\pawn.test">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\php.test">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\vala.test">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\tests.vpj">
+      <Filter>Extras\Tests</Filter>
     </None>
   </ItemGroup>
 </Project>

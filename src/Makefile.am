@@ -31,6 +31,10 @@ token_names.h: token_enum.h ../make_token_names.sh
 	@echo "Rebuilding token_names.h"
 	@sh ../make_token_names.sh
 
+punctuators.h: ../scripts/punc.py punctuators.cpp
+	@echo "Rebuilding punctuators.h"
+	cd ../
+	python scripts/punc.py > src/punctuators.h
 
 # uncrustify_CPPFLAGS = -Wall
 

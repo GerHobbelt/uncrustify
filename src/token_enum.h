@@ -8,6 +8,9 @@
 #ifndef TOKEN_ENUM_H_INCLUDED
 #define TOKEN_ENUM_H_INCLUDED
 
+/* TODO: all enum entries which assign a value are temporary hacks and must be cleaned up / augmented in the code */
+
+
 /**
  * This is an enum of all the different chunks/tokens/elements that the
  * program can work with.  The parser and scanner assigns one of these to
@@ -203,6 +206,15 @@ typedef enum
 
    CT_BIT_COLON,        /* a ':' in a variable declaration */
 
+   /* TODO: */
+   CT_BASED = CT_ATTRIBUTE,
+   CT_DECLSPEC = CT_FUNCTION,
+   CT_EXCEPT = CT_CATCH,
+   CT_IF_EXISTS = CT_FUNCTION,
+   CT_LEAVE = CT_BREAK,
+   CT_INHERITANCE = CT_ATTRIBUTE,
+   CT_UNALIGNED = CT_ATTRIBUTE,
+
    CT_OC_DYNAMIC,
    CT_OC_END,           /* ObjC: @end */
    CT_OC_IMPL,          /* ObjC: @implementation */
@@ -281,6 +293,32 @@ typedef enum
    CT_CS_SQ_STMT,       /* '[assembly: xxx]' or '[Attribute()]' or '[Help()]', etc */
    CT_CS_SQ_COLON,      /* the colon in one of those [] thingys */
    CT_CS_PROPERTY,      /* word or ']' followed by '{' */
+   CT_CS_ARRAY = CT_CLASS,
+
+   /* C-sharp and Managed C++ */
+   CT_AS_FRIEND = CT_ATTRIBUTE,
+   CT_GCNEW = CT_NEW,
+   CT_GENERIC = CT_WORD,
+   CT_WHERE = CT_WORD,
+   CT_INITONLY = CT_WORD,
+   CT_INTERIOR_PTR = CT_WORD,
+   CT_LITERAL = CT_WORD,
+   CT_NULLPTR = CT_WORD,
+   CT_BOX = CT_FUNCTION,
+   CT_GC = CT_ATTRIBUTE,
+   CT_IDENTIFIER = CT_ATTRIBUTE,
+   CT_NOGC = CT_ATTRIBUTE,
+   CT_PIN = CT_ATTRIBUTE,
+   CT_PROPERTY = CT_ATTRIBUTE,
+   CT_SEALED = CT_ATTRIBUTE,
+   CT_VALUE = CT_ATTRIBUTE,
+
+   CT_EVENT = CT_ATTRIBUTE,
+   CT_HOOK = CT_ATTRIBUTE,
+   CT_INTERFACE = CT_FUNCTION,
+   CT_RAISE = CT_ATTRIBUTE,
+   CT_UNHOOK = CT_ATTRIBUTE,
+   CT_UUIDOF = CT_FUNCTION,
 
    /* Embedded SQL - always terminated with a semicolon */
    CT_SQL_EXEC,         /* the 'EXEC' in 'EXEC SQL ...' */
@@ -294,6 +332,29 @@ typedef enum
 
    /* Java */
    CT_ASSERT,           /* assert EXP1 [ : EXP2 ] ; */
+
+   /* PHP */
+   CT_CONCATENATE,		/* . as in 'concatenate strings' */
+   CT_XML_OPSTART,		/* <?, <?php ... */
+   CT_XML_OPEND,		/* ... ?> */
+   CT_PHP_ARRAY = CT_FUNCTION,
+   CT_CFUNCTION = CT_FUNCTION,
+   CT_CLONE = CT_OPERATOR,
+   CT_DECLARE = CT_FUNCTION,
+   CT_ENDDECLARE = CT_WORD,
+   CT_ENDFOR = CT_WORD,
+   CT_ENDFOREACH = CT_WORD,
+   CT_ENDIF = CT_WORD,
+   CT_ENDSWITCH = CT_WORD,
+   CT_ENDWHILE = CT_WORD,
+   CT_GLOBAL = CT_EXTERN,
+   CT_INCLUDE = CT_FUNCTION,
+   CT_INCLUDE_ONCE = CT_FUNCTION,
+   CT_OLD_FUNCTION = CT_FUNCTION,
+   CT_REQUIRE = CT_FUNCTION,
+   CT_REQUIRE_ONCE = CT_FUNCTION,
+   CT_USE = CT_USING,
+
 } c_token_t;
 
 #endif   /* TOKEN_ENUM_H_INCLUDED */

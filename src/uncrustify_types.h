@@ -222,21 +222,22 @@ struct chunk_t
 
 enum
 {
-   LANG_C    = 0x0001,
-   LANG_CPP  = 0x0002,
-   LANG_D    = 0x0004,
-   LANG_CS   = 0x0008,     /*<< C# or C-sharp */
-   LANG_JAVA = 0x0010,
-   LANG_OC   = 0x0020,     /*<< Objective C */
-   LANG_VALA = 0x0040,     /*<< Like C# */
-   LANG_PAWN = 0x0080,
-   LANG_ECMA = 0x0100,
-   LANG_PHP  = 0x0200,
+   LANG_C       = 0x0001,
+   LANG_CPP     = 0x0002,
+   LANG_D       = 0x0004,
+   LANG_CS      = 0x0008,     /*<< C# or C-sharp */
+   LANG_JAVA    = 0x0010,
+   LANG_OC      = 0x0020,     /*<< Objective C */
+   LANG_VALA    = 0x0040,     /*<< Like C# */
+   LANG_PAWN    = 0x0080,
+   LANG_ECMA    = 0x0100,
+   LANG_PHP     = 0x0200,
+   LANG_CPPNET  = 0x4002,	  /*<< managed C++ */
 
-   LANG_ALLC = 0x017f,
-   LANG_ALL  = 0x0fff,
+   LANG_ALLC    = 0x017f,
+   LANG_ALL     = 0x0fff,
 
-   FLAG_PP   = 0x8000,     /*<< only appears in a preprocessor */
+   FLAG_PP      = 0x8000,     /*<< only appears in a preprocessor */
 };
 
 /**
