@@ -169,41 +169,6 @@
 
 30940 mod_case_brace_rm.cfg            cpp/case-brace-remove.cpp
 
-30950 ben.cfg                          cpp/comidl___event.cpp
-30951 ben.cfg                          cpp/comidl___hook.cpp
-30952 ben.cfg                          cpp/comidl___hook.h
-30953 ben.cfg                          cpp/comidl___uuidof.cpp
-
-30960 ben.cfg                          cpp/dotnet_boxed.cpp
-30961 ben.cfg                          cpp/dotnet_for_each.cpp
-30962 ben.cfg                          cpp/dotnet_generic_1.cpp
-30963 ben.cfg                          cpp/dotnet_generic_where.cpp
-30964 ben.cfg                          cpp/dotnet_initonly.cpp
-30965 ben.cfg                          cpp/dotnet_literal.cpp
-30966 ben.cfg                          cpp/dotnet_nullptr.cpp
-30967 ben.cfg                          cpp/dotnet_nullptr_2.cpp
-30968 ben.cfg                          cpp/dotnet_nullptr_3.cpp
-30969 ben.cfg                          cpp/dotnet_nullptr_4.cpp
-30970 ben.cfg                          cpp/dotnet_safe_cast.cpp
-30971 ben.cfg                          cpp/dotnet___delegate.cpp
-30972 ben.cfg                          cpp/dotnet___event_1.cpp
-30973 ben.cfg                          cpp/dotnet___event_2.cpp
-30974 ben.cfg                          cpp/dotnet___event_3.cpp
-30975 ben.cfg                          cpp/dotnet___gc_1.cpp
-30976 ben.cfg                          cpp/dotnet___identifier.cpp
-30977 ben.cfg                          cpp/dotnet___property.cpp
-30978 ben.cfg                          cpp/dotnet___sealed.cpp
-30979 ben.cfg                          cpp/dotnet___try_cast.cpp
-30980 ben.cfg                          cpp/dotnet___value.cpp
-
-30990 ben.cfg                          cpp/msvc___assume.cpp
-30991 ben.cfg                          cpp/msvc___based.cpp
-
-30992 ben.cfg                          cpp/__hook.cpp
-30993 ben.cfg                          cpp/__if_exists.cpp
-30994 ben.cfg                          cpp/__leave.cpp
-30995 ben.cfg                          cpp/__noop.cpp
-30996 ben.cfg                          cpp/__raise.cpp
-30997 ben.cfg                          cpp/__single_inheritance.cpp
-30998 ben.cfg                          cpp/__unaligned.cpp
-30999 ben.cfg                          cpp/forceinline.cpp
+30950 sp_before_tr_emb_cmt-f.cfg       cpp/sp_before_tr_emb_cmt_input.cpp
+30951 sp_before_tr_emb_cmt-a.cfg       cpp/sp_before_tr_emb_cmt_input.cpp
+30955 indent_ctor_init.cfg             cpp/indent_ctor_init.cpp

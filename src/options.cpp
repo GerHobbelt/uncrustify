@@ -185,6 +185,13 @@ void register_options(void)
                   "If true (default), 'assert(x<0 && y>=3)' will be broken.\n"
                   "Improvements to template detection may make this option obsolete.");
 
+   unc_add_option("utf8_bom", UO_utf8_bom, AT_IARF,
+                  "Control what to do with the UTF-8 BOM (recommed 'remove')");
+   unc_add_option("utf8_byte", UO_utf8_byte, AT_BOOL,
+                  "If the file only contains chars between 128 and 255 and is not UTF-8, then output as UTF-8");
+   unc_add_option("utf8_force", UO_utf8_force, AT_BOOL,
+                  "Force the output encoding to UTF-8");
+
    unc_begin_group(UG_space, "Spacing options");
    unc_add_option("sp_arith", UO_sp_arith, AT_IARF,
                   "Add or remove space around arithmetic operator '+', '-', '/', '*', etc");
@@ -501,6 +508,10 @@ void register_options(void)
                   "Controls the spaces between #else or #endif and a trailing comment");
    unc_add_option("sp_after_new", UO_sp_after_new, AT_IARF,
                   "Controls the spaces after 'new', 'delete', and 'delete[]'");
+   unc_add_option("sp_before_tr_emb_cmt", UO_sp_before_tr_emb_cmt, AT_IARF,
+                  "Controls the spaces before a trailing or embedded comment");
+   unc_add_option("sp_num_before_tr_emb_cmt", UO_sp_num_before_tr_emb_cmt, AT_NUM,
+                  "Number of spaces before a trailing or embedded comment");
 
    unc_begin_group(UG_indent, "Indenting");
    unc_add_option("indent_columns", UO_indent_columns, AT_NUM,
@@ -550,6 +561,8 @@ void register_options(void)
                   "Whether the 'class' body is indented");
    unc_add_option("indent_class_colon", UO_indent_class_colon, AT_BOOL,
                   "Whether to indent the stuff after a leading class colon");
+   unc_add_option("indent_ctor_init", UO_indent_ctor_init, AT_NUM,
+                  "Additional indenting for constructor initializer list");
    unc_add_option("indent_else_if", UO_indent_else_if, AT_BOOL,
                   "False=treat 'else\\nif' as 'else if' for indenting purposes\n"
                   "True=indent the 'if' one level");
@@ -734,6 +747,8 @@ void register_options(void)
                   "Add or remove newline between ')' and 'throw'");
    unc_add_option("nl_after_case", UO_nl_after_case, AT_BOOL,
                   "Whether to put a newline after 'case' statement");
+   unc_add_option("nl_case_colon_brace", UO_nl_case_colon_brace, AT_IARF,
+                  "Add or remove a newline between a case ':' and '{'. Overrides nl_after_case.");
    unc_add_option("nl_namespace_brace", UO_nl_namespace_brace, AT_IARF,
                   "Newline between namespace and {");
    unc_add_option("nl_template_class", UO_nl_template_class, AT_IARF,
@@ -950,7 +965,7 @@ void register_options(void)
 
    unc_begin_group(UG_linesplit, "Line Splitting options");
    unc_add_option("code_width", UO_code_width, AT_NUM,
-                  "Try to limit code width to N number of columns", "", 16, 5000);
+                  "Try to limit code width to N number of columns", "", 0, 5000);
    unc_add_option("ls_for_split_full", UO_ls_for_split_full, AT_BOOL,
                   "Whether to fully split long 'for' statements at semi-colons");
    unc_add_option("ls_func_split_full", UO_ls_func_split_full, AT_BOOL,
@@ -1079,10 +1094,10 @@ void register_options(void)
 
    unc_begin_group(UG_comment, "Comment modifications");
    unc_add_option("cmt_width", UO_cmt_width, AT_NUM,
-                  "Try to wrap comments at cmt_width columns", "", 16, 5000);
+                  "Try to wrap comments at cmt_width columns", "", -1, 5000);
    unc_add_option("cmt_inline_width", UO_cmt_inline_width, AT_NUM,
                   "Try to wrap in-line comments at cmt_inline_width columns\n"
-				  "(equal to cmt_width by default)", "", 16, 5000);
+				  "(equal to cmt_width by default)", "", -1, 5000);
    unc_add_option("cmt_reflow_mode", UO_cmt_reflow_mode, AT_NUM,
                   "Set the comment reflow mode (default: 0)\n"
                   "0: no reflowing (apart from the line wrapping due to cmt_width)\n"

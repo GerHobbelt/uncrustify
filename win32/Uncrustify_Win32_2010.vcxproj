@@ -200,6 +200,7 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2010.$(Configuration)\$(
       <StringPooling>true</StringPooling>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+<<<<<<< HEAD
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
@@ -209,6 +210,10 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2010.$(Configuration)\$(
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <EnablePREfast>true</EnablePREfast>
+=======
+      <ProgramDataBaseFileName>.\Debug/</ProgramDataBaseFileName>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+>>>>>>> bengardner-master
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -271,11 +276,15 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2010.$(Configuration)\$(
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+<<<<<<< HEAD
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <TargetMachine>MachineIA64</TargetMachine>
+=======
+      <AdditionalDependencies>setargv.obj;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+>>>>>>> bengardner-master
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -305,6 +314,7 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2010.$(Configuration)\$(
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
+<<<<<<< HEAD
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
       <BrowseInformation>true</BrowseInformation>
       <WarningLevel>Level4</WarningLevel>
@@ -361,6 +371,15 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2010.$(Configuration)\$(
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DisableSpecificWarnings>4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+=======
+      <ProgramDataBaseFileName>.\Release/</ProgramDataBaseFileName>
+      <BrowseInformation>false</BrowseInformation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <PrecompiledHeaderFile>uncrustify_types.h</PrecompiledHeaderFile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <WarningLevel>Level3</WarningLevel>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+>>>>>>> bengardner-master
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -376,7 +395,12 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2010.$(Configuration)\$(
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
+<<<<<<< HEAD
       <TargetMachine>MachineX64</TargetMachine>
+=======
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalDependencies>setargv.obj;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+>>>>>>> bengardner-master
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -465,6 +489,8 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2010.$(Configuration)\$(
     <ClCompile Include="..\src\tokenize.cpp" />
     <ClCompile Include="..\src\tokenize_cleanup.cpp" />
     <ClCompile Include="..\src\uncrustify.cpp" />
+    <ClCompile Include="..\src\unc_text.cpp" />
+    <ClCompile Include="..\src\unicode.cpp" />
     <ClCompile Include="..\src\universalindentgui.cpp" />
     <ClCompile Include="..\src\width.cpp" />
   </ItemGroup>
@@ -491,6 +517,8 @@ copy "$(TargetPath)" "$(SolutionDir)bin\$(Platform)_MSVC2010.$(Configuration)\$(
     <ClInclude Include="..\src\token_names.h" />
     <ClInclude Include="..\src\uncrustify_types.h" />
     <ClInclude Include="..\src\uncrustify_version.h" />
+    <ClInclude Include="..\src\unc_ctype.h" />
+    <ClInclude Include="..\src\unc_text.h" />
     <ClInclude Include="windows_compat.h" />
   </ItemGroup>
   <ItemGroup>

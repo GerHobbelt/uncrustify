@@ -105,6 +105,10 @@ enum uncrustify_options
    //UO_indent,                   //TODO: 0=don't change indentation, 1=change indentation
    UO_tok_split_gte,             // allow split of '>>=' in template detection
 
+   UO_utf8_byte,
+   UO_utf8_force,
+   UO_utf8_bom,
+
    UO_input_tab_size,           // tab size on input file: usually 8
    UO_output_tab_size,          // tab size for output: usually 8
 
@@ -167,6 +171,8 @@ enum uncrustify_options
    UO_indent_extern,
    UO_indent_class,                         // indent stuff inside class braces
    UO_indent_class_colon,                   // indent stuff after a class colon
+
+   UO_indent_ctor_init,                     // additional indenting for ctor initializer lists
 
    UO_indent_member,                        // indent lines broken at a member '.' or '->'
 
@@ -336,6 +342,8 @@ enum uncrustify_options
    UO_sp_cmt_cpp_start,
    UO_sp_endif_cmt,
    UO_sp_after_new,
+   UO_sp_before_tr_emb_cmt,  // treatment of spaces before comments following code
+   UO_sp_num_before_tr_emb_cmt,  // number of spaces before comments following code
 
    /*
     * Line splitting options (for long lines)
@@ -509,6 +517,7 @@ enum uncrustify_options
    UO_nl_getset_leave_one_liners,    // leave one-line get/set bodies
    UO_nl_func_leave_one_liners,      // leave one-line function def bodies
    UO_nl_if_leave_one_liners,
+   UO_nl_case_colon_brace,
 
    UO_nl_template_class,          // newline between '>' and class in "template <x> class"
 

@@ -9,8 +9,10 @@
 #define C_PARSE_PROTOTYPES_H_INCLUDED
 
 #include "uncrustify_types.h"
+#include "chunk_list.h"
 
 #include <string>
+#include <deque>
 
 /*
  *  uncrustify.cpp
@@ -98,7 +100,7 @@ void quick_align_again(void);
 
 void do_braces(void);
 void add_long_closebrace_comment(void);
-chunk_t *insert_comment_after(chunk_t *ref, c_token_t cmt_type, int cmt_len, const char *cmt_text);
+chunk_t *insert_comment_after(chunk_t *ref, c_token_t cmt_type, const unc_text& cmt_text);
 
 
 /*
@@ -122,7 +124,7 @@ void do_parens(void);
 void space_text(void);
 void space_text_balance_nested_parens(void);
 int space_col_align(chunk_t *first, chunk_t *second);
-bool space_needed(chunk_t *first, chunk_t *second);
+int space_needed(chunk_t *first, chunk_t *second);
 void space_add_after(chunk_t *pc, int count);
 
 
@@ -134,6 +136,8 @@ void fix_symbols(void);
 void combine_labels(void);
 void mark_comments(void);
 void make_type(chunk_t *pc);
+
+void flag_series(chunk_t *start, chunk_t *end, UINT64 flags, chunk_nav_t nav = CNAV_ALL);
 
 chunk_t *skip_template_next(chunk_t *ang_open);
 chunk_t *skip_template_prev(chunk_t *ang_close);
@@ -182,7 +186,7 @@ chunk_t *newline_add_between2(chunk_t *start, chunk_t *end,
  *  tokenize.cpp
  */
 
-void tokenize(const vector<char>& data, chunk_t *ref);
+void tokenize(const deque<int>& data, chunk_t *ref);
 
 
 /*
@@ -263,6 +267,17 @@ chunk_t *pawn_add_vsemi_after(chunk_t *pc);
  * universalindentgui.cpp
  */
 void print_universal_indent_cfg(FILE *pfile);
+
+
+/*
+ * unicode.cpp
+ */
+void write_bom(FILE *pf, CharEncoding enc);
+void write_char(FILE *pf, int ch, CharEncoding enc);
+void write_string(FILE *pf, const deque<int>& text, CharEncoding enc);
+void write_string(FILE *pf, const char *ascii_text, CharEncoding enc);
+bool decode_unicode(const vector<UINT8>& in_data, deque<int>& out_data, CharEncoding& enc, bool& has_bom);
+void encode_utf8(int ch, vector<UINT8>& res);
 
 
 /*

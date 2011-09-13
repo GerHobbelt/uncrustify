@@ -56,10 +56,10 @@ struct cp_data cpd = {0};
 static int language_from_tag(const char *tag);
 static int language_from_filename(const char *filename);
 static const char *language_to_string(int lang);
-static bool read_stdin(vector<char>& data);
-static void uncrustify_start(const vector<char>& data);
+static bool read_stdin(file_mem& fm);
+static void uncrustify_start(const deque<int>& data);
 static void uncrustify_end();
-static void uncrustify_file(const vector<char>& data, FILE *pfout,
+static void uncrustify_file(const file_mem& fm, FILE *pfout,
                             const char *parsed_file);
 static void do_source_file(const char *filename_in,
                            const char *filename_out,
@@ -959,8 +959,8 @@ int main(int argc, char *argv[])
 
       redir_stdout(output_file);
 
-      vector<char> data;
-      if (!read_stdin(data))
+      file_mem fm;
+      if (!read_stdin(fm))
       {
          LOG_FMT(LERR, "Failed to read stdin\n");
          return(100);
@@ -969,10 +969,11 @@ int main(int argc, char *argv[])
       cpd.filename = "stdin";
 
       /* Done reading from stdin */
-      LOG_FMT(LSYS, "Parsing: %d bytes from stdin as language %s\n",
-              (int)data.size(), language_to_string(cpd.lang_flags));
+      LOG_FMT(LSYS, "Parsing: %d bytes (%d chars) from stdin as language %s\n",
+              (int)fm.raw.size(), (int)fm.data.size(),
+              language_to_string(cpd.lang_flags));
 
-      uncrustify_file(data, stdout, parsed_file);
+      uncrustify_file(fm, stdout, parsed_file);
    }
    else if (source_file != NULL)
    {
@@ -1058,29 +1059,29 @@ static void process_source_list(const char *source_list,
 }
 
 
-static bool read_stdin(vector<char>& data)
+static bool read_stdin(file_mem& fm)
 {
-   deque<char> dq;
-   char        buf[4096];
-   int         len;
-   int         idx;
+   deque<UINT8> dq;
+   char         buf[4096];
+   int          len;
+   int          idx;
+
+   fm.raw.clear();
+   fm.data.clear();
+   fm.enc = ENC_ASCII;
 
    while (!feof(stdin))
    {
       len = fread(buf, 1, sizeof(buf), stdin);
       for (idx = 0; idx < len; idx++)
       {
-         /* TODO: parse as UTF-8 and add int-chars */
          dq.push_back(buf[idx]);
       }
    }
-   /* terminate the string */
-   dq.push_back(0);
 
-   /* Copy the data from the deque to the vector */
-   data.clear();
-   data.insert(data.end(), dq.begin(), dq.end());
-   return(true);
+   /* Copy the raw data from the deque to the vector */
+   fm.raw.insert(fm.raw.end(), dq.begin(), dq.end());
+   return decode_unicode(fm.raw, fm.data, fm.enc, fm.bom);
 }
 
 
@@ -1134,7 +1135,9 @@ static int load_mem_file(const char *filename, file_mem& fm)
    struct stat my_stat;
    FILE        *p_file;
 
+   fm.raw.clear();
    fm.data.clear();
+   fm.enc = ENC_ASCII;
 
    /* Grab the stat info for the file */
    if (stat(filename, &my_stat) < 0)
@@ -1154,24 +1157,25 @@ static int load_mem_file(const char *filename, file_mem& fm)
       return(-1);
    }
 
-   fm.data.resize(my_stat.st_size + 1);
-   if (fread(&fm.data[0], fm.data.size() - 1, 1, p_file) != 1)
+   /* read the raw data */
+   fm.raw.resize(my_stat.st_size);
+   if (fread(&fm.raw[0], fm.raw.size(), 1, p_file) != 1)
    {
       LOG_FMT(LERR, "%s: fread(%s) failed: %s (%d)\n",
               __func__, filename, strerror(errno), errno);
       cpd.error_count++;
    }
+   else if (!decode_unicode(fm.raw, fm.data, fm.enc, fm.bom))
+   {
+      LOG_FMT(LERR, "%s: failed to decode the file '%s'\n", __func__, filename);
+   }
    else
    {
-      fm.data[fm.data.size() - 1] = 0;
+      LOG_FMT(LNOTE, "%s: '%s' encoding looks like %d\n", __func__, filename, fm.enc);
       retval = 0;
    }
    fclose(p_file);
 
-   if (retval != 0)
-   {
-      fm.data.clear();
-   }
    return(retval);
 }
 
@@ -1384,7 +1388,7 @@ static void do_source_file(const char *filename_in,
 
          if (!no_backup)
          {
-            if (backup_copy_file(filename_in, fm.data) != SUCCESS)
+            if (backup_copy_file(filename_in, fm.raw) != SUCCESS)
             {
                LOG_FMT(LERR, "%s: Failed to create backup file for %s\n",
                        __func__, filename_in);
@@ -1409,7 +1413,7 @@ static void do_source_file(const char *filename_in,
    }
 
    cpd.filename = filename_in;
-   uncrustify_file(fm.data, pfout, parsed_file);
+   uncrustify_file(fm, pfout, parsed_file);
 
    if (did_open)
    {
@@ -1665,7 +1669,7 @@ static void add_msg_header(c_token_t type, file_mem& fm)
 }
 
 
-static void uncrustify_start(const vector<char>& data)
+static void uncrustify_start(const deque<int>& data)
 {
    /**
     * Parse the text into chunks
@@ -1729,10 +1733,45 @@ static void uncrustify_start(const vector<char>& data)
 }
 
 
-static void uncrustify_file(const vector<char>& data, FILE *pfout,
+static void uncrustify_file(const file_mem& fm, FILE *pfout,
                             const char *parsed_file)
 {
-   /* Check for embedded 0's */
+   const deque<int>& data = fm.data;
+
+   /* Save off the encoding and whether a BOM is required */
+   cpd.bom = fm.bom;
+   cpd.enc = fm.enc;
+   if (cpd.settings[UO_utf8_force].b ||
+       ((cpd.enc == ENC_BYTE) && cpd.settings[UO_utf8_byte].b))
+   {
+      cpd.enc = ENC_UTF8;
+   }
+   argval_t av;
+   switch (cpd.enc)
+   {
+   case ENC_UTF8:
+      av = cpd.settings[UO_utf8_bom].a;
+      break;
+
+   case ENC_UTF16_LE:
+   case ENC_UTF16_BE:
+      av = AV_FORCE;
+      break;
+
+   default:
+      av = AV_IGNORE;
+      break;
+   }
+   if (av == AV_REMOVE)
+   {
+      cpd.bom = false;
+   }
+   else if (av != AV_IGNORE)
+   {
+      cpd.bom = true;
+   }
+
+   /* Check for embedded 0's (represents a decoding failure or corrupt file) */
    for (int idx = 0; idx < (int)data.size() - 1; idx++)
    {
       if (data[idx] == 0)
@@ -1794,45 +1833,56 @@ static void uncrustify_file(const vector<char>& data, FILE *pfout,
       /**
        * Insert line breaks as needed
        */
-      do_blank_lines();
-      newlines_cleanup_braces();
-      if (cpd.settings[UO_nl_after_multiline_comment].b)
+      //do_newlines();
+      int old_changes;
+      cpd.pass_count = 3;
+      do
       {
-         newline_after_multiline_comment();
-      }
-      newlines_insert_blank_lines();
-      if (cpd.settings[UO_pos_bool].tp != TP_IGNORE)
-      {
-         newlines_chunk_pos(CT_BOOL, cpd.settings[UO_pos_bool].tp);
-      }
-      if (cpd.settings[UO_pos_compare].tp != TP_IGNORE)
-      {
-         newlines_chunk_pos(CT_COMPARE, cpd.settings[UO_pos_compare].tp);
-      }
-      if (cpd.settings[UO_pos_conditional].tp != TP_IGNORE)
-      {
-         newlines_chunk_pos(CT_COND_COLON, cpd.settings[UO_pos_conditional].tp);
-         newlines_chunk_pos(CT_QUESTION, cpd.settings[UO_pos_conditional].tp);
-      }
-      if (cpd.settings[UO_pos_comma].tp != TP_IGNORE)
-      {
-         newlines_chunk_pos(CT_COMMA, cpd.settings[UO_pos_comma].tp);
-      }
-      if (cpd.settings[UO_pos_assign].tp != TP_IGNORE)
-      {
-         newlines_chunk_pos(CT_ASSIGN, cpd.settings[UO_pos_assign].tp);
-      }
-      if (cpd.settings[UO_pos_arith].tp != TP_IGNORE)
-      {
-         newlines_chunk_pos(CT_ARITH, cpd.settings[UO_pos_arith].tp);
-      }
-      newlines_class_colon_pos();
-      if (cpd.settings[UO_nl_squeeze_ifdef].b)
-      {
-         newlines_squeeze_ifdef();
-      }
-      newlines_eat_start_end();
-      newlines_cleanup_dup();
+         old_changes = cpd.changes;
+
+         LOG_FMT(LNEWLINE, "Newline loop start: %d\n", cpd.changes);
+
+         newlines_cleanup_dup();
+         newlines_cleanup_braces();
+         if (cpd.settings[UO_nl_after_multiline_comment].b)
+         {
+            newline_after_multiline_comment();
+         }
+         newlines_insert_blank_lines();
+         if (cpd.settings[UO_pos_bool].tp != TP_IGNORE)
+         {
+            newlines_chunk_pos(CT_BOOL, cpd.settings[UO_pos_bool].tp);
+         }
+         if (cpd.settings[UO_pos_compare].tp != TP_IGNORE)
+         {
+            newlines_chunk_pos(CT_COMPARE, cpd.settings[UO_pos_compare].tp);
+         }
+         if (cpd.settings[UO_pos_conditional].tp != TP_IGNORE)
+         {
+            newlines_chunk_pos(CT_COND_COLON, cpd.settings[UO_pos_conditional].tp);
+            newlines_chunk_pos(CT_QUESTION, cpd.settings[UO_pos_conditional].tp);
+         }
+         if (cpd.settings[UO_pos_comma].tp != TP_IGNORE)
+         {
+            newlines_chunk_pos(CT_COMMA, cpd.settings[UO_pos_comma].tp);
+         }
+         if (cpd.settings[UO_pos_assign].tp != TP_IGNORE)
+         {
+            newlines_chunk_pos(CT_ASSIGN, cpd.settings[UO_pos_assign].tp);
+         }
+         if (cpd.settings[UO_pos_arith].tp != TP_IGNORE)
+         {
+            newlines_chunk_pos(CT_ARITH, cpd.settings[UO_pos_arith].tp);
+         }
+         newlines_class_colon_pos();
+         if (cpd.settings[UO_nl_squeeze_ifdef].b)
+         {
+            newlines_squeeze_ifdef();
+         }
+         do_blank_lines();
+         newlines_eat_start_end();
+         newlines_cleanup_dup();
+      } while ((old_changes != cpd.changes) && (cpd.pass_count-- > 0));
 
       mark_comments();
 
@@ -1900,18 +1950,17 @@ static void uncrustify_file(const vector<char>& data, FILE *pfout,
 
       if (cpd.settings[UO_code_width].n > 0)
       {
-         int max_passes = 3;
-         int prev_changes;
+         cpd.pass_count = 3;
          do
          {
-            prev_changes = cpd.changes;
+            old_changes = cpd.changes;
             do_code_width();
-            if (prev_changes != cpd.changes)
+            if (old_changes != cpd.changes)
             {
                align_all();
                indent_text();
             }
-         } while ((prev_changes != cpd.changes) && (--max_passes > 0));
+         } while ((old_changes != cpd.changes) && (cpd.pass_count-- > 0));
       }
 
       /**
@@ -1957,12 +2006,6 @@ static void uncrustify_end()
    while ((pc = chunk_get_head()) != NULL)
    {
       chunk_del(pc);
-   }
-
-   if (cpd.bom != NULL)
-   {
-      chunk_del(cpd.bom);
-      cpd.bom = NULL;
    }
 
    /* Clean up some state variables */
