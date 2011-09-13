@@ -216,11 +216,13 @@ if __name__ == '__main__':
 	print "Passed %d / %d tests" % (pass_count, pass_count + fail_count)
 	if fail_count > 0:
 		print BOLD + "Failed %d test(s)" % (fail_count) + NORMAL
+		if unst_count > 0:
+			print BOLD + "%d tests were unstable" % (unst_count) + NORMAL
 		sys.exit(1)
 	else:
 		txt = BOLD + "All tests passed" + NORMAL
 		if unst_count > 0:
-			txt += ", but some files were unstable"
+			txt += ", but %d files were unstable" % (unst_count)
 		print txt
 		sys.exit(0)
 
