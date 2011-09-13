@@ -40,6 +40,10 @@ public:
    {
       set(ascii_text);
    }
+   unc_text(const char *ascii_text, size_t len)
+   {
+      set(ascii_text, len);
+   }
    unc_text(const string& ascii_text)
    {
       set(ascii_text);
@@ -62,6 +66,7 @@ public:
    void set(const unc_text& ref, int idx, int len = -1);
    void set(const string& ascii_text);
    void set(const char *ascii_text);
+   void set(const char *ascii_text, size_t len);
    void set(const value_type& data, int idx = 0, int len = -1);
 
    unc_text& operator =(int ch)

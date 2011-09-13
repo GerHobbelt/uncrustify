@@ -17,6 +17,8 @@ static void split_for_stmt(chunk_t *start);
 
 static_inline bool is_past_width(chunk_t *pc)
 {
+	if (cpd.settings[UO_code_width].n == 0)
+		return false;
    return((pc->column + pc->len()) > cpd.settings[UO_code_width].n);
 }
 

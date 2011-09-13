@@ -919,7 +919,7 @@ int col_diff;
       chunk_t *prev = chunk_get_prev(pc);
       if (prev != NULL)
       {
-         int col_min = prev->column + prev->len + 1;
+         int col_min = prev->column + prev->len() + 1;
          if (m_left_global_output_column < col_min)
          {
             m_left_global_output_column = col_min;

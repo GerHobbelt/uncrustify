@@ -415,5 +415,8 @@
     <None Include="..\tests\tests.vpj">
       <Filter>Extras\Tests</Filter>
     </None>
+    <None Include="..\make_punctuators.sh">
+      <Filter>Extras\Scripts</Filter>
+    </None>
   </ItemGroup>
 </Project>

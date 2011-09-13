@@ -948,11 +948,26 @@ bool parse_word(tok_ctx& ctx, chunk_t& pc, bool skipcheck)
    }
    else
    {
-      /* Turn it into a keyword now */
-      pc.type = find_keyword_type(pc.str.c_str(), pc.str.size());
-   }
+   /* Turn it into a keyword now */
+#if 0 // [i_a] this was old code of mine which supported custom 'keywords' with embedded whitespace, i.e. complete 'keyphrases' rather
+     tag = find_keyword(pc.str.c_str(), pc.str.size()); /* [i_a] warning: will scan BEYOND 'len'! */
+     if (tag != NULL)
+     {
+       pc->type = tag->type;
+	   // adjust length to match the 'keyword' found - as those can be 'keyPHRASES' rather, this must be done.
+       cpd.column -= pc->len;
+	   pc->len     = (int)strlen(tag->tag);
+       cpd.column += pc->len;
+     }
+#endif
 
-   return(true);
+     const chunk_tag_t *tag = find_keyword(pc.str.c_str(), pc.str.size());
+     if (tag)
+     {
+	   pc.type = tag->type;
+     }
+   }
+   return(true);  // [i_a] is this really what you want???
 }
 
 

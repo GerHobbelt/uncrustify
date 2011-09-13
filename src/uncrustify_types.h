@@ -325,7 +325,7 @@ struct file_mem
    deque<int>     data;
    bool           bom;
    CharEncoding   enc;
-#ifdef HAVE_UTIME_H
+#if defined(HAVE_STRUCT_UTIMBUF_ACTIME) && defined(HAVE_UTIME)
    struct utimbuf utb;
 #endif
 };

@@ -158,7 +158,7 @@ static void setup_newline_add(chunk_t *prev, chunk_t *nl, chunk_t *next)
    if (prev->orig_col_end > 0)
    {
 		nl->orig_col = prev->orig_col_end + 1;
-		nl->orig_col_end = nl->orig_col + nl->len - 1;
+		nl->orig_col_end = nl->orig_col + nl->len() - 1;
    }
 }
 

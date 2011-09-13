@@ -10,9 +10,12 @@
 #include "prototypes.h"
 #include "chunk_list.h"
 #include "unc_ctype.h"
+#include "reflow_text.h"
+#include <cstring>
 #include <cstdlib>
 //#include <cassert>
 
+#if 0
 static void output_comment_multi(chunk_t *pc);
 static void output_comment_multi_simple(chunk_t *pc);
 
@@ -34,6 +37,10 @@ static chunk_t *output_comment_c(chunk_t *pc);
 static chunk_t *output_comment_cpp(chunk_t *pc);
 static void add_comment_text(const unc_text& text,
                              cmt_reflow& cmt, bool esc_close);
+#endif
+
+static chunk_t *output_comment(chunk_t *pc);
+
 
 /**
  * All output text is sent here, one char at a time.
@@ -1033,6 +1040,7 @@ static chunk_t *output_comment(chunk_t *pc)
    cmt_reflow cmt;
 
    /* See if we can combine this comment with the next comment */
+#if 0
    if (!cpd.settings[UO_cmt_c_group].b ||
        !can_combine_comment(first, cmt))
    {
@@ -1064,9 +1072,27 @@ static chunk_t *output_comment(chunk_t *pc)
    }
    add_comment_text("*/", cmt, false);
    return(pc);
-}
+
+#else
+
+   while (cmt.can_combine_comment(pc))
+   {
+	  cmt.m_is_merged_comment = true;
+      cmt.push_chunk(pc);
+	  cmt.push("\n");
+      pc = chunk_get_next(chunk_get_next(pc));
+   }
+   cmt.push_chunk(pc);
+   cmt.m_last_pc = pc;
 
    cmt.render();
+
+   return pc;
+#endif
+}
+
+
+#if 0
 
 /**
  * Outputs the CPP comment at pc.
@@ -1481,6 +1507,37 @@ void cmt_reflow::write(const char *str, size_t len)
       }
    }
 }
+
+#else
+
+void cmt_reflow::write(char ch)
+{
+	UNC_ASSERT(ch);
+	if (ch == NONBREAKING_SPACE_CHAR)
+	{
+		ch = ' ';
+	}
+	::add_char(ch);
+}
+
+void cmt_reflow::write(const char *str)
+{
+	UNC_ASSERT(str);
+	UNC_ASSERT(*str);
+	::add_text(str);
+}
+
+void cmt_reflow::write(const char *str, size_t len)
+{
+	UNC_ASSERT(str);
+	UNC_ASSERT(len);
+	UNC_ASSERT(*str);
+	unc_text txt(str, len);
+	::add_text(txt);
+}
+
+#endif
+
 
 #if 0
 

@@ -69,6 +69,8 @@ static void process_source_list(const char *source_list, const char *prefix,
                                 const char *suffix, bool no_backup, bool keep_mtime);
 static int load_header_files();
 
+static void make_folders(const string& filename);
+
 static const char *make_output_filename(char *buf, int buf_size,
                                         const char *filename,
                                         const char *prefix,

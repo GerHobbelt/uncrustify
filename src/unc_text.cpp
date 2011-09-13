@@ -169,6 +169,16 @@ void unc_text::set(const char *ascii_text)
    m_logok = false;
 }
 
+void unc_text::set(const char *ascii_text, size_t len)
+{
+   m_chars.resize(len);
+   for (size_t idx = 0; idx < len; idx++)
+   {
+      m_chars[idx] = *ascii_text++;
+   }
+   m_logok = false;
+}
+
 void unc_text::set(const value_type& data, int idx, int len)
 {
    fix_len_idx(data.size(), idx, len);

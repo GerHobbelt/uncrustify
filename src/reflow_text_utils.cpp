@@ -728,7 +728,7 @@ void cmt_reflow::add_javaparam(chunk_t *pc)
             if (prev != NULL)
             {
                push(" ");
-               push(prev->str, prev->len);
+               push(prev->str.c_str(), prev->len());
                push(" TODO");
             }
             prev = NULL;
@@ -776,7 +776,7 @@ int cmt_reflow::add_kw(const char *text) /* [i_a] */
       chunk_t *tmp = get_next_class(m_first_pc);
       if (tmp != NULL)
       {
-         push(tmp->str, tmp->len);
+         push(tmp->str.c_str(), tmp->len());
          return(8);
       }
    }
@@ -790,7 +790,7 @@ int cmt_reflow::add_kw(const char *text) /* [i_a] */
 
    if (strncmp(text, "$(message)", 10) == 0)
    {
-      push(fcn->str, fcn->len);
+      push(fcn->str.c_str(), fcn->len());
       chunk_t *tmp = chunk_get_next_ncnl(fcn);
       chunk_t *word = NULL;
       while (tmp)
@@ -803,7 +803,7 @@ int cmt_reflow::add_kw(const char *text) /* [i_a] */
          {
             if (word != NULL)
             {
-               push(word->str, word->len);
+               push(word->str.c_str(), word->len());
                word = NULL;
             }
             push(":");
@@ -822,7 +822,7 @@ int cmt_reflow::add_kw(const char *text) /* [i_a] */
       {
          push("operator ");
       }
-      push(fcn->str, fcn->len);
+      push(fcn->str.c_str(), fcn->len());
       return(11);
    }
    if (strncmp(text, "$(javaparam)", 12) == 0)
@@ -841,7 +841,7 @@ int cmt_reflow::add_kw(const char *text) /* [i_a] */
                             (tmp->type == CT_MEMBER)))
       {
          tmp = chunk_get_prev_ncnl(tmp);
-         push(tmp->str, tmp->len);
+         push(tmp->str.c_str(), tmp->len());
          return(9);
       }
    }
@@ -858,8 +858,8 @@ bool cmt_reflow::detect_as_javadoc_chunk(chunk_t *pc, bool setup)
 			|| (pc->type == CT_COMMENT_MULTI)
 			|| (pc->type == CT_COMMENT_CPP)))
 	{
-		const char *text = pc->str + 2;
-		int len = pc->len - 4;
+		const char *text = pc->str.c_str() + 2;
+		int len = pc->len() - 4;
 		const char *eos = text + len;
 
 		const char *eojd_marker = text;
@@ -1428,14 +1428,14 @@ void cmt_reflow::push_chunk(chunk_t *pc)
 	   '*'+'/' or '+'+'/' (in the case of LANG_D) may be absent. Thsi condition takes
 	   care of that matter for us.
 	   */
-	   bool walkback = (pc->str[pc->len - 1] == pc->str[0]
-						&& pc->str[pc->len - 2] == pc->str[1]);
-		push_text(pc->str + 2, pc->len - (walkback ? 4 : 2), false, 2, pc->orig_col, pc);
+	   bool walkback = (pc->str[pc->len() - 1] == pc->str[0]
+						&& pc->str[pc->len() - 2] == pc->str[1]);
+		push_text(pc->str + 2, pc->len() - (walkback ? 4 : 2), false, 2, pc->orig_col, pc);
    }
    else
    {
 	   UNC_ASSERT(pc->type == CT_COMMENT_CPP);
-		push_text(pc->str + 2, pc->len - 2, true, 2, pc->orig_col, pc);
+		push_text(pc->str.c_str() + 2, pc->len() - 2, true, 2, pc->orig_col, pc);
    }
 
 	m_last_pc = pc;
@@ -1732,7 +1732,7 @@ void cmt_reflow::write_line_to_initial_column(void)
 		{
 		   allow_tabs = (cpd.settings[UO_align_with_tabs].b &&
 						 ((m_first_pc->flags & PCF_WAS_ALIGNED) != 0) &&
-						 prev && ((prev->column + prev->len + 1) != m_first_pc->column));
+						 prev && ((prev->column + prev->len() + 1) != m_first_pc->column));
 		}
 	}
 	else
