@@ -191,10 +191,12 @@ static void output_to_column(int column, bool allow_tabs, int max_tabbed_column 
 }
 
 
-void output_parsed(FILE *pfile)
+void output_parsed(const char *fname, FILE *pfile)
 {
    chunk_t *pc;
    int     cnt;
+
+   fprintf(pfile, "\n######## dump @ %s ########\n\n\n", fname);
 
    output_options(pfile);
    output_defines(pfile);

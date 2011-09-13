@@ -1451,7 +1451,7 @@ static bool parse_next(tok_ctx& ctx, chunk_t& pc)
  * All the tokens are inserted before ref. If ref is NULL, they are inserted
  * at the end of the list.  Line numbers are relative to the start of the data.
  */
-void tokenize(const deque<int>& data, chunk_t *ref)
+void tokenize(const deque<int>& data, chunk_t *ref, const char *parsed_file)
 {
    tok_ctx            ctx(data);
    chunk_t            chunk;
@@ -1602,6 +1602,9 @@ void tokenize(const deque<int>& data, chunk_t *ref)
       cpd.newline = "\r";
       LOG_FMT(LLINEENDS, "Using CR line endings\n");
    }
+
+   /* Special hook for dumping parsed data for debugging */
+   dump_parsed_input(__func__, parsed_file);
 }
 
 

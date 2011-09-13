@@ -806,10 +806,10 @@ void cmt_reflow::pretty_print_diagnostic2output(const char *text, size_t text_le
 	{
 		/*
 		The offender is dumped to the output while special legibility formatting is applied. When this is done, the
-		'lead in' and 'lead out' sizes are balanced, that is: these number can be considered a /ratio/ -- currently
+		'lead in' and 'lead out' sizes are balanced, that is: these numbers can be considered a /ratio/ -- currently
 		set at 1/3rd.
 		*/
-		const int dump_len = 40;
+		const size_t dump_len = 40;
 		const int dump_leadin = 1;
 		const int dump_leadout = 3;
 

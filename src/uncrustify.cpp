@@ -57,7 +57,7 @@ static int language_from_tag(const char *tag);
 static int language_from_filename(const char *filename);
 static const char *language_to_string(int lang);
 static bool read_stdin(file_mem& fm);
-static void uncrustify_start(const deque<int>& data);
+static void uncrustify_start(const deque<int>& data, const char *parsed_file);
 static void uncrustify_end();
 static void uncrustify_file(const file_mem& fm, FILE *pfout,
                             const char *parsed_file);
@@ -225,12 +225,43 @@ static void version_exit(void)
 }
 
 
+static FILE *unc_fopen(const char *path, const char *mode)
+{
+	if (path == NULL || strcmp(path, "-") == 0)
+	{
+		if (strchr(mode, 'w') || strchr(mode, 'a'))
+		{
+			return stdout;
+		}
+		else
+		{
+			return stdin;
+		}
+	}
+
+	if (strchr(mode, 'w'))
+	{
+		make_folders(path);
+	}
+
+	return fopen(path, mode);
+}
+
+static int unc_fclose(FILE *fh)
+{
+	if (fh && fh != stdin && fh != stderr && fh != stdout)
+	{
+		return fclose(fh);
+	}
+	return 0;
+}
+
 static void redir_stdout(const char *output_file)
 {
    /* Reopen stdout */
    FILE *my_stdout = stdout;
 
-   if (output_file != NULL)
+   if (output_file != NULL && strcmp(output_file, "-") != 0)
    {
       my_stdout = freopen(output_file, "wb", stdout);
       if (my_stdout == NULL)
@@ -861,7 +892,7 @@ int main(int argc, char *argv[])
 
       if (output_file != NULL)
       {
-         pfile = fopen(output_file, "w");
+         pfile = unc_fopen(output_file, "w");
          if (pfile == NULL)
          {
             fprintf(stderr, "Unable to open %s for write: %s (%d)\n",
@@ -899,7 +930,7 @@ int main(int argc, char *argv[])
          return(EXIT_FAILURE);
       }
 
-      uncrustify_start(fm.data);
+      uncrustify_start(fm.data, parsed_file);
       detect_options();
       uncrustify_end();
 
@@ -980,6 +1011,8 @@ int main(int argc, char *argv[])
    else if (source_file != NULL)
    {
       /* Doing a single file */
+	   if (output_file == NULL)
+		   output_file = "-";
       do_source_file(source_file, output_file, parsed_file, no_backup, keep_mtime);
    }
    else
@@ -1021,7 +1054,7 @@ static void process_source_list(const char *source_list,
                                 const char *prefix, const char *suffix,
                                 bool no_backup, bool keep_mtime)
 {
-   FILE *p_file = fopen(source_list, "r");
+   FILE *p_file = unc_fopen(source_list, "r");
 
    if (p_file == NULL)
    {
@@ -1057,7 +1090,7 @@ static void process_source_list(const char *source_list,
                         NULL, no_backup, keep_mtime);
       }
    }
-   fclose(p_file);
+   unc_fclose(p_file);
 }
 
 
@@ -1153,7 +1186,7 @@ static int load_mem_file(const char *filename, file_mem& fm)
 #endif
 
    /* Try to read in the file */
-   p_file = fopen(filename, "rb");
+   p_file = unc_fopen(filename, "rb");
    if (p_file == NULL)
    {
       return(-1);
@@ -1176,8 +1209,12 @@ static int load_mem_file(const char *filename, file_mem& fm)
       LOG_FMT(LNOTE, "%s: '%s' encoding looks like %d\n", __func__, filename, fm.enc);
       retval = 0;
    }
-   fclose(p_file);
+   unc_fclose(p_file);
 
+   if (retval != 0)
+   {
+      fm.data.clear();
+   }
    return(retval);
 }
 
@@ -1252,14 +1289,21 @@ static const char *make_output_filename(char *buf, int buf_size,
 {
    int len = 0;
 
-   if (prefix != NULL)
+   if (strcmp(filename, "-") == 0)
    {
-      len = snprintf(buf, buf_size, "%s/", prefix);
+	   strncpy(buf, "-", buf_size);
    }
+   else
+   {
+	   if (prefix != NULL)
+	   {
+		  len = snprintf(buf, buf_size, "%s/", prefix);
+	   }
 
-   snprintf(&buf[len], buf_size - len, "%s%s", filename,
-            (suffix != NULL) ? suffix : "");
-
+	   snprintf(&buf[len], buf_size - len, "%s%s", filename,
+				(suffix != NULL) ? suffix : "");
+   }
+   buf[buf_size - 1] = 0;
    return(buf);
 }
 
@@ -1353,7 +1397,6 @@ static void do_source_file(const char *filename_in,
                            bool       keep_mtime)
 {
    FILE       *pfout;
-   bool       did_open    = false;
    bool       need_backup = false;
    file_mem   fm;
    string     filename_tmp;
@@ -1375,15 +1418,9 @@ static void do_source_file(const char *filename_in,
    LOG_FMT(LSYS, "Parsing: %s as language %s\n",
            filename_in, language_to_string(cpd.lang_flags));
 
-   if (filename_out == NULL)
-   {
-      pfout = stdout;
-   }
-   else
-   {
       /* If the out file is the same as the in file, then use a temp file */
       filename_tmp = filename_out;
-      if (strcmp(filename_in, filename_out) == 0)
+      if (strcmp(filename_in, filename_out) == 0 && strcmp(filename_in, "-") != 0)
       {
          /* Create 'outfile.uncrustify' */
          filename_tmp = fix_filename(filename_out);
@@ -1400,9 +1437,8 @@ static void do_source_file(const char *filename_in,
             need_backup = true;
          }
       }
-      make_folders(filename_tmp);
 
-      pfout = fopen(filename_tmp.c_str(), "wb");
+      pfout = unc_fopen(filename_tmp.c_str(), "wb");
       if (pfout == NULL)
       {
          LOG_FMT(LERR, "%s: Unable to create %s: %s (%d)\n",
@@ -1410,17 +1446,15 @@ static void do_source_file(const char *filename_in,
          cpd.error_count++;
          return;
       }
-      did_open = true;
       //LOG_FMT(LSYS, "Output file %s\n", filename_out);
-   }
 
    cpd.filename = filename_in;
    uncrustify_file(fm, pfout, parsed_file);
 
-   if (did_open)
-   {
-      fclose(pfout);
+   unc_fclose(pfout);
 
+   if (pfout != stdout && pfout != stderr)
+   {
       if (need_backup)
       {
          backup_create_md5_file(filename_in);
@@ -1458,17 +1492,17 @@ static void do_source_file(const char *filename_in,
 }
 
 
-static void add_file_header()
+static void add_file_header(const char *parsed_file)
 {
    if (!chunk_is_comment(chunk_get_head()))
    {
       /*TODO: detect the typical #ifndef FOO / #define FOO sequence */
-      tokenize(cpd.file_hdr.data, chunk_get_head());
+      tokenize(cpd.file_hdr.data, chunk_get_head(), parsed_file);
    }
 }
 
 
-static void add_file_footer()
+static void add_file_footer(const char *parsed_file)
 {
    chunk_t *pc = chunk_get_tail();
 
@@ -1486,12 +1520,12 @@ static void add_file_footer()
          LOG_FMT(LSYS, "Adding a newline at the end of the file\n");
          newline_add_after(pc);
       }
-      tokenize(cpd.file_ftr.data, NULL);
+      tokenize(cpd.file_ftr.data, NULL, parsed_file);
    }
 }
 
 
-static void add_func_header(c_token_t type, file_mem& fm)
+static void add_func_header(c_token_t type, file_mem& fm, const char *parsed_file)
 {
    chunk_t *pc;
    chunk_t *ref;
@@ -1561,7 +1595,7 @@ static void add_func_header(c_token_t type, file_mem& fm)
       {
          /* Insert between after and ref */
          chunk_t *after = chunk_get_next_ncnl(ref);
-         tokenize(fm.data, after);
+         tokenize(fm.data, after, parsed_file);
          for (tmp = chunk_get_next(ref); tmp != after; tmp = chunk_get_next(tmp))
          {
             tmp->level = after->level;
@@ -1571,7 +1605,7 @@ static void add_func_header(c_token_t type, file_mem& fm)
 }
 
 
-static void add_msg_header(c_token_t type, file_mem& fm)
+static void add_msg_header(c_token_t type, file_mem& fm, const char *parsed_file)
 {
    chunk_t *pc;
    chunk_t *ref;
@@ -1661,7 +1695,7 @@ static void add_msg_header(c_token_t type, file_mem& fm)
       {
          /* Insert between after and ref */
          chunk_t *after = chunk_get_next_ncnl(ref);
-         tokenize(fm.data, after);
+         tokenize(fm.data, after, parsed_file);
          for (tmp = chunk_get_next(ref); tmp != after; tmp = chunk_get_next(tmp))
          {
             tmp->level = after->level;
@@ -1671,12 +1705,33 @@ static void add_msg_header(c_token_t type, file_mem& fm)
 }
 
 
-static void uncrustify_start(const deque<int>& data)
+void dump_parsed_input(const char *fname, const char *parsed_file)
+{
+	static int first = 1;
+
+   if (parsed_file != NULL)
+   {
+      FILE *p_file = unc_fopen(parsed_file, (first ? "w" : "a"));
+      if (p_file != NULL)
+      {
+		  first = 0;
+         output_parsed(fname, p_file);
+         unc_fclose(p_file);
+      }
+      else
+      {
+         LOG_FMT(LERR, "%s: Failed to open '%s' for write: %s (%d)\n",
+                 __func__, parsed_file, strerror(errno), errno);
+      }
+   }
+}
+
+static void uncrustify_start(const deque<int>& data, const char *parsed_file)
 {
    /**
     * Parse the text into chunks
     */
-   tokenize(data, NULL);
+   tokenize(data, NULL, parsed_file);
 
    /* Get the column for the fragment indent */
    if (cpd.frag)
@@ -1689,13 +1744,13 @@ static void uncrustify_start(const deque<int>& data)
    /* Add the file header */
    if (cpd.file_hdr.data.size() > 0)
    {
-      add_file_header();
+      add_file_header(parsed_file);
    }
 
    /* Add the file footer */
    if (cpd.file_ftr.data.size() > 0)
    {
-      add_file_footer();
+      add_file_footer(parsed_file);
    }
 
    /**
@@ -1786,7 +1841,7 @@ static void uncrustify_file(const file_mem& fm, FILE *pfout,
       }
    }
 
-   uncrustify_start(data);
+   uncrustify_start(data, parsed_file);
 
    /**
     * Done with detection. Do the rest only if the file will go somewhere.
@@ -1799,15 +1854,15 @@ static void uncrustify_file(const file_mem& fm, FILE *pfout,
        */
       if (cpd.func_hdr.data.size() > 0)
       {
-         add_func_header(CT_FUNC_DEF, cpd.func_hdr);
+         add_func_header(CT_FUNC_DEF, cpd.func_hdr, parsed_file);
       }
       if (cpd.class_hdr.data.size() > 0)
       {
-         add_func_header(CT_CLASS, cpd.class_hdr);
+         add_func_header(CT_CLASS, cpd.class_hdr, parsed_file);
       }
       if (cpd.oc_msg_hdr.data.size() > 0)
       {
-         add_msg_header(CT_OC_MSG_DECL, cpd.oc_msg_hdr);
+         add_msg_header(CT_OC_MSG_DECL, cpd.oc_msg_hdr, parsed_file);
       }
 
       /**
@@ -1981,20 +2036,7 @@ static void uncrustify_file(const file_mem& fm, FILE *pfout,
    }
 
    /* Special hook for dumping parsed data for debugging */
-   if (parsed_file != NULL)
-   {
-      FILE *p_file = fopen(parsed_file, "w");
-      if (p_file != NULL)
-      {
-         output_parsed(p_file);
-         fclose(p_file);
-      }
-      else
-      {
-         LOG_FMT(LERR, "%s: Failed to open '%s' for write: %s (%d)\n",
-                 __func__, parsed_file, strerror(errno), errno);
-      }
-   }
+   dump_parsed_input(__func__, parsed_file);
 
    uncrustify_end();
 }

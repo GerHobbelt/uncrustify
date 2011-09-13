@@ -24,6 +24,7 @@ void log_pcf_flags(log_sev_t sev, UINT64 flags);
 const char *path_basename(const char *path);
 int path_dirname_len(const char *filename);
 const char *get_file_extension(int& idx);
+void dump_parsed_input(const char *fname, const char *parsed_file);
 
 
 /*
@@ -38,7 +39,7 @@ void detect_options();
  */
 
 void output_text(FILE *pfile);
-void output_parsed(FILE *pfile);
+void output_parsed(const char *fname, FILE *pfile);
 void output_options(FILE *pfile);
 void add_long_preprocessor_conditional_block_comment(void);
 
@@ -186,7 +187,7 @@ chunk_t *newline_add_between2(chunk_t *start, chunk_t *end,
  *  tokenize.cpp
  */
 
-void tokenize(const deque<int>& data, chunk_t *ref);
+void tokenize(const deque<int>& data, chunk_t *ref, const char *parsed_file);
 
 
 /*
