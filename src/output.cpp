@@ -133,6 +133,7 @@ static void add_text(const unc_text& text)
 }
 
 
+#if 0
 /**
  * Count the number of characters to the end of the next chunk of text.
  * If it exceeds the limit, return true.
@@ -156,6 +157,7 @@ static bool next_word_exceeds_limit(const unc_text& text, int idx)
    }
    return((cpd.column + length - 1) > cpd.settings[UO_cmt_width].n);
 }
+#endif
 
 
 /**
