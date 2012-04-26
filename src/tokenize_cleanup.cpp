@@ -108,7 +108,7 @@ void tokenize_cleanup(void)
           (pc->flags & PCF_IN_PREPROC) &&
           !chunk_get_next_ncnl(pc, CNAV_PREPROC))
       {
-         LOG_FMT(LWARN, "%s:%d Detected a macro that ends with a semicolon. Expect failures if used.\n",
+         LOG_FMT(LNOTE, "%s:%d Detected a macro that ends with a semicolon. Possible failures if used.\n",
                  cpd.filename, pc->orig_line);
       }
    }
@@ -268,7 +268,7 @@ void tokenize_cleanup(void)
          }
 
          /* handle "version(unittest) { }" vs "unittest { }" */
-         if ((pc->type == CT_UNITTEST) && (prev->type == CT_PAREN_OPEN))
+         if (prev && (pc->type == CT_UNITTEST) && (prev->type == CT_PAREN_OPEN))
          {
             pc->type = CT_WORD;
          }
@@ -298,6 +298,14 @@ void tokenize_cleanup(void)
          {
             pc->type = CT_WORD;
          }
+      }
+
+      /* Interface is only a keyword in MS land if followed by 'class' or 'struct'
+       * likewise, 'class' may be a member name in Java.
+       */
+      if ((pc->type == CT_CLASS) && !CharTable::IsKw1(next->str[0]))
+      {
+         pc->type = CT_WORD;
       }
 
       /* Change item after operator (>=, ==, etc) to a CT_OPERATOR_VAL
@@ -488,8 +496,8 @@ void tokenize_cleanup(void)
       if (cpd.lang_flags & LANG_OC)
       {
          if (((pc->type == CT_IF) ||
-             (pc->type == CT_FOR) ||
-             (pc->type == CT_WHILE)) &&
+              (pc->type == CT_FOR) ||
+              (pc->type == CT_WHILE)) &&
              !chunk_is_token(next, CT_PAREN_OPEN))
          {
             pc->type = CT_WORD;
@@ -931,7 +939,8 @@ static void check_template(chunk_t *start)
 
          if ((tokens[num_tokens - 1] == CT_ANGLE_OPEN) &&
              (pc->str[0] == '>') && (pc->len() > 1) &&
-             (cpd.settings[UO_tok_split_gte].b || chunk_is_str(pc, ">>", 2)))
+             (cpd.settings[UO_tok_split_gte].b ||
+              (chunk_is_str(pc, ">>", 2) && ((cpd.lang_flags & LANG_CPP) == 0))))
          {
             LOG_FMT(LTEMPL, " {split '%s' at %d:%d}",
                     pc->str.c_str(), pc->orig_line, pc->orig_col);

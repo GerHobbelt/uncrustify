@@ -96,6 +96,7 @@
 00161  indent_func_call_param.cfg  c/fcn_indent.c
 00162  indent_func_def_param.cfg   c/fcn_indent.c
 00163  indent_func_proto_param.cfg c/fcn_indent.c
+00164  rdan.cfg                    c/fcn_indent_func_def_col1.c
 
 00170  empty.cfg               c/beautifier-off.c
 
@@ -153,6 +154,8 @@
 00614  pp-space.cfg            c/pp-space.c
 
 00615  pp-indent-2.cfg         c/pp-nest.c
+00616  pp_if_indent-1.cfg      c/pp-if-indent.c
+00617  rdan.cfg                c/pp-if-indent.c
 
 00620  ben.cfg                 c/indent-assign.c
 00621  nl_endif.cfg            c/nl_endif.c
@@ -211,6 +214,8 @@
 
 01050  func_call_user.cfg      c/func_call_user.c
 
+01060 empty.cfg                c/backslash-newline-lex.c
+
 # big general tests
 02000 ben.cfg                  c/i2c-core.c
 02001 preproc-cleanup.cfg      c/directfb.h
@@ -253,6 +258,7 @@
 
 02421 cmt_multi-1.cfg          c/cmt_multi.c
 02422 cmt_multi-2.cfg          c/cmt_multi.c
+02423 cmt_multi-2.cfg          c/cmt_multi_utf8.c
 
 02431 align_right_cmt_gap-1.cfg c/cmt_right_align.c
 02432 align_right_cmt_gap-2.cfg c/cmt_right_align.c
@@ -279,3 +285,4 @@
 
 # test 00053, but with a different cfg:
 99053 nl_brace_test-2.cfg       c/brace.c
+

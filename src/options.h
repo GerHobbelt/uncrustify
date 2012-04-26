@@ -54,6 +54,7 @@ enum tokenpos_e
    TP_TRAIL       = 8,     /* at the end of a line or trailing if wrapped line */
    TP_TRAIL_BREAK = (TP_TRAIL | TP_BREAK),
    TP_TRAIL_FORCE = (TP_TRAIL | TP_FORCE),
+   TP_JOIN        = 16,    /* remove newlines on both sides */
 };
 
 /** tristate values */
@@ -154,6 +155,7 @@ enum uncrustify_options
 
    UO_indent_col1_comment,       // indent comments in column 1
 
+   UO_indent_func_def_force_col1,// force indentation of function definition to start in column 1
    UO_indent_func_call_param,    // indent continued function calls to indent_columns
    UO_indent_func_proto_param,   // same, but for function protos
    UO_indent_func_def_param,     // same, but for function defs
@@ -172,6 +174,7 @@ enum uncrustify_options
    UO_indent_class,                         // indent stuff inside class braces
    UO_indent_class_colon,                   // indent stuff after a class colon
 
+   UO_indent_ctor_init_leading,             // virtual indent from the ':' for member initializers. Default is 2. (applies to the leading colon case)
    UO_indent_ctor_init,                     // additional indenting for ctor initializer lists
 
    UO_indent_member,                        // indent lines broken at a member '.' or '->'
@@ -202,6 +205,7 @@ enum uncrustify_options
    UO_sp_after_byref,           // space after a '&'  as in 'int& var'
 
    UO_sp_after_type,            // space between type and word
+   UO_sp_before_template_paren, // D: "template Foo("
 
    UO_sp_inside_fparen,         // space inside 'foo( xxx )' vs 'foo(xxx)'
    UO_sp_inside_fparens,        // space inside 'foo( )' vs 'foo()'
@@ -223,6 +227,7 @@ enum uncrustify_options
    UO_sp_angle_paren,           // space between '<>' and '(' in "a = new List<byte>();"
    UO_sp_angle_word,            // space between '<>' and a word in "List<byte> a;"
    UO_sp_angle_shift,           // '> >' vs '>>'
+   UO_sp_permit_cpp11_shift,    // '>>' vs '> >' for C++11 code
 
    UO_sp_before_square,         // space before single '['
    UO_sp_before_squares,        // space before '[]', as in 'byte []'
@@ -245,6 +250,8 @@ enum uncrustify_options
    UO_sp_pp_stringify,          // space around #
    UO_sp_compare,               // space around < > ==, etc
    UO_sp_assign,                // space around =, +=, etc
+   UO_sp_cpp_lambda_assign,     // space around the capture spec [=](...){...}
+   UO_sp_cpp_lambda_paren,      // space after the capture spec [] (...){...}
    UO_sp_assign_default,        // space around '=' in prototype
    UO_sp_before_assign,         // space before =, +=, etc
    UO_sp_after_assign,          // space after =, +=, etc
@@ -280,8 +287,8 @@ enum uncrustify_options
    UO_sp_before_byref_func,
    UO_sp_between_ptr_star,      // space between two '*' that are part of a type
 
-   UO_sp_special_semi,      /* space empty stmt ';' on while, if, for
-                             * example "while (*p++ = ' ') ;" */
+   UO_sp_special_semi,          /* space empty stmt ';' on while, if, for
+                                 * example "while (*p++ = ' ') ;" */
    UO_sp_before_semi,           // space before all ';'
    UO_sp_before_semi_for,       // space before the two ';' in a for() - non-empty
    UO_sp_before_semi_for_empty, // space before ';' in empty for statement
@@ -342,8 +349,8 @@ enum uncrustify_options
    UO_sp_cmt_cpp_start,
    UO_sp_endif_cmt,
    UO_sp_after_new,
-   UO_sp_before_tr_emb_cmt,  // treatment of spaces before comments following code
-   UO_sp_num_before_tr_emb_cmt,  // number of spaces before comments following code
+   UO_sp_before_tr_emb_cmt,     // treatment of spaces before comments following code
+   UO_sp_num_before_tr_emb_cmt, // number of spaces before comments following code
 
    /*
     * Line splitting options (for long lines)
@@ -352,6 +359,7 @@ enum uncrustify_options
    UO_code_width,           // ie 80 columns
    UO_ls_for_split_full,    // try to split long 'for' statements at semi-colons
    UO_ls_func_split_full,   // try to split long func proto/def at comma
+   UO_ls_code_width,        // try to split at code_width
    //UO_ls_before_bool_op,    //TODO: break line before of after boolean op
    //UO_ls_before_paren,      //TODO: break before open paren
    //UO_ls_after_arith,       //TODO: break after arith op '+', etc
@@ -388,6 +396,7 @@ enum uncrustify_options
    UO_align_var_struct_span,      // span for struct/union (0=don't align)
    UO_align_var_struct_thresh,    // threshold for struct/union, 0=no limit
    UO_align_var_struct_gap,       // gap for struct/union
+   UO_align_pp_define_together,   // align macro functions and variables together
    UO_align_pp_define_span,       // align bodies in #define statements
    //UO_align_pp_define_col_min,    //TODO: min column for a #define value
    //UO_align_pp_define_col_max,    //TODO: max column for a #define value
@@ -442,9 +451,16 @@ enum uncrustify_options
    UO_nl_func_type_name_class,       // newline between return type and func name in class
    UO_nl_func_scope_name,
    UO_nl_func_proto_type_name,       // nl_func_type_name, but for prottypes
-   UO_nl_func_var_def_blk,           // newline after a block of variable defs
+   UO_nl_func_var_def_blk,           // newline after first block of func variable defs
+   UO_nl_typedef_blk_start,          // newline before typedef block
+   UO_nl_typedef_blk_end,            // newline after typedef block
+   UO_nl_typedef_blk_in,             // newline max within typedef block
+   UO_nl_var_def_blk_start,          // newline before variable defs block
+   UO_nl_var_def_blk_end,            // newline after variable defs block
+   UO_nl_var_def_blk_in,             // newline max within variable defs block
    UO_nl_before_case,                // newline before 'case' statement
    UO_nl_before_throw,
+   UO_nl_before_return,
    UO_nl_after_return,               /* newline after return statement */
    UO_nl_return_expr,
    UO_nl_after_case,                 /* disallow nested "case 1: a=3;" */
@@ -479,6 +495,9 @@ enum uncrustify_options
    UO_nl_catch_brace,                /* nl between catch and { */
    UO_nl_brace_catch,                /* nl between } and catch */
    UO_nl_while_brace,                /* nl between while and { */
+   UO_nl_unittest_brace,             /* nl between unittest and { */
+   UO_nl_scope_brace,
+   UO_nl_version_brace,
    UO_nl_using_brace,
    UO_nl_switch_brace,               /* nl between switch and { */
    UO_nl_brace_else,                 // nl between } and else
@@ -548,7 +567,6 @@ enum uncrustify_options
    UO_nl_after_func_body_one_liner,  // after the closing brace of a single line function body
    UO_nl_after_func_proto,           // after each prototype
    UO_nl_after_func_proto_group,     // after a block of prototypes
-   //UO_nl_after_var_def_group,        // after a group of variable defs at top of proc
    //UO_nl_after_ifdef,                // after #if or #ifdef - but not if covers whole file
    UO_nl_after_struct,
    UO_nl_after_class,
@@ -563,6 +581,7 @@ enum uncrustify_options
 
    UO_eat_blanks_after_open_brace,   // remove blank lines after {
    UO_eat_blanks_before_close_brace, // remove blank lines before }
+   UO_nl_remove_extra_newlines,      // remove extra nl aggressiveness
 
 
    /*
@@ -674,7 +693,7 @@ struct option_map_value
 };
 
 
-typedef map<string, option_map_value>::iterator        option_name_map_it;
+typedef map<string, option_map_value>::iterator             option_name_map_it;
 typedef map<uncrustify_groups, group_map_value>::iterator   group_map_it;
 typedef list<uncrustify_options>::iterator                  option_list_it;
 typedef list<uncrustify_options>::const_iterator            option_list_cit;

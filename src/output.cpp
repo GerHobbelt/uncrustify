@@ -42,6 +42,9 @@ static void add_comment_text(const unc_text& text,
 static chunk_t *output_comment(chunk_t *pc);
 
 
+#define LOG_CONTTEXT() \
+   LOG_FMT(LCONTTEXT, "%s:%d set cont_text to '%s'\n", __func__, __LINE__, cmt.cont_text.c_str())
+
 /**
  * All output text is sent here, one char at a time.
  */
@@ -193,6 +196,50 @@ static void output_to_column(int column, bool allow_tabs, int max_tabbed_column 
 }
 
 
+#if 0
+/**
+ * Output a comment to the column using indent_with_tabs and
+ * indent_cmt_with_tabs as the rules.
+ * base_col is the indent of the first line of the comment.
+ * On the first line, column == base_col.
+ * On subsequnet lines, column >= base_col.
+ *
+ * @param brace_col the brace-level indent of the comment
+ * @param base_col  the indent of the start of the comment (multiline)
+ * @param column    the column that we should end up in
+ */
+static void cmt_output_indent(int brace_col, int base_col, int column)
+{
+   int iwt;
+   int tab_col;
+
+   iwt = cpd.settings[UO_indent_cmt_with_tabs].b ? 2 :
+         (cpd.settings[UO_indent_with_tabs].n ? 1 : 0);
+
+   tab_col = (iwt == 0) ? 0 : ((iwt == 1) ? brace_col : base_col);
+
+   //LOG_FMT(LSYS, "%s(brace=%d base=%d col=%d iwt=%d) tab=%d cur=%d\n",
+   //        __func__, brace_col, base_col, column, iwt, tab_col, cpd.column);
+
+   cpd.did_newline = 0;
+   if ((iwt == 2) || ((cpd.column == 1) && (iwt == 1)))
+   {
+      /* tab out as far as possible and then use spaces */
+      while (next_tab_column(cpd.column) <= tab_col)
+      {
+         add_text("\t");
+      }
+   }
+
+   /* space out the rest */
+   while (cpd.column < column)
+   {
+      add_text(" ");
+   }
+}
+#endif
+
+
 void output_parsed(const char *fname, FILE *pfile)
 {
    chunk_t *pc;
@@ -329,7 +376,7 @@ void output_text(FILE *pfile)
 
                if ((prev != NULL) && (prev->nl_count == 0))
                {
-				   UNC_ASSERT(pc->orig_col >= prev->orig_col_end);
+				  UNC_ASSERT(pc->orig_col >= prev->orig_col_end);
                   int orig_sp = (pc->orig_col - prev->orig_col_end);
                   pc->column = cpd.column + orig_sp;
 				  UNC_ASSERT(pc->column >= 0);
@@ -478,6 +525,10 @@ static int cmt_parse_lead(const unc_text& line, int is_last)
    {
       return len;
    }
+   if ((len == 1) && (line[0] == '*'))
+   {
+      return len;
+   }
    if (is_last && (len > 0))
    {
       return len;
@@ -593,7 +644,10 @@ static void calculate_comment_body_indent(cmt_reflow &cmt, const unc_text& str)
       }
       else
       {
-         width = 0;
+         if ((width != 1) || (str[idx - 1] != '*'))
+         {
+            width = 0;
+         }
          break;
       }
    }
@@ -967,6 +1021,10 @@ static void output_cmt_start(cmt_reflow& cmt, chunk_t *pc)
       chunk_t *prev = chunk_get_prev(pc);
       if (prev != NULL)
       {
+         while (prev->prev && prev->type == CT_VBRACE_CLOSE)
+         {
+            prev = prev->prev;
+         }
          int col_min = prev->column + prev->len() + 1;
          if (cmt.column < col_min)
          {
@@ -1039,12 +1097,18 @@ static bool can_combine_comment(chunk_t *pc, cmt_reflow& cmt)
  *
  * @return the last chunk output'd
  */
-static chunk_t *output_comment(chunk_t *pc)
+static chunk_t *output_comment(chunk_t *first)
 {
+#if 0
    cmt_reflow cmt;
 
+   output_cmt_start(cmt, first);
+   cmt.reflow = (cpd.settings[UO_cmt_reflow_mode].n != 1);
+
+   cmt.cont_text = cpd.settings[UO_cmt_star_cont].b ? " *" : "  ";
+   LOG_CONTTEXT();
+
    /* See if we can combine this comment with the next comment */
-#if 0
    if (!cpd.settings[UO_cmt_c_group].b ||
        !can_combine_comment(first, cmt))
    {
@@ -1072,6 +1136,7 @@ static chunk_t *output_comment(chunk_t *pc)
    if (cpd.settings[UO_cmt_c_nl_end].b)
    {
       cmt.cont_text = " ";
+      LOG_CONTTEXT();
       add_comment_text("\n", cmt, false);
    }
    add_comment_text("*/", cmt, false);
@@ -1079,19 +1144,22 @@ static chunk_t *output_comment(chunk_t *pc)
 
 #else
 
-   while (cmt.can_combine_comment(pc))
+   cmt_reflow cmt;
+
+   /* See if we can combine this comment with the next comment */
+   while (cmt.can_combine_comment(first))
    {
 	  cmt.m_is_merged_comment = true;
-      cmt.push_chunk(pc);
+      cmt.push_chunk(first);
 	  cmt.push("\n");
-      pc = chunk_get_next(chunk_get_next(pc));
+      first = chunk_get_next(chunk_get_next(first));
    }
-   cmt.push_chunk(pc);
-   cmt.m_last_pc = pc;
+   cmt.push_chunk(first);
+   cmt.m_last_pc = first;
 
    cmt.render();
 
-   return pc;
+   return first;
 #endif
 }
 
@@ -1109,7 +1177,14 @@ static chunk_t *output_comment_cpp(chunk_t *first)
    cmt_reflow cmt;
    unc_text   tmp;
 
+   output_cmt_start(cmt, first);
+   cmt.reflow = (cpd.settings[UO_cmt_reflow_mode].n != 1);
 
+   /* CPP comments can't be grouped unless they are converted to C comments */
+   if (!cpd.settings[UO_cmt_cpp_to_c].b)
+   {
+      cmt.cont_text = (cpd.settings[UO_sp_cmt_cpp_start].a & AV_REMOVE) ? "//" : "// ";
+      LOG_CONTTEXT();
 
       if (cpd.settings[UO_sp_cmt_cpp_start].a == AV_IGNORE)
       {
@@ -1147,6 +1222,7 @@ static chunk_t *output_comment_cpp(chunk_t *first)
 
    /* We are going to convert the CPP comments to C comments */
    cmt.cont_text = cpd.settings[UO_cmt_star_cont].b ? " * " : "   ";
+   LOG_CONTTEXT();
 
    /* See if we can combine this comment with the next comment */
    if (!cpd.settings[UO_cmt_cpp_group].b ||
@@ -1190,6 +1266,7 @@ static chunk_t *output_comment_cpp(chunk_t *first)
    if (cpd.settings[UO_cmt_cpp_nl_end].b)
    {
       cmt.cont_text = "";
+      LOG_CONTTEXT();
       add_comment_text("\n", cmt, false);
    }
    add_comment_text(" */", cmt, false);
@@ -1234,7 +1311,6 @@ void cmt_reflow::write(const char *str, size_t len)
    int        cmt_col;
    int        cmt_idx;
    int        ch;
-   chunk_t    *prev;
    unc_text   line;
    int        line_count = 0;
    int        ccol; /* the col of subsequent comment lines */
@@ -1244,7 +1320,6 @@ void cmt_reflow::write(const char *str, size_t len)
 
    //LOG_FMT(LSYS, "%s: line %d\n", __func__, pc->orig_line);
 
-   prev = chunk_get_prev(pc);
    output_cmt_start(cmt, pc);
    cmt.reflow = (cpd.settings[UO_cmt_reflow_mode].n != 1);
 
@@ -1255,6 +1330,7 @@ void cmt_reflow::write(const char *str, size_t len)
 
    cmt.cont_text = !cpd.settings[UO_cmt_indent_multi].b ? "" :
                    (cpd.settings[UO_cmt_star_cont].b ? "* " : "  ");
+   LOG_CONTTEXT();
 
    //LOG_FMT(LSYS, "Indenting1 line %d to col %d (orig=%d) col_diff=%d xtra=%d cont='%s'\n",
    //        pc->orig_line, cmt_col, pc->orig_col, col_diff, cmt.xtra_indent, cmt.cont_text.c_str());
@@ -1492,6 +1568,11 @@ void cmt_reflow::write(const char *str, size_t len)
                   if (idx > 0)
                   {
                      cmt.cont_text.set(line, 0, idx);
+                     LOG_CONTTEXT();
+                     if ((line.size() >= 2) && (line[0] == '*') && unc_isalnum(line[1]))
+                     {
+                        line.insert(1, ' ');
+                     }
                   }
                   else
                   {
@@ -1547,9 +1628,8 @@ void cmt_reflow::write(const char *str, size_t len)
 
 void cmt_reflow::output_to_column(int column, bool allow_tabs, int max_tabbed_column)
 {
-   int        cmt_col = pc->column;
    int        cmt_idx;
-   char       ch;
+   int        ch;
    int        line_count = 0;
    int        ccol;
    int        col_diff = 0;
@@ -1562,13 +1642,11 @@ void cmt_reflow::output_to_column(int column, bool allow_tabs, int max_tabbed_co
    if (chunk_is_newline(chunk_get_prev(pc)))
    {
       /* The comment should be indented correctly */
-      cmt_col  = pc->column;
       col_diff = pc->orig_col - pc->column;
    }
    else
    {
       /* The comment starts after something else */
-      cmt_col  = pc->orig_col;
       col_diff = 0;
    }
 

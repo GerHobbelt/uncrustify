@@ -235,7 +235,7 @@ static const chunk_tag_t keywords[] =
    { "inout",            CT_QUALIFIER,    LANG_D                                                                      },
    { "instanceof",       CT_SIZEOF,       LANG_JAVA | LANG_ECMA | LANG_PHP                                            },
    { "int",              CT_TYPE,         LANG_ALLC                                                                   },
-   { "interface",        CT_CLASS,        LANG_CS | LANG_D | LANG_JAVA | LANG_VALA | LANG_ECMA | LANG_PHP             },
+   { "interface",        CT_CLASS,        LANG_C | LANG_CPP | LANG_CS | LANG_D | LANG_JAVA | LANG_VALA | LANG_ECMA | LANG_PHP },
    { "interior_ptr",     CT_INTERIOR_PTR, LANG_CPPNET																  },
    { "internal",         CT_QUALIFIER,    LANG_CS                                                                     },
    { "invariant",        CT_INVARIANT,    LANG_D                                                                      },

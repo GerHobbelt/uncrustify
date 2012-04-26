@@ -484,8 +484,17 @@ static void parse_suffix(tok_ctx& ctx, chunk_t& pc, bool forstring = false)
       int slen = 0;
       int oldsize = pc.str.size();
       tok_info ss;
-      ctx.save(ss);
 
+      /* don't add the suffix if we see L" or L' or S" */
+      int p1 = ctx.peek();
+      int p2 = ctx.peek(1);
+      if (forstring &&
+          (((p1 == 'L') && ((p2 == '"') || (p2 == '\''))) ||
+           ((p1 == 'S') && (p2 == '"'))))
+      {
+          return;
+      }
+      ctx.save(ss);
       while (ctx.more() && CharTable::IsKw2(ctx.peek()))
       {
          slen++;
@@ -751,6 +760,7 @@ static bool parse_string(tok_ctx& ctx, chunk_t& pc, int quote_idx, bool allow_es
       {
          pc.nl_count++;
          pc.type = CT_STRING_MULTI;
+         escaped = 0;
          continue;
       }
       if ((ch == '\r') && (ctx.peek() != '\n'))
@@ -758,6 +768,7 @@ static bool parse_string(tok_ctx& ctx, chunk_t& pc, int quote_idx, bool allow_es
          pc.str.append(ctx.get());
          pc.nl_count++;
          pc.type = CT_STRING_MULTI;
+         escaped = 0;
          continue;
       }
       if (!escaped)
@@ -1457,7 +1468,6 @@ void tokenize(const deque<int>& data, chunk_t *ref, const char *parsed_file)
    chunk_t            chunk;
    chunk_t            *pc    = NULL;
    chunk_t            *rprev = NULL;
-   chunk_t            *prev  = NULL;
    struct parse_frame frm;
    bool               last_was_tab = false;
 
@@ -1512,10 +1522,6 @@ void tokenize(const deque<int>& data, chunk_t *ref, const char *parsed_file)
 
       /* Add the chunk to the list */
       rprev = pc;
-      if (!chunk_is_newline(pc) && !chunk_is_comment(pc))
-      {
-         prev = pc;
-      }
       if (rprev != NULL)
       {
          pc->flags |= rprev->flags & PCF_COPY_FLAGS;

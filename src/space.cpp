@@ -118,6 +118,10 @@ static argval_t do_space(chunk_t *first, chunk_t *second, int& min_sp, bool comp
       log_rule("sp_pp_stringify");
       return(cpd.settings[UO_sp_pp_stringify].a);
    }
+   if ((second->type == CT_POUND) && chunk_is_str(first, "L", 1))
+   {
+      return(AV_IGNORE);
+   }
 
    if ((first->type == CT_SPACE) || (second->type == CT_SPACE))
    {
@@ -451,6 +455,32 @@ static argval_t do_space(chunk_t *first, chunk_t *second, int& min_sp, bool comp
    {
       log_rule("sp_after_oc_block_caret");
       return(cpd.settings[UO_sp_after_oc_block_caret].a);
+   }
+
+   // Handle the special lambda case for C++11:
+   //    [=](Something arg){.....}
+   if ((cpd.settings[UO_sp_cpp_lambda_assign].a != AV_IGNORE) &&
+       (((first->type == CT_SQUARE_OPEN) &&
+         (first->parent_type == CT_CPP_LAMBDA) &&
+         (second->type == CT_ASSIGN))
+        ||
+        ((first->type == CT_ASSIGN) &&
+         (second->type == CT_SQUARE_CLOSE) &&
+         (second->parent_type == CT_CPP_LAMBDA))))
+   {
+      log_rule("UO_sp_cpp_lambda_assign");
+      return(cpd.settings[UO_sp_cpp_lambda_assign].a);
+   }
+
+   // Handle the special lambda case for C++11:
+   //    [](Something arg){.....}
+   if ((cpd.settings[UO_sp_cpp_lambda_paren].a != AV_IGNORE) &&
+       (first->type == CT_SQUARE_CLOSE) &&
+       (first->parent_type == CT_CPP_LAMBDA) &&
+       (second->type == CT_FPAREN_OPEN))
+   {
+      log_rule("UO_sp_cpp_lambda_paren");
+      return(cpd.settings[UO_sp_cpp_lambda_paren].a);
    }
 
    if (second->type == CT_ASSIGN)
@@ -1001,6 +1031,8 @@ static argval_t do_space(chunk_t *first, chunk_t *second, int& min_sp, bool comp
    if ((cpd.settings[UO_sp_after_class_colon].a != AV_IGNORE) &&
        (first->type == CT_CLASS_COLON))
    {
+      min_sp = cpd.settings[UO_indent_ctor_init_leading].n - 1; // default indent is 1 space
+
       log_rule("sp_after_class_colon");
       return(cpd.settings[UO_sp_after_class_colon].a);
    }
@@ -1216,6 +1248,12 @@ static argval_t do_space(chunk_t *first, chunk_t *second, int& min_sp, bool comp
    {
       log_rule("sp_before_sparen");
       return(cpd.settings[UO_sp_before_sparen].a);
+   }
+
+   if ((second->type == CT_PAREN_OPEN) && (second->parent_type == CT_TEMPLATE))
+   {
+      log_rule("UO_sp_before_template_paren");
+      return(cpd.settings[UO_sp_before_template_paren].a);
    }
 
    if ((second->type != CT_PTR_TYPE) &&
@@ -1450,7 +1488,25 @@ void space_text(void)
                   if ((ct != NULL) && ((int)strlen(ct->tag) != pc->len()))
                   {
                      /* punctuator parsed to a different size.. */
-                     pc->flags |= PCF_FORCE_SPACE;
+
+                     /* C++11 allows '>>' to mean '> >' in templates:
+                      *   some_func<vector<string>>();
+                      */
+                     if ((cpd.lang_flags & LANG_CPP) &&
+                         cpd.settings[UO_sp_permit_cpp11_shift].b &&
+                         (pc->type == CT_ANGLE_CLOSE) &&
+                         (next->type == CT_ANGLE_CLOSE))
+                     {
+                        /* allow '>' and '>' to become '>>' */
+                     }
+                     else if (strcmp(ct->tag, "[]") == 0)
+                     {
+                        /* this is OK */
+                     }
+                     else
+                     {
+                        pc->flags |= PCF_FORCE_SPACE;
+                     }
                   }
                }
             }

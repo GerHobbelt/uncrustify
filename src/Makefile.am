@@ -18,7 +18,8 @@ uncrustify_SOURCES = uncrustify.cpp chunk_list.cpp indent.cpp align.cpp combine.
 		backup.cpp parens.cpp universalindentgui.cpp semicolons.cpp \
 		sorting.cpp detect.cpp unicode.cpp unc_text.cpp \
 		reflow_text.cpp reflow_text_dbg.cpp \
-		reflow_text_utils.cpp reflow_text_box.cpp reflow_text_para.cpp
+		reflow_text_utils.cpp reflow_text_box.cpp reflow_text_para.cpp \
+		compat_posix.cpp compat_win32.cpp
 
 noinst_HEADERS = chunk_list.h options.h char_table.h chunk_list.h \
 		uncrustify_types.h prototypes.h logmask.h logger.h \
@@ -26,7 +27,7 @@ noinst_HEADERS = chunk_list.h options.h char_table.h chunk_list.h \
 		align_stack.h backup.h base_types.h log_levels.h \
 		punctuators.h reflow_text.h reflow_text_internal.h \
 		uncrustify_version.h \
-		unc_ctype.h
+		unc_ctype.h unc_text.h
 
 token_names.h: token_enum.h ../make_token_names.sh
 	@echo "Rebuilding token_names.h"

@@ -33,6 +33,9 @@
 #include <cstring>
 #include <cerrno>
 #include <fcntl.h>
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 #include "unc_ctype.h"
 #ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
@@ -524,7 +527,7 @@ static void clear_everything(void)
 
 int main(int argc, char *argv[])
 {
-   const char *cfg_file    = "uncrustify.cfg";
+   string cfg_file;
    const char *parsed_file = NULL;
    const char *source_file = NULL;
    const char *output_file = NULL;
@@ -733,31 +736,48 @@ int main(int argc, char *argv[])
    }
 
    /* Get the config file name */
-   if (((cfg_file = arg.Param("--config")) == NULL) &&
-       ((cfg_file = arg.Param("-c")) == NULL))
+   if (((p_arg = arg.Param("--config")) != NULL) ||
+       ((p_arg = arg.Param("-c")) != NULL))
    {
-      /* Handled later */
+      cfg_file = p_arg;
    }
 
-   /* Try to file a config at an alternate location */
-   char buf[1024];
-   if (cfg_file == NULL)
+   /* Try to find a config file at an alternate location */
+   if (cfg_file.empty())
    {
-      cfg_file = getenv("UNCRUSTIFY_CONFIG");
-      if (cfg_file == NULL)
+      if (!unc_getenv("UNCRUSTIFY_CONFIG", cfg_file))
       {
-         const char *home = getenv("HOME");
+         string home;
 
-         if (home != NULL)
+         if (unc_homedir(home))
          {
             struct stat tmp_stat;
+            string      path;
 
-            snprintf(buf, sizeof(buf), "%s/.uncrustify.cfg", home);
-            if (stat(buf, &tmp_stat) == 0)
+            path = home + "/uncrustify.cfg";
+            if (stat(path.c_str(), &tmp_stat) == 0)
             {
-               cfg_file = buf;
+               cfg_file = path;
+            }
+            else
+            {
+               path = home + "/.uncrustify.cfg";
+               if (stat(path.c_str(), &tmp_stat) == 0)
+               {
+                  cfg_file = path;
+               }
             }
          }
+      }
+   }
+
+   if (cfg_file.empty())
+   {
+      struct stat tmp_stat;
+
+      if (stat("uncrustify.cfg", &tmp_stat) == 0)
+      {
+         cfg_file = "uncrustify.cfg";
       }
    }
 
@@ -845,6 +865,7 @@ int main(int argc, char *argv[])
    /* Grab the output override */
    output_file = arg.Param("-o");
 
+   LOG_FMT(LDATA, "config_file = %s\n", cfg_file.c_str());
    LOG_FMT(LDATA, "output_file = %s\n", (output_file != NULL) ? output_file : "null");
    LOG_FMT(LDATA, "source_file = %s\n", (source_file != NULL) ? source_file : "null");
    LOG_FMT(LDATA, "source_list = %s\n", (source_list != NULL) ? source_list : "null");
@@ -877,10 +898,10 @@ int main(int argc, char *argv[])
     * It is optional for "--universalindent" and "--detect", but required for
     * everything else.
     */
-   if (cfg_file != NULL)
+   if (!cfg_file.empty())
    {
-      cpd.filename = cfg_file;
-      if (load_option_file(cfg_file) < 0)
+      cpd.filename = cfg_file.c_str();
+      if (load_option_file(cpd.filename) < 0)
       {
          usage_exit("Unable to load the config file", argv[0], 56);
       }
@@ -942,7 +963,7 @@ int main(int argc, char *argv[])
    /* Everything beyond this point requires a config file, so complain and
     * bail if we don't have one.
     */
-   if (cfg_file == NULL)
+   if (cfg_file.empty())
    {
       usage_exit("Specify the config file with '-c file' or set UNCRUSTIFY_CONFIG",
                  argv[0], 58);
@@ -1192,22 +1213,33 @@ static int load_mem_file(const char *filename, file_mem& fm)
       return(-1);
    }
 
-   /* read the raw data */
    fm.raw.resize(my_stat.st_size);
-   if (fread(&fm.raw[0], fm.raw.size(), 1, p_file) != 1)
+   if (my_stat.st_size == 0)
    {
-      LOG_FMT(LERR, "%s: fread(%s) failed: %s (%d)\n",
-              __func__, filename, strerror(errno), errno);
-      cpd.error_count++;
-   }
-   else if (!decode_unicode(fm.raw, fm.data, fm.enc, fm.bom))
-   {
-      LOG_FMT(LERR, "%s: failed to decode the file '%s'\n", __func__, filename);
+      /* Empty file */
+      retval = 0;
+      fm.bom = false;
+      fm.enc = ENC_ASCII;
+      fm.data.clear();
    }
    else
    {
-      LOG_FMT(LNOTE, "%s: '%s' encoding looks like %d\n", __func__, filename, fm.enc);
-      retval = 0;
+      /* read the raw data */
+      if (fread(&fm.raw[0], fm.raw.size(), 1, p_file) != 1)
+      {
+         LOG_FMT(LERR, "%s: fread(%s) failed: %s (%d)\n",
+                 __func__, filename, strerror(errno), errno);
+         cpd.error_count++;
+      }
+      else if (!decode_unicode(fm.raw, fm.data, fm.enc, fm.bom))
+      {
+         LOG_FMT(LERR, "%s: failed to decode the file '%s'\n", __func__, filename);
+      }
+      else
+      {
+         LOG_FMT(LNOTE, "%s: '%s' encoding looks like %d\n", __func__, filename, fm.enc);
+         retval = 0;
+      }
    }
    unc_fclose(p_file);
 
@@ -1888,10 +1920,15 @@ static void uncrustify_file(const file_mem& fm, FILE *pfout,
       do_parens();
 
       /**
-       * Insert line breaks as needed
+       * Modify line breaks as needed
        */
-      //do_newlines();
-      int old_changes;
+      bool first = true;
+      int  old_changes;
+
+      if (cpd.settings[UO_nl_remove_extra_newlines].n == 2)
+      {
+         newlines_remove_newlines();
+      }
       cpd.pass_count = 3;
       do
       {
@@ -1900,7 +1937,7 @@ static void uncrustify_file(const file_mem& fm, FILE *pfout,
          LOG_FMT(LNEWLINE, "Newline loop start: %d\n", cpd.changes);
 
          newlines_cleanup_dup();
-         newlines_cleanup_braces();
+         newlines_cleanup_braces(first);
          if (cpd.settings[UO_nl_after_multiline_comment].b)
          {
             newline_after_multiline_comment();
@@ -1939,6 +1976,7 @@ static void uncrustify_file(const file_mem& fm, FILE *pfout,
          do_blank_lines();
          newlines_eat_start_end();
          newlines_cleanup_dup();
+         first = false;
       } while ((old_changes != cpd.changes) && (cpd.pass_count-- > 0));
 
       mark_comments();
@@ -2000,25 +2038,29 @@ static void uncrustify_file(const file_mem& fm, FILE *pfout,
       }
 
       /**
-       * Aligning everything else and reindent
+       * Align everything else, reindent and break at code_width
        */
-      align_all();
-      indent_text();
-
-      if (cpd.settings[UO_code_width].n > 0)
+      first          = true;
+      cpd.pass_count = 3;
+      do
       {
-         cpd.pass_count = 3;
-         do
+         align_all();
+         indent_text();
+         old_changes = cpd.changes;
+         if (cpd.settings[UO_code_width].n > 0)
          {
-            old_changes = cpd.changes;
+            LOG_FMT(LNEWLINE, "Code_width loop start: %d\n", cpd.changes);
+
             do_code_width();
-            if (old_changes != cpd.changes)
+            if ((old_changes != cpd.changes) && first)
             {
-               align_all();
-               indent_text();
+               /* retry line breaks caused by splitting 1-liners */
+               newlines_cleanup_braces(false);
+               newlines_insert_blank_lines();
+               first = false;
             }
-         } while ((old_changes != cpd.changes) && (cpd.pass_count-- > 0));
-      }
+         }
+      } while ((old_changes != cpd.changes) && (cpd.pass_count-- > 0));
 
       /**
        * And finally, align the backslash newline stuff
@@ -2136,6 +2178,10 @@ struct file_lang languages[] =
    { ".hpp",  "",     LANG_CPP           },
    { ".hxx",  "",     LANG_CPP           },
    { ".cc",   "",     LANG_CPP           },
+   { ".cp",   "",     LANG_CPP           },
+   { ".C",    "",     LANG_CPP           },
+   { ".CPP",  "",     LANG_CPP           },
+   { ".c++",  "",     LANG_CPP           },
    { ".di",   "",     LANG_D             },
    { ".m",    "OC",   LANG_OC            },
    { ".mm",   "OC+",  LANG_OC | LANG_CPP },

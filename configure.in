@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([uncrustify], [0.58],,,[http://uncrustify.sourceforge.net/])
+AC_INIT([uncrustify], [0.59],,,[http://uncrustify.sourceforge.net/])
 enable_silent_rules=${enable_silent_rules-yes}
 
 # Must come before AM_INIT_AUTOMAKE.

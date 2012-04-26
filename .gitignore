@@ -11,6 +11,8 @@ BuildLog.htm
 .deps
 .libs
 *.user
+*.sdf
+*.opensdf
 *.pdb
 *.gz
 *.7z
@@ -27,8 +29,6 @@ Makefile
 man/Makefile
 man/uncrustify.1
 src/Makefile
-src/stamp-h1
-src/uncrustify_version.h
 *.exe
 *~
 config.log
@@ -42,6 +42,9 @@ build
 waf*
 win32/Release
 win32/Debug
+win32/obj
+win32/bin
+win32/ipch
 *.obj
 autom4te.cache
 build
@@ -51,5 +54,9 @@ build
 *.xcodeproj/*.tm_build_errors
 *.tmproj
 Debug
-.*
 uncrustify-*-win32
+
+src/stamp-h1
+src/uncrustify_version.h
+src/config.h
+

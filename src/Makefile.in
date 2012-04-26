@@ -65,7 +65,8 @@ am_uncrustify_OBJECTS = uncrustify.$(OBJEXT) chunk_list.$(OBJEXT) \
 	semicolons.$(OBJEXT) sorting.$(OBJEXT) detect.$(OBJEXT) \
 	unicode.$(OBJEXT) unc_text.$(OBJEXT) reflow_text.$(OBJEXT) \
 	reflow_text_dbg.$(OBJEXT) reflow_text_utils.$(OBJEXT) \
-	reflow_text_box.$(OBJEXT) reflow_text_para.$(OBJEXT)
+	reflow_text_box.$(OBJEXT) reflow_text_para.$(OBJEXT) \
+	compat_posix.$(OBJEXT) compat_win32.$(OBJEXT)
 uncrustify_OBJECTS = $(am_uncrustify_OBJECTS)
 uncrustify_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -200,7 +201,8 @@ uncrustify_SOURCES = uncrustify.cpp chunk_list.cpp indent.cpp align.cpp combine.
 		backup.cpp parens.cpp universalindentgui.cpp semicolons.cpp \
 		sorting.cpp detect.cpp unicode.cpp unc_text.cpp \
 		reflow_text.cpp reflow_text_dbg.cpp \
-		reflow_text_utils.cpp reflow_text_box.cpp reflow_text_para.cpp
+		reflow_text_utils.cpp reflow_text_box.cpp reflow_text_para.cpp \
+		compat_posix.cpp compat_win32.cpp
 
 noinst_HEADERS = chunk_list.h options.h char_table.h chunk_list.h \
 		uncrustify_types.h prototypes.h logmask.h logger.h \
@@ -208,7 +210,7 @@ noinst_HEADERS = chunk_list.h options.h char_table.h chunk_list.h \
 		align_stack.h backup.h base_types.h log_levels.h \
 		punctuators.h reflow_text.h reflow_text_internal.h \
 		uncrustify_version.h \
-		unc_ctype.h
+		unc_ctype.h unc_text.h
 
 all: $(BUILT_SOURCES) config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am

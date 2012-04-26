@@ -88,8 +88,11 @@
 30250 align_fcall.cfg                  cpp/align_fcall.cpp
 30251 align_fcall-2.cfg                cpp/align_fcall.cpp
 30253 align_left_shift.cfg             cpp/align_left_shift.cpp
-
+30254 align_left_shift.cfg             cpp/align_left_shift2.cpp
 30255 ben.cfg                          cpp/align_constr.cpp
+30256 align_left_shift.cfg             cpp/func_call.cpp
+30257 pbtech.cfg                       cpp/func_call_chain.cpp
+30258 ben.cfg                          cpp/casts.cpp
 
 30260 var_def_gap.cfg                  cpp/var_def_gap.cpp
 
@@ -114,6 +117,9 @@
 30740 sef.cfg                          cpp/sef.cpp
 30741 al.cfg                           cpp/al.cpp
 30742 delete.cfg                       cpp/delete.cpp
+
+30750 ben.cfg                          cpp/lambda.cpp
+30751 lambda1.cfg                      cpp/lambda.cpp
 
 30800 star_pos-0.cfg                   cpp/align-star-amp-pos.cpp
 30801 star_pos-1.cfg                   cpp/align-star-amp-pos.cpp
@@ -168,6 +174,9 @@
 30936 indent_braces_no.cfg             cpp/indent_braces_no.h
 
 30940 mod_case_brace_rm.cfg            cpp/case-brace-remove.cpp
+
+30945 sf.3266678.cfg                   cpp/sf.3266678.cpp
+30946 sf.3315874.cfg                   cpp/sf.3315874.h
 
 30950 sp_before_tr_emb_cmt-f.cfg       cpp/sp_before_tr_emb_cmt_input.cpp
 30951 sp_before_tr_emb_cmt-a.cfg       cpp/sp_before_tr_emb_cmt_input.cpp

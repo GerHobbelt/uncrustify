@@ -247,11 +247,6 @@ void align_all(void)
       align_oc_msg_colons();
    }
 
-   if (cpd.settings[UO_align_oc_decl_colon].b)
-   {
-      align_oc_decl_colon();
-   }
-
    /* Align variable definitions */
    if ((cpd.settings[UO_align_var_def_span].n > 0) ||
        (cpd.settings[UO_align_var_struct_span].n > 0))
@@ -281,6 +276,12 @@ void align_all(void)
    if (cpd.settings[UO_align_oc_msg_spec_span].n > 0)
    {
       align_oc_msg_spec(cpd.settings[UO_align_oc_msg_spec_span].n);
+   }
+
+   /* Align OC colons */
+   if (cpd.settings[UO_align_oc_decl_colon].b)
+   {
+      align_oc_decl_colon();
    }
 
    /* Align variable defs in function prototypes */
@@ -477,7 +478,10 @@ void align_preprocessor(void)
       cur_as = &as;
       if (pc->type == CT_MACRO_FUNC)
       {
-         cur_as = &asf;
+         if (!cpd.settings[UO_align_pp_define_together].b)
+         {
+            cur_as = &asf;
+         }
 
          /* Skip to the close paren */
          pc = chunk_get_next_nc(pc); // point to open (
@@ -804,7 +808,7 @@ static void align_same_func_call_params()
       {
          if (chunk_is_newline(pc))
          {
-            for (idx = 0; idx <= (int)as.size(); idx++)
+            for (idx = 0; idx < (int)as.size(); idx++)
             {
                as[idx].NewLines(pc->nl_count);
             }
@@ -925,6 +929,8 @@ static void align_func_proto(int span)
    LOG_FMT(LALIGN, "%s\n", __func__);
    as.Start(span, 0);
    as.m_gap = cpd.settings[UO_align_func_proto_gap].n;
+   as.m_star_style = (AlignStack::StarStyle)cpd.settings[UO_align_var_def_star_style].n;
+   as.m_amp_style  = (AlignStack::StarStyle)cpd.settings[UO_align_var_def_amp_style].n;
 
    as_br.Start(span, 0);
    as_br.m_gap = cpd.settings[UO_align_single_line_brace_gap].n;
@@ -1136,7 +1142,8 @@ static chunk_t *align_var_def_brace(chunk_t *start, int span, int *p_nl_count)
       if ((pc->type != CT_FUNC_CLASS) &&
           ((pc->flags & align_mask) == PCF_VAR_1ST) &&
           ((pc->level == (start->level + 1)) ||
-           (pc->level == 0)))
+           (pc->level == 0)) &&
+          pc->prev && (pc->prev->type != CT_MEMBER))
       {
          if (!did_this_line)
          {
@@ -1379,7 +1386,6 @@ static chunk_t *scan_ib_line(chunk_t *start, bool first_pass)
    chunk_t *prev_match = NULL;
    int     token_width;
    int     idx = 0;
-   bool    last_was_comment = false;
 
    /* Skip past C99 "[xx] =" stuff */
    if (start->type == CT_SQUARE_OPEN)
@@ -1428,7 +1434,6 @@ static chunk_t *scan_ib_line(chunk_t *start, bool first_pass)
             cpd.al[cpd.al_cnt].len  = token_width;
             cpd.al_cnt++;
             idx++;
-            last_was_comment = false;
          }
          else
          {
@@ -1467,14 +1472,8 @@ static chunk_t *scan_ib_line(chunk_t *start, bool first_pass)
          }
          prev_match = pc;
       }
-      last_was_comment = chunk_is_comment(pc);
       pc = chunk_get_next_nc(pc);
    }
-
-   //if (last_was_comment && (cpd.al[cpd.al_cnt - 1].type == CT_COMMA))
-   //{
-   //   cpd.al_cnt--;
-   //}
    return(pc);
 }
 
@@ -1696,7 +1695,6 @@ static void align_init_brace(chunk_t *start)
 static void align_typedefs(int span)
 {
    chunk_t    *pc;
-   chunk_t    *c_type    = NULL;
    chunk_t    *c_typedef = NULL;
    AlignStack as;
 
@@ -1728,7 +1726,6 @@ static void align_typedefs(int span)
             LOG_FMT(LALTD, "%s: line %d, col %d\n",
                     __func__, pc->orig_line, pc->orig_col);
             c_typedef = pc;
-            c_type    = NULL;
          }
       }
 
@@ -1748,7 +1745,7 @@ static void align_left_shift(void)
    chunk_t    *start = NULL;
    AlignStack as;
 
-   as.Start(2);
+   as.Start(255);
 
    pc = chunk_get_head();
    while (pc != NULL)
@@ -1775,8 +1772,26 @@ static void align_left_shift(void)
       }
       else if (chunk_is_str(pc, "<<", 2))
       {
-         if (as.m_aligned.Empty())
+         if (pc->parent_type == CT_OPERATOR)
          {
+            /* Ignore operator<< */
+         }
+         else if (as.m_aligned.Empty())
+         {
+            /* check if the first one is actually on a blank line and then
+             * indent it. Eg:
+             *
+             *      cout
+             *          << "something";
+             */
+            chunk_t *prev = chunk_get_prev(pc);
+            if (prev && chunk_is_newline(prev))
+            {
+                indent_to_column(pc, pc->column_indent + cpd.settings[UO_indent_columns].n);
+                pc->column_indent = pc->column;
+                pc->flags |= PCF_DONT_INDENT;
+            }
+
             /* first one can be anywhere */
             as.Add(pc);
             start = pc;
@@ -1786,6 +1801,22 @@ static void align_left_shift(void)
             /* subsequent ones must be after a newline */
             as.Add(pc);
          }
+      }
+      else if (!as.m_aligned.Empty())
+      {
+          /* check if the given statement is on a line of its own, immediately following <<
+           * and then it. Eg:
+           *
+           *      cout <<
+           *          "something";
+           */
+          chunk_t *prev = chunk_get_prev(pc);
+          if (prev && chunk_is_newline(prev))
+          {
+              indent_to_column(pc, pc->column_indent + cpd.settings[UO_indent_columns].n);
+              pc->column_indent = pc->column;
+              pc->flags |= PCF_DONT_INDENT;
+          }
       }
 
       pc = chunk_get_next(pc);
@@ -1939,7 +1970,8 @@ static void align_oc_decl_colon(void)
                 &&
                 ((tmp->type == CT_WORD) ||
                  (tmp->type == CT_TYPE) ||
-                 (tmp->type == CT_OC_MSG_DECL))
+                 (tmp->type == CT_OC_MSG_DECL) ||
+                 (tmp->type == CT_OC_MSG_SPEC))
                 &&
                 ((tmp2->type == CT_WORD) ||
                  (tmp2->type == CT_TYPE) ||

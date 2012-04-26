@@ -153,7 +153,8 @@ void remove_extra_returns();
  *  newlines.cpp
  */
 
-void newlines_cleanup_braces(void);
+void newlines_remove_newlines(void);
+void newlines_cleanup_braces(bool first);
 void newlines_insert_blank_lines(void);
 void newlines_squeeze_ifdef(void);
 void newlines_eat_start_end(void);
@@ -167,8 +168,14 @@ void newline_iarf(chunk_t *pc, argval_t av);
 #define newline_add_before(pc)    newline_add_before2(pc, __func__, __LINE__)
 chunk_t *newline_add_before2(chunk_t *pc, const char *fcn, int line);
 
+#define newline_force_before(pc)    newline_force_before2(pc, __func__, __LINE__)
+chunk_t *newline_force_before2(chunk_t *pc, const char *fcn, int line);
+
 #define newline_add_after(pc)     newline_add_after2(pc, __func__, __LINE__)
 chunk_t *newline_add_after2(chunk_t *pc, const char *fcn, int line);
+
+#define newline_force_after(pc)     newline_force_after2(pc, __func__, __LINE__)
+chunk_t *newline_force_after2(chunk_t *pc, const char *fcn, int line);
 
 
 #define newline_del_between(start, end) \
@@ -285,6 +292,12 @@ void encode_utf8(int ch, vector<UINT8>& res);
  * semicolons.cpp
  */
 void remove_extra_semicolons(void);
+
+/*
+ * compat_posix.cpp / compat_win32.cpp
+ */
+bool unc_getenv(const char *name, std::string& str);
+bool unc_homedir(std::string& home);
 
 
 /**
