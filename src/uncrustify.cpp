@@ -536,7 +536,7 @@ int main(int argc, char *argv[])
    int        idx;
    const char *p_arg;
 
-#if defined(DEBUG) || defined(_DEBUG)
+#if (defined(DEBUG) || defined(_DEBUG)) && 0
    printf("argc = %d\n", argc);
    for (idx = 0; idx < argc; idx++)
    {
