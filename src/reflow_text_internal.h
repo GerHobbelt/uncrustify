@@ -348,10 +348,6 @@ public:
 			m_items = (T *)realloc(m_items, n * sizeof(m_items[0]));
 			UNC_ASSERT(m_items);
 			memset(m_items + m_item_allocsize, 0, (n - m_item_allocsize) * sizeof(m_items[0]));
-			m_items = (T *)realloc(m_items, (n + 100) * sizeof(m_items[0]));
-			UNC_ASSERT(m_items);
-			m_items = (T *)realloc(m_items, n * sizeof(m_items[0]));
-			UNC_ASSERT(m_items);
 			m_item_allocsize = n;
 		}
 	}
