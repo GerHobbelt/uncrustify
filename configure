@@ -1331,13 +1331,13 @@ Optional Features:
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
   --enable-debug          Specify to create a so-called 'production' or
-                          'release build'. You can explicitly specify
-                          '--enable-debug' to create a standard uncrustify
+                          'release build'. You can explicitly specify
+                          '--enable-debug' to create a standard uncrustify
                           (debuggable) build. (default: debugging turned OFF)
   --enable-profiling      You can explicitly specify '--enable-profiling' to
                           create a uncrustify build which can be profiled
-                          with, for example, gprof. (default: profiling turned
-                          OFF)
+                          with, for  example, gprof. (default: profiling
+                          turned OFF)
   --disable-extended-compile-warnings
                           turn maximum compiler/linker warnings level off
                           (default: turn on all warnings)

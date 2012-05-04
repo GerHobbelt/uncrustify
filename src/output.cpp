@@ -10,7 +10,6 @@
 #include "prototypes.h"
 #include "chunk_list.h"
 #include "unc_ctype.h"
-#include <cstring>
 #include <cstdlib>
 #include "reflow_text.h"
 

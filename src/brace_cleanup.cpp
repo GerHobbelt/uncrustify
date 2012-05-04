@@ -883,8 +883,6 @@ static chunk_t *insert_vbrace(chunk_t *pc, bool after,
    chunk_t *rv;
    chunk_t *ref;
 
-   memset(&chunk, 0, sizeof(chunk));
-
    chunk.orig_line   = pc->orig_line;
    chunk.parent_type = frm->pse[frm->pse_tos].type;
    chunk.level       = frm->level;
