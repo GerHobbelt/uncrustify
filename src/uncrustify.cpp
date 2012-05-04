@@ -382,6 +382,8 @@ bfc_report_mem_analysis(void)
 
 #endif
 
+#ifdef UNC_ASSERT_IMPLEMENT
+
 int report_assertion_failed(const char *expr, const char *function, const char *filepath, int lineno, assert_extended_reporter *rprtr)
 {
 	const char *msg = (rprtr ? rprtr->c_msg() : "");
@@ -393,8 +395,11 @@ int report_assertion_failed(const char *expr, const char *function, const char *
 	exit(EXIT_FAILURE);
 }
 
+#endif
+
 #else
 
+#ifdef UNC_ASSERT_IMPLEMENT
 
 int report_assertion_failed(const char *expr, const char *function, const char *filepath, int lineno, assert_extended_reporter *rprtr)
 {
@@ -428,6 +433,10 @@ int report_assertion_failed(const char *expr, const char *function, const char *
 
 #endif
 
+#endif
+
+
+#ifdef UNC_ASSERT_IMPLEMENT
 
 assert_extended_reporter::assert_extended_reporter()
 {
@@ -513,6 +522,8 @@ int assert_extended_reporter::vprint(int suggested_buflen, const char *msg, va_l
 		rv = -1;
 	return rv;
 }
+
+#endif
 
 
 

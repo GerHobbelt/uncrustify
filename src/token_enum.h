@@ -184,7 +184,7 @@ typedef enum
    CT_MACRO_CLOSE,
    CT_MACRO_ELSE,
 
-   /* agregate types */
+   /* aggregate types */
    CT_LABEL,            /* a non-case label */
    CT_LABEL_COLON,      /* the colon for a label */
    CT_FUNCTION,         /* function - unspecified, call mark_function() */

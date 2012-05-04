@@ -72,6 +72,7 @@ typedef uint64_t   UINT64;
 #if defined(NDEBUG)
 
 #define UNC_ASSERT(expr)				((void)0)
+#define UNC_ASSERT_EX(expr, msgcombo)	((void)0)										
 
 #else
 
@@ -92,6 +93,8 @@ typedef uint64_t   UINT64;
 					&__m);														\
 		}																		\
 	} while (0)
+
+#define UNC_ASSERT_IMPLEMENT
 
 class assert_extended_reporter
 {

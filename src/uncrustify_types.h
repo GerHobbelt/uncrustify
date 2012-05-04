@@ -348,7 +348,7 @@ struct cp_data
 
    bool               unc_off;
    unsigned int       line_number;
-   unsigned int       column;  /* column for parsing */
+   int				  column;  /* column for parsing */
    unsigned int       spaces;  /* space count on output */
 
    bool               frag;
