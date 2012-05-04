@@ -45,6 +45,9 @@
 #include "args.h"
 #include "reflow_text.h"
 
+
+#if USE_NEW_COMMENT_FORMATTER
+
 #include "reflow_text_internal.h"
 
 
@@ -962,9 +965,6 @@ size_t cmt_reflow::expand_tabs_and_clean(char **dst_ref, size_t *dstlen_ref, con
 	*dst_ref = dst = (char *)malloc(dstlen);
 	char *last_nonwhite_idx = dst;
 
-	/* a bit whacky assert, this one; just checkin' ... */
-	UNC_ASSERT(part_of_preproc_continuation == ((cpd.in_preproc != CT_NONE) && (cpd.in_preproc != CT_PP_DEFINE)));
-
 	for (; pos < first_column - 1; pos++)
 	{
 		UNC_ASSERT(dstlen > (size_t)(dst - *dst_ref));
@@ -1040,7 +1040,7 @@ size_t cmt_reflow::expand_tabs_and_clean(char **dst_ref, size_t *dstlen_ref, con
 				if (srclen > 1 && '/' == src[1])
 				{
 					/*
-					Inject another character so the '*'+'/' seqeunce gets broken.
+					Inject another character so the '*'+'/' sequence gets broken.
 
 					As it is an inject, do NOT count it against POS? For now, we do NOT.
 					*/
@@ -1521,7 +1521,7 @@ void cmt_reflow::push_text(const char *text, int len, bool esc_close, int first_
    */
    char *dst;
    size_t newlen;
-	UNC_ASSERT(m_comment_is_part_of_preproc_macro == ((cpd.in_preproc != CT_NONE) && (cpd.in_preproc != CT_PP_DEFINE)));
+
    /*
    unfortunately, 'pc && (pc->flags & PCF_IN_PREPROC)' is also TRUE when inside a big #if 0 ... #endif chunk :-(
    */
@@ -1994,3 +1994,6 @@ void cmt_reflow::write2out_comment_end(int deferred_whitespace, int deferred_nl)
 }
 
 
+
+
+#endif

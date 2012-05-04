@@ -45,6 +45,9 @@
 #include "args.h"
 #include "reflow_text.h"
 
+
+#if USE_NEW_COMMENT_FORMATTER
+
 #include "reflow_text_internal.h"
 
 
@@ -904,3 +907,4 @@ void cmt_reflow::pretty_print_diagnostic2output(const char *text, size_t text_le
 
 
 
+#endif

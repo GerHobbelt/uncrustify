@@ -45,6 +45,12 @@
 #include <stdlib.h>   // free
 
 
+#define USE_NEW_COMMENT_FORMATTER  0
+
+
+
+#if USE_NEW_COMMENT_FORMATTER
+
 struct reflow_box;
 struct paragraph_box;
 class words_collection;
@@ -264,5 +270,6 @@ protected:
 
 
 
+#endif
 
 #endif

@@ -45,6 +45,9 @@
 #include "args.h"
 #include "reflow_text.h"
 
+
+#if USE_NEW_COMMENT_FORMATTER
+
 #include "reflow_text_internal.h"
 
 
@@ -842,7 +845,7 @@ void cmt_reflow::set_cmt_config_params(void)
 	m_cmt_reflow_minimum_words_per_line = cpd.settings[UO_cmt_reflow_minimum_words_per_line].n;
 	m_cmt_reflow_intermission_indent_threshold = cpd.settings[UO_cmt_reflow_intermission_indent_threshold].n;
 
-	m_comment_is_part_of_preproc_macro = ((cpd.in_preproc != CT_NONE) && (cpd.in_preproc != CT_PP_DEFINE));
+	//m_comment_is_part_of_preproc_macro = ((cpd.in_preproc != CT_NONE) && (cpd.in_preproc != CT_PP_DEFINE));
 }
 
 
@@ -853,9 +856,14 @@ void cmt_reflow::set_deferred_cmt_config_params_phase1(void)
 {
 	chunk_t *pc = m_first_pc;
 
-   /*
-   unfortunately, 'pc && (pc->flags & PCF_IN_PREPROC)' is also TRUE when inside a big #if 0 ... #endif chunk :-(
-   */
+	// do NOT use cpd.in_preproc as it'll be invalid in the uncrustify output phase, 
+	// i.e. when the comments are reformatted!
+	//m_comment_is_part_of_preproc_macro = ((cpd.in_preproc != CT_NONE) && (cpd.in_preproc != CT_PP_DEFINE));
+    /*
+     unfortunately, 'pc && (pc->flags & PCF_IN_PREPROC)' is also TRUE when inside a big #if 0 ... #endif chunk :-(
+    */
+	m_comment_is_part_of_preproc_macro = (pc && (pc->flags & PCF_IN_PREPROC));
+
    UNC_ASSERT((pc && (pc->flags & PCF_IN_PREPROC)) >= m_comment_is_part_of_preproc_macro);
 
 	//m_left_global_output_column = cpd.column;
@@ -7892,7 +7900,7 @@ void cmt_reflow::render(void)
 	UNC_ASSERT(m_comment_len == strlen(m_comment));
 
 	/*
-	make sure the comment is positioned at a valiable start column, i.e.
+	make sure the comment is positioned at a viable start column, i.e.
 	if the m_left_global_output_column setting doesn't make sense in the current situation, adjust
 	the m_left_global_output_column to cope.
 	*/
@@ -7917,3 +7925,4 @@ void cmt_reflow::render(void)
 
 
 
+#endif

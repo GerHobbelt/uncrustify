@@ -10,14 +10,15 @@
 #include "prototypes.h"
 #include "chunk_list.h"
 #include "unc_ctype.h"
-#include "reflow_text.h"
 #include <cstring>
 #include <cstdlib>
-//#include <cassert>
+#include "reflow_text.h"
 
-#if 0
+
 static void output_comment_multi(chunk_t *pc);
 static void output_comment_multi_simple(chunk_t *pc);
+
+#if !USE_NEW_COMMENT_FORMATTER
 
 struct cmt_reflow
 {
@@ -32,14 +33,21 @@ struct cmt_reflow
    bool       reflow;      /* reflow the current line */
 };
 
+#endif
 
 static chunk_t *output_comment_c(chunk_t *pc);
 static chunk_t *output_comment_cpp(chunk_t *pc);
-static void add_comment_text(const unc_text& text,
-                             cmt_reflow& cmt, bool esc_close);
-#endif
+
+#if USE_NEW_COMMENT_FORMATTER
 
 static chunk_t *output_comment(chunk_t *pc);
+
+#else
+
+static void add_comment_text(const unc_text& text,
+                             cmt_reflow& cmt, bool esc_close);
+
+#endif
 
 
 #define LOG_CONTTEXT() \
@@ -136,7 +144,8 @@ static void add_text(const unc_text& text)
 }
 
 
-#if 0
+#if !USE_NEW_COMMENT_FORMATTER
+
 /**
  * Count the number of characters to the end of the next chunk of text.
  * If it exceeds the limit, return true.
@@ -158,8 +167,9 @@ static bool next_word_exceeds_limit(const unc_text& text, int idx)
       idx++;
       length++;
    }
-   return((cpd.column + length - 1) > cpd.settings[UO_cmt_width].n);
+   return(cpd.column + length - 1 > cpd.settings[UO_cmt_width].n);
 }
+
 #endif
 
 
@@ -196,7 +206,8 @@ static void output_to_column(int column, bool allow_tabs, int max_tabbed_column 
 }
 
 
-#if 0
+#if !USE_NEW_COMMENT_FORMATTER
+
 /**
  * Output a comment to the column using indent_with_tabs and
  * indent_cmt_with_tabs as the rules.
@@ -237,6 +248,7 @@ static void cmt_output_indent(int brace_col, int base_col, int column)
       add_text(" ");
    }
 }
+
 #endif
 
 
@@ -395,11 +407,24 @@ void output_text(FILE *pfile)
          cpd.column      = 1;
          LOG_FMT(LOUTIND, " \\xx\n");
       }
-      else if (pc->type == CT_COMMENT_MULTI
-		  || pc->type == CT_COMMENT_CPP
-		  || pc->type == CT_COMMENT)
+      else if (pc->type == CT_COMMENT_MULTI)
       {
-         pc = output_comment(pc);
+         if (cpd.settings[UO_cmt_indent_multi].b)
+         {
+            output_comment_multi(pc);
+         }
+         else
+         {
+            output_comment_multi_simple(pc);
+         }
+      }
+      else if (pc->type == CT_COMMENT_CPP)
+      {
+         pc = output_comment_cpp(pc);
+      }
+      else if (pc->type == CT_COMMENT)
+      {
+         pc = output_comment_c(pc);
       }
       else if ((pc->type == CT_JUNK) || (pc->type == CT_IGNORED))
       {
@@ -481,7 +506,7 @@ void output_text(FILE *pfile)
 }
 
 
-#if 0
+#if !USE_NEW_COMMENT_FORMATTER
 
 /**
  * Checks for and updates the lead chars.
@@ -1091,15 +1116,41 @@ static bool can_combine_comment(chunk_t *pc, cmt_reflow& cmt)
 #endif
 
 
+#if USE_NEW_COMMENT_FORMATTER
+
+static chunk_t *output_comment(chunk_t *pc)
+{
+   cmt_reflow cmt;
+
+   /* See if we can combine this comment with the next comment */
+   while (cmt.can_combine_comment(pc))
+   {
+	  cmt.m_is_merged_comment = true;
+      cmt.push_chunk(pc);
+	  cmt.push("\n");
+      pc = chunk_get_next(chunk_get_next(pc));
+   }
+   cmt.push_chunk(pc);
+   cmt.m_last_pc = pc;
+
+   cmt.render();
+
+   return pc;
+}
+
+#endif
+
 /**
- * Outputs the C/C++ comment at pc.
+ * Outputs the C comment at pc.
  * Comment combining is done here as well.
  *
  * @return the last chunk output'd
  */
-static chunk_t *output_comment(chunk_t *first)
+static chunk_t *output_comment_c(chunk_t *first)
 {
-#if 0
+#if USE_NEW_COMMENT_FORMATTER
+   return output_comment(first);
+#else
    cmt_reflow cmt;
 
    output_cmt_start(cmt, first);
@@ -1141,30 +1192,9 @@ static chunk_t *output_comment(chunk_t *first)
    }
    add_comment_text("*/", cmt, false);
    return(pc);
-
-#else
-
-   cmt_reflow cmt;
-
-   /* See if we can combine this comment with the next comment */
-   while (cmt.can_combine_comment(first))
-   {
-	  cmt.m_is_merged_comment = true;
-      cmt.push_chunk(first);
-	  cmt.push("\n");
-      first = chunk_get_next(chunk_get_next(first));
-   }
-   cmt.push_chunk(first);
-   cmt.m_last_pc = first;
-
-   cmt.render();
-
-   return first;
 #endif
 }
 
-
-#if 0
 
 /**
  * Outputs the CPP comment at pc.
@@ -1174,6 +1204,9 @@ static chunk_t *output_comment(chunk_t *first)
  */
 static chunk_t *output_comment_cpp(chunk_t *first)
 {
+#if USE_NEW_COMMENT_FORMATTER
+   return output_comment(first);
+#else
    cmt_reflow cmt;
    unc_text   tmp;
 
@@ -1271,6 +1304,7 @@ static chunk_t *output_comment_cpp(chunk_t *first)
    }
    add_comment_text(" */", cmt, false);
    return(pc);
+#endif
 }
 
 
@@ -1306,8 +1340,17 @@ static void cmt_trim_whitespace(unc_text& line, bool in_preproc)
    }
 }
 
-void cmt_reflow::write(const char *str, size_t len)
+
+/**
+ * A multiline comment -- woopeee!
+ * The only trick here is that we have to trim out whitespace characters
+ * to get the comment to line up.
+ */
+static void output_comment_multi(chunk_t *pc)
 {
+#if USE_NEW_COMMENT_FORMATTER
+   return output_comment(first);
+#else
    int        cmt_col;
    int        cmt_idx;
    int        ch;
@@ -1591,42 +1634,16 @@ void cmt_reflow::write(const char *str, size_t len)
          ccol = 1;
       }
    }
-}
-
-#else
-
-void cmt_reflow::write(char ch)
-{
-	UNC_ASSERT(ch);
-	if (ch == NONBREAKING_SPACE_CHAR)
-	{
-		ch = ' ';
-	}
-	::add_char(ch);
-}
-
-void cmt_reflow::write(const char *str)
-{
-	UNC_ASSERT(str);
-	UNC_ASSERT(*str);
-	::add_text(str);
-}
-
-void cmt_reflow::write(const char *str, size_t len)
-{
-	UNC_ASSERT(str);
-	UNC_ASSERT(len);
-	UNC_ASSERT(*str);
-	unc_text txt(str, len);
-	::add_text(txt);
-}
-
 #endif
+}
 
 
-#if 0
-
-void cmt_reflow::output_to_column(int column, bool allow_tabs, int max_tabbed_column)
+/**
+ * Output a multiline comment without any reformatting other than shifting
+ * it left or right to get the column right.
+ * Oh, and trim trailing whitespace.
+ */
+static void output_comment_multi_simple(chunk_t *pc)
 {
    int        cmt_idx;
    int        ch;
@@ -1726,7 +1743,35 @@ void cmt_reflow::output_to_column(int column, bool allow_tabs, int max_tabbed_co
    }
 }
 
-#else
+
+
+#if USE_NEW_COMMENT_FORMATTER
+
+void cmt_reflow::write(char ch)
+{
+	UNC_ASSERT(ch);
+	if (ch == NONBREAKING_SPACE_CHAR)
+	{
+		ch = ' ';
+	}
+	::add_char(ch);
+}
+
+void cmt_reflow::write(const char *str)
+{
+	UNC_ASSERT(str);
+	UNC_ASSERT(*str);
+	::add_text(str);
+}
+
+void cmt_reflow::write(const char *str, size_t len)
+{
+	UNC_ASSERT(str);
+	UNC_ASSERT(len);
+	UNC_ASSERT(*str);
+	unc_text txt(str, len);
+	::add_text(txt);
+}
 
 void cmt_reflow::output_to_column(int column, bool allow_tabs, int max_tabbed_column)
 {

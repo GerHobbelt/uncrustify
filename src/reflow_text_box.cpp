@@ -45,6 +45,9 @@
 #include "args.h"
 #include "reflow_text.h"
 
+
+#if USE_NEW_COMMENT_FORMATTER
+
 #include "reflow_text_internal.h"
 
 
@@ -89,3 +92,4 @@ bool reflow_box::box_is_a_usual_piece_of_text(bool count_basic_punctuation_as_un
 }
 
 
+#endif
