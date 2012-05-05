@@ -151,6 +151,15 @@ static void setup_newline_add(chunk_t *prev, chunk_t *nl, chunk_t *next)
       nl->type = CT_NEWLINE;
       nl->str  = "\n";
    }
+   /*
+   [i_a] patch the column position into the new backslash/newline object too:
+         this information is required by the preprocessor macro output code at least.
+   */
+   if (prev->orig_col_end > 0)
+   {
+		nl->orig_col = prev->orig_col_end + 1;
+		nl->orig_col_end = nl->orig_col + nl->len() - 1;
+   }
 }
 
 

@@ -19,7 +19,10 @@ void ChunkStack::Set(const ChunkStack& cs)
       m_cse[idx].m_pc     = cs.m_cse[idx].m_pc;
       m_cse[idx].m_seqnum = cs.m_cse[idx].m_seqnum;
    }
-   m_seqnum = cs.m_seqnum;
+   if (m_seqnum < cs.m_seqnum)
+   {
+      m_seqnum = cs.m_seqnum;
+   }
 }
 
 

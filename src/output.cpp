@@ -159,14 +159,21 @@ static bool next_word_exceeds_limit(const unc_text& text, int idx)
  *
  * @param column  The column to advance to
  */
-static void output_to_column(int column, bool allow_tabs)
+static void output_to_column(int column, bool allow_tabs, int max_tabbed_column = -1)
 {
+	if (allow_tabs)
+	   LOG_FMT(LOUTIND, " to_col:%d/%d/%d - ", cpd.column, max_tabbed_column, column);
+
+   if (max_tabbed_column < 0)
+	   max_tabbed_column = column;
+   else if (max_tabbed_column > column)
+	   max_tabbed_column = column;
 
    cpd.did_newline = 0;
    if (allow_tabs)
    {
       /* tab out as far as possible and then use spaces */
-      while (next_tab_column(cpd.column) <= column)
+      while (next_tab_column(cpd.column) <= max_tabbed_column)
       {
          add_text("\t");
       }

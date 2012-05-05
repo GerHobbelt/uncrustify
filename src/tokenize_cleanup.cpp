@@ -335,8 +335,13 @@ void tokenize_cleanup(void)
             {
                next->str  = "()";
                next->type = CT_OPERATOR_VAL;
+#if 0
                chunk_del(tmp);
                next->orig_col_end += 1;
+#else
+               next->orig_col_end = tmp->orig_col_end;
+               chunk_del(tmp);
+#endif
             }
          }
          else if ((next->type == CT_ANGLE_CLOSE) &&
