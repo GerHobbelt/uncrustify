@@ -1,8 +1,19 @@
 #
-# Test cases specifically for the ECMA language.
+# Test cases specifically for the ECMA languages.
 #
 # Range: 90000 - 99999
 # test.name  config.file  input.file
 
-90000 ben.cfg ecma/example-1.es
+
+90000 ben.cfg 				ecma/example-1.es
+90001 js-nil.cfg 			ecma/use-strict.js
+90002 ben.cfg 				ecma/use-strict.js
+
+90003 js-nil.cfg			ecma/FileManager.js
+90004 js-nil.cfg			ecma/FileManager.TinyMCE.js
+90005 js-nil.cfg			ecma/Gallery.js
+90006 js-nil.cfg			ecma/NoFlash.Uploader.js
+90007 js-nil.cfg			ecma/Uploader.js
+90008 js-nil.cfg			ecma/mootools-core.js
+90009 js-nil.cfg			ecma/mootools-more.js
 
