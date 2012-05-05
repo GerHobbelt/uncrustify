@@ -1092,7 +1092,7 @@ static chunk_t *output_comment_c(chunk_t *first)
    output_cmt_start(cmt, first);
    cmt.reflow = (cpd.settings[UO_cmt_reflow_mode].n != 1);
 
-   cmt.cont_text = cpd.settings[UO_cmt_star_cont].b ? " *" : "  ";
+   cmt.cont_text = cpd.settings[UO_cmt_star_cont].t == TB_TRUE ? " *" : "  ";
    LOG_CONTTEXT();
 
    /* See if we can combine this comment with the next comment */
@@ -1186,7 +1186,7 @@ static chunk_t *output_comment_cpp(chunk_t *first)
    }
 
    /* We are going to convert the CPP comments to C comments */
-   cmt.cont_text = cpd.settings[UO_cmt_star_cont].b ? " * " : "   ";
+   cmt.cont_text = cpd.settings[UO_cmt_star_cont].t == TB_TRUE ? " * " : "   ";
    LOG_CONTTEXT();
 
    /* See if we can combine this comment with the next comment */
@@ -1300,7 +1300,7 @@ static void output_comment_multi(chunk_t *pc)
    calculate_comment_body_indent(cmt, pc->str);
 
    cmt.cont_text = !cpd.settings[UO_cmt_indent_multi].b ? "" :
-                   (cpd.settings[UO_cmt_star_cont].b ? "* " : "  ");
+                   (cpd.settings[UO_cmt_star_cont].t == TB_TRUE ? "* " : "  ");
    LOG_CONTTEXT();
 
    //LOG_FMT(LSYS, "Indenting1 line %d to col %d (orig=%d) col_diff=%d xtra=%d cont='%s'\n",
@@ -1405,7 +1405,7 @@ static void output_comment_multi(chunk_t *pc)
           *   something clearly non-alphanumeric (you see where we're going with this?)
           *
           * - bullet lists that are closely spaced: bullets are always non-alphanumeric
-          *   characters, such as '-' or '+' (or, oh horor, '*' - that's bloody ambiguous
+          *   characters, such as '-' or '+' (or, oh horror, '*' - that's bloody ambiguous
           *   to parse :-( ... with or without '*' comment start prefix, that's the
           *   question, then.)
           *
@@ -1483,7 +1483,7 @@ static void output_comment_multi(chunk_t *pc)
             if (line.size() == 0)
             {
                /* Empty line - just a '\n' */
-               if (cpd.settings[UO_cmt_star_cont].b)
+               if (cpd.settings[UO_cmt_star_cont].t == TB_TRUE)
                {
                   cmt.column = cmt_col + cpd.settings[UO_cmt_sp_before_star_cont].n;
                   cmt_output_indent(cmt.brace_col, cmt.base_col, cmt.column);
@@ -1506,7 +1506,7 @@ static void output_comment_multi(chunk_t *pc)
                {
                   int start_col = cmt_col + cpd.settings[UO_cmt_sp_before_star_cont].n;
 
-                  if (cpd.settings[UO_cmt_star_cont].b)
+                  if (cpd.settings[UO_cmt_star_cont].t == TB_TRUE)
                   {
                      cmt.column = start_col;
                      cmt_output_indent(cmt.brace_col, cmt.base_col, cmt.column);
