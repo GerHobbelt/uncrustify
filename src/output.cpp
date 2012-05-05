@@ -5,6 +5,7 @@
  * @author  Ben Gardner
  * @license GPL v2+
  */
+
 #include "uncrustify_types.h"
 #include "prototypes.h"
 #include "chunk_list.h"
@@ -73,7 +74,7 @@ static void add_char(UINT32 ch)
       if ((ch == '\t') && (last_char == ' '))
       {
          int endcol = next_tab_column(cpd.column);
-         while (cpd.column < endcol)
+         while ((int)cpd.column < endcol)
          {
             add_char(' ');
          }
@@ -148,7 +149,7 @@ static bool next_word_exceeds_limit(const unc_text& text, int idx)
       idx++;
       length++;
    }
-   return((cpd.column + length - 1) > cpd.settings[UO_cmt_width].n);
+   return(cpd.column + length - 1 > cpd.settings[UO_cmt_width].n);
 }
 
 
@@ -160,19 +161,18 @@ static bool next_word_exceeds_limit(const unc_text& text, int idx)
  */
 static void output_to_column(int column, bool allow_tabs)
 {
-   int nc;
 
    cpd.did_newline = 0;
    if (allow_tabs)
    {
       /* tab out as far as possible and then use spaces */
-      while ((nc = next_tab_column(cpd.column)) <= column)
+      while (next_tab_column(cpd.column) <= column)
       {
          add_text("\t");
       }
    }
    /* space out the final bit */
-   while (cpd.column < column)
+   while ((int)cpd.column < column)
    {
       add_text(" ");
    }
@@ -221,10 +221,13 @@ static void cmt_output_indent(int brace_col, int base_col, int column)
 }
 
 
-void output_parsed(FILE *pfile)
+
+void output_parsed(const char *fname, FILE *pfile)
 {
    chunk_t *pc;
    int     cnt;
+
+   fprintf(pfile, "\n######## dump @ %s ########\n\n\n", fname);
 
    output_options(pfile);
    output_defines(pfile);
@@ -355,10 +358,12 @@ void output_text(FILE *pfile)
 
                if ((prev != NULL) && (prev->nl_count == 0))
                {
+				  UNC_ASSERT(pc->orig_col >= prev->orig_col_end);
                   int orig_sp = (pc->orig_col - prev->orig_col_end);
                   pc->column = cpd.column + orig_sp;
+				  UNC_ASSERT(pc->column >= 0);
                   if ((cpd.settings[UO_sp_before_nl_cont].a != AV_IGNORE) &&
-                      (pc->column < (cpd.column + 1)))
+                      (pc->column < (int)(cpd.column + 1)))
                   {
                      pc->column = cpd.column + 1;
                   }
@@ -434,7 +439,7 @@ void output_text(FILE *pfile)
                          (chunk_is_comment(pc) &&
                           (cpd.settings[UO_indent_with_tabs].n != 0));
 
-            LOG_FMT(LOUTIND, "  %d> col %d/%d/%d - ", pc->orig_line, pc->column, pc->column_indent, cpd.column);
+			LOG_FMT(LOUTIND, "  %d> col %d/%d/%d/%d lvl:%d/%d - ", pc->orig_line, pc->column, cpd.column, pc->column_indent, pc->brace_level, pc->pp_level, pc->level);
          }
          else
          {
@@ -444,7 +449,7 @@ void output_text(FILE *pfile)
              * This has to be done here because comments are not formatted
              * until the output phase.
              */
-            if (pc->column < cpd.column)
+            if (pc->column < (int)cpd.column)
             {
                reindent_line(pc, cpd.column);
             }
@@ -1076,7 +1081,7 @@ static bool can_combine_comment(chunk_t *pc, cmt_reflow& cmt)
 
 /**
  * Outputs the C comment at pc.
- * C comment combining is done here
+ * Comment combining is done here as well.
  *
  * @return the last chunk output'd
  */

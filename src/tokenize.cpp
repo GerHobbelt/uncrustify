@@ -7,6 +7,7 @@
  * @author  Ben Gardner
  * @license GPL v2+
  */
+
 #include "uncrustify_types.h"
 #include "char_table.h"
 #include "prototypes.h"
@@ -738,8 +739,8 @@ static bool parse_string(tok_ctx& ctx, chunk_t& pc, int quote_idx, bool allow_es
 {
    bool escaped = 0;
    int  end_ch;
-   char escape_char  = cpd.settings[UO_string_escape_char].n;
-   char escape_char2 = cpd.settings[UO_string_escape_char2].n;
+   char escape_char  = (char)cpd.settings[UO_string_escape_char].n;
+   char escape_char2 = (char)cpd.settings[UO_string_escape_char2].n;
 
    pc.str.clear();
    while (quote_idx-- > 0)
@@ -958,11 +959,26 @@ bool parse_word(tok_ctx& ctx, chunk_t& pc, bool skipcheck)
    }
    else
    {
-      /* Turn it into a keyword now */
-      pc.type = find_keyword_type(pc.str.c_str(), pc.str.size());
-   }
+   /* Turn it into a keyword now */
+#if 0 // [i_a] this was old code of mine which supported custom 'keywords' with embedded whitespace, i.e. complete 'keyphrases' rather
+     tag = find_keyword(pc.str.c_str(), pc.str.size()); /* [i_a] warning: will scan BEYOND 'len'! */
+     if (tag != NULL)
+     {
+       pc->type = tag->type;
+	   // adjust length to match the 'keyword' found - as those can be 'keyPHRASES' rather, this must be done.
+       cpd.column -= pc->len;
+	   pc->len     = (int)strlen(tag->tag);
+       cpd.column += pc->len;
+     }
+#endif
 
-   return(true);
+     const chunk_tag_t *tag = find_keyword(pc.str.c_str(), pc.str.size());
+     if (tag)
+     {
+	   pc.type = tag->type;
+     }
+   }
+   return(true);  // [i_a] is this really what you want???
 }
 
 
@@ -1446,7 +1462,7 @@ static bool parse_next(tok_ctx& ctx, chunk_t& pc)
  * All the tokens are inserted before ref. If ref is NULL, they are inserted
  * at the end of the list.  Line numbers are relative to the start of the data.
  */
-void tokenize(const deque<int>& data, chunk_t *ref)
+void tokenize(const deque<int>& data, chunk_t *ref, const char *parsed_file)
 {
    tok_ctx            ctx(data);
    chunk_t            chunk;
@@ -1592,6 +1608,9 @@ void tokenize(const deque<int>& data, chunk_t *ref)
       cpd.newline = "\r";
       LOG_FMT(LLINEENDS, "Using CR line endings\n");
    }
+
+   /* Special hook for dumping parsed data for debugging */
+   dump_parsed_input(__func__, parsed_file);
 }
 
 

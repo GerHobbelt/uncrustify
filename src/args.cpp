@@ -5,6 +5,7 @@
  * @author  Ben Gardner
  * @license GPL v2+
  */
+
 #include "args.h"
 #include <cstring>
 #include "unc_ctype.h"
@@ -202,7 +203,7 @@ const char *Args::Unused(int& index)
  * @param num_args   The number of items in args
  * @return           The number of arguments parsed (always <= num_args)
  */
-int Args::SplitLine(char *text, char *args[], int num_args)
+int Args::SplitLine(char *text, const char *args[], int num_args)
 {
    char cur_quote    = 0;
    bool in_backslash = false;

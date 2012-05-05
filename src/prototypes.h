@@ -24,6 +24,7 @@ void log_pcf_flags(log_sev_t sev, UINT64 flags);
 const char *path_basename(const char *path);
 int path_dirname_len(const char *filename);
 const char *get_file_extension(int& idx);
+void dump_parsed_input(const char *fname, const char *parsed_file);
 
 
 /*
@@ -38,7 +39,7 @@ void detect_options();
  */
 
 void output_text(FILE *pfile);
-void output_parsed(FILE *pfile);
+void output_parsed(const char *fname, FILE *pfile);
 void output_options(FILE *pfile);
 void add_long_preprocessor_conditional_block_comment(void);
 
@@ -56,6 +57,8 @@ int set_option_value(const char *name, const char *value);
 const group_map_value *get_group_name(int ug);
 const option_map_value *get_option_name(int uo);
 void print_options(FILE *pfile, bool verbose);
+void clear_options(void);
+
 
 string argtype_to_string(argtype_e argtype);
 string bool_to_string(bool val);
@@ -191,7 +194,7 @@ chunk_t *newline_add_between2(chunk_t *start, chunk_t *end,
  *  tokenize.cpp
  */
 
-void tokenize(const deque<int>& data, chunk_t *ref);
+void tokenize(const deque<int>& data, chunk_t *ref, const char *parsed_file);
 
 
 /*
@@ -213,7 +216,7 @@ void brace_cleanup(void);
  */
 
 int load_keyword_file(const char *filename);
-c_token_t find_keyword_type(const char *word, int len);
+const chunk_tag_t *find_keyword(const char *word, int len);
 void add_keyword(const char *tag, c_token_t type);
 void output_types(FILE *pfile);
 void print_keywords(FILE *pfile);

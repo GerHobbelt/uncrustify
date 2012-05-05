@@ -6,6 +6,7 @@
  * @author  Ben Gardner
  * @license GPL v2+
  */
+
 #ifndef BASE_TYPES_H_INCLUDED
 #define BASE_TYPES_H_INCLUDED
 
@@ -21,8 +22,11 @@
 
 #define __STDC_FORMAT_MACROS
 
+
 #if defined HAVE_INTTYPES_H
 #include <inttypes.h>
+#elif defined HAVE_STDINT_H
+#include <stdint.h>
 #else
 #error "Don't know where int8_t is defined"
 #endif
@@ -40,6 +44,13 @@ typedef uint8_t    UINT8;
 typedef uint16_t   UINT16;
 typedef uint32_t   UINT32;
 typedef uint64_t   UINT64;
+
+
+#ifndef PRIx64
+#define PRIx64             "llx"
+#endif
+
+#define unc_rename(a, b)	rename(a, b)
 
 #endif   /* ifdef WIN32 */
 

@@ -5,6 +5,7 @@
  * @author  Ben Gardner
  * @license GPL v2+
  */
+
 #include "uncrustify_types.h"
 #include "prototypes.h"
 #include "char_table.h"
@@ -410,7 +411,7 @@ int load_keyword_file(const char *filename)
    FILE *pf;
    char buf[256];
    char *ptr;
-   char *args[3];
+   const char *args[3];
    int  argc;
    int  line_no = 0;
 

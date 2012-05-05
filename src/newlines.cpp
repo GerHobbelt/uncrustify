@@ -1867,7 +1867,7 @@ void newlines_cleanup_braces(bool first)
    chunk_t  *next;
    chunk_t  *prev;
    chunk_t  *tmp;
-   argval_t arg;
+   //argval_t arg;  // 1>d:\h\prj\3actual\uncrustify\src\newlines.cpp(1815) : warning C6246: Local declaration of 'arg' hides declaration of the same name in outer scope. For additional information, see previous declaration at line '1436' of 'd:\h\prj\3actual\uncrustify\src\newlines.cpp': Lines: 1436
 
    for (pc = chunk_get_head(); pc != NULL; pc = chunk_get_next_ncnl(pc))
    {
@@ -1877,7 +1877,7 @@ void newlines_cleanup_braces(bool first)
       }
       else if (pc->type == CT_ELSEIF)
       {
-         arg = cpd.settings[UO_nl_elseif_brace].a;
+		 argval_t arg = cpd.settings[UO_nl_elseif_brace].a; // [i_a]
          newlines_if_for_while_switch(
             pc, (arg != AV_IGNORE) ? arg : cpd.settings[UO_nl_if_brace].a);
       }
@@ -2906,7 +2906,7 @@ void do_blank_lines(void)
 
       /* Limit consecutive newlines */
       if ((cpd.settings[UO_nl_max].n > 0) &&
-          (pc->nl_count > (cpd.settings[UO_nl_max].n)))
+          (pc->nl_count > cpd.settings[UO_nl_max].n))
       {
          blank_line_max(pc, UO_nl_max);
       }
@@ -3068,7 +3068,8 @@ void do_blank_lines(void)
       }
 
       /* Change blanks between a function comment and body */
-      if ((cpd.settings[UO_nl_comment_func_def].n != 0) &&
+      if ((cpd.settings[UO_nl_comment_func_def].n > 0) &&
+		  (cpd.settings[UO_nl_comment_func_def].n != pc->nl_count) &&
           (pcmt->type == CT_COMMENT_MULTI) &&
           (pcmt->parent_type == CT_COMMENT_WHOLE) &&
           (next != NULL) && ((next->parent_type == CT_FUNC_DEF) || (next->parent_type == CT_FUNC_CLASS)))
@@ -3080,7 +3081,7 @@ void do_blank_lines(void)
       }
 
       /* Change blanks after a try-catch-finally block */
-      if ((cpd.settings[UO_nl_after_try_catch_finally].n != 0) &&
+      if ((cpd.settings[UO_nl_after_try_catch_finally].n > 0) &&
           (cpd.settings[UO_nl_after_try_catch_finally].n != pc->nl_count) &&
           (prev != NULL) && (next != NULL))
       {
@@ -3098,7 +3099,7 @@ void do_blank_lines(void)
       }
 
       /* Change blanks after a try-catch-finally block */
-      if ((cpd.settings[UO_nl_between_get_set].n != 0) &&
+      if ((cpd.settings[UO_nl_between_get_set].n > 0) &&
           (cpd.settings[UO_nl_between_get_set].n != pc->nl_count) &&
           (prev != NULL) && (next != NULL))
       {
@@ -3112,7 +3113,7 @@ void do_blank_lines(void)
       }
 
       /* Change blanks after a try-catch-finally block */
-      if ((cpd.settings[UO_nl_around_cs_property].n != 0) &&
+      if ((cpd.settings[UO_nl_around_cs_property].n > 0) &&
           (cpd.settings[UO_nl_around_cs_property].n != pc->nl_count) &&
           (prev != NULL) && (next != NULL))
       {

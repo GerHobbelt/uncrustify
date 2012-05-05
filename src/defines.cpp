@@ -8,6 +8,7 @@
  * @author  Ben Gardner
  * @license GPL v2+
  */
+
 #include "uncrustify_types.h"
 #include "char_table.h"
 #include "args.h"
@@ -65,7 +66,7 @@ int load_define_file(const char *filename)
    FILE *pf;
    char buf[160];
    char *ptr;
-   char *args[3];
+   const char *args[3];
    int  argc;
    int  line_no = 0;
 

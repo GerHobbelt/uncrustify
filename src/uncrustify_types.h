@@ -6,6 +6,7 @@
  * @author  Ben Gardner
  * @license GPL v2+
  */
+
 #ifndef UNCRUSTIFY_TYPES_H_INCLUDED
 #define UNCRUSTIFY_TYPES_H_INCLUDED
 
@@ -20,9 +21,11 @@ using namespace std;
 #include "logger.h"
 #include "unc_text.h"
 #include <cstdio>
-#include <assert.h>
-#ifdef HAVE_UTIME_H
+//#include <cassert>
+#if defined(HAVE_UTIME_H)
 #include <utime.h>
+#elif defined(HAVE_SYS_UTIME_H)
+#include <sys/utime.h>
 #endif
 
 #define UNCRUSTIFY_OFF_TEXT    " *INDENT-OFF*"
@@ -243,38 +246,38 @@ struct chunk_t
    chunk_t     *prev;
    align_ptr_t align;
    c_token_t   type;
-   c_token_t   parent_type;     /* usually CT_NONE */
+   c_token_t   parent_type;      /* usually CT_NONE */
    UINT32      orig_line;
    UINT32      orig_col;
    UINT32      orig_col_end;
    UINT64      flags;            /* see PCF_xxx */
    int         column;           /* column of chunk */
    int         column_indent;    /* if 1st on a line, set to the 'indent'
-                                  * column, which may be less that the real column */
+                                  * column, which may be less than the real column */
    int         nl_count;         /* number of newlines in CT_NEWLINE */
    int         level;            /* nest level in {, (, or [ */
    int         brace_level;      /* nest level in braces only */
    int         pp_level;         /* nest level in #if stuff */
    bool        after_tab;        /* whether this token was after a tab */
-   unc_text    str;             /* pointer to the token text */
+   unc_text    str;              /* pointer to the token text */
 };
 
 enum
 {
-   LANG_C    = 0x0001,
-   LANG_CPP  = 0x0002,
-   LANG_D    = 0x0004,
-   LANG_CS   = 0x0008,     /*<< C# or C-sharp */
-   LANG_JAVA = 0x0010,
-   LANG_OC   = 0x0020,     /*<< Objective C */
-   LANG_VALA = 0x0040,     /*<< Like C# */
-   LANG_PAWN = 0x0080,
-   LANG_ECMA = 0x0100,
+   LANG_C       = 0x0001,
+   LANG_CPP     = 0x0002,
+   LANG_D       = 0x0004,
+   LANG_CS      = 0x0008,     /*<< C# or C-sharp */
+   LANG_JAVA    = 0x0010,
+   LANG_OC      = 0x0020,     /*<< Objective C */
+   LANG_VALA    = 0x0040,     /*<< Like C# */
+   LANG_PAWN    = 0x0080,
+   LANG_ECMA    = 0x0100,
 
-   LANG_ALLC = 0x017f,
-   LANG_ALL  = 0x0fff,
+   LANG_ALLC    = 0x017f,
+   LANG_ALL     = 0x0fff,
 
-   FLAG_PP   = 0x8000,     /*<< only appears in a preprocessor */
+   FLAG_PP      = 0x8000,     /*<< only appears in a preprocessor */
 };
 
 /**
@@ -320,7 +323,7 @@ struct file_mem
    deque<int>     data;
    bool           bom;
    CharEncoding   enc;
-#ifdef HAVE_UTIME_H
+#if defined(HAVE_STRUCT_UTIMBUF_ACTIME) && defined(HAVE_UTIME)
    struct utimbuf utb;
 #endif
 };
@@ -329,7 +332,7 @@ struct cp_data
 {
    FILE               *fout;
 
-   UINT32             error_count;
+   unsigned int       error_count;
    const char         *filename;
 
    file_mem           file_hdr;   /* for cmt_insert_file_header */
@@ -342,12 +345,12 @@ struct cp_data
    bool               lang_forced;
 
    bool               unc_off;
-   UINT32             line_number;
-   UINT16             column;  /* column for parsing */
-   UINT16             spaces;  /* space count on output */
+   unsigned int       line_number;
+   int				  column;  /* column for parsing */
+   unsigned int       spaces;  /* space count on output */
 
    bool               frag;
-   UINT16             frag_cols;
+   unsigned int       frag_cols;
 
    /* stuff to auto-detect line endings */
    UINT32             le_counts[LE_AUTO];

@@ -8,6 +8,7 @@
  * @author  Ben Gardner
  * @license GPL v2+
  */
+
 #include "uncrustify_types.h"
 #include "prototypes.h"
 #include "chunk_list.h"
@@ -449,7 +450,7 @@ void tokenize_cleanup(void)
                {
                   break;
                }
-               if ((tmp->len() > 0) && isalpha(*tmp->str))
+               if ((tmp->len() > 0) && unc_isalpha(*tmp->str))
                {
                   tmp->type = CT_SQL_WORD;
                }

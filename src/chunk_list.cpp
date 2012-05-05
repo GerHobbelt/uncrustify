@@ -5,6 +5,7 @@
  * @author  Ben Gardner
  * @license GPL v2+
  */
+
 #include "chunk_list.h"
 #include <cstring>
 #include <cstdlib>
@@ -48,7 +49,7 @@ chunk_t *chunk_get_next(chunk_t *cur, chunk_nav_t nav)
       }
       return(pc);
    }
-   /* Not in a preproc, skip any proproc */
+   /* Not in a preproc, skip any preproc */
    while ((pc != NULL) && (pc->flags & PCF_IN_PREPROC))
    {
       pc = g_cl.GetNext(pc);

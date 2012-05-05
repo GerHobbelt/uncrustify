@@ -15,6 +15,7 @@
 enum argtype_e
 {
    AT_BOOL,    /**< true / false */
+   AT_TRISTATE_BOOL, /**< true / false / nochange */
    AT_IARF,    /**< Ignore / Add / Remove / Force */
    AT_NUM,     /**< Number */
    AT_LINE,    /**< Line Endings */
@@ -56,11 +57,20 @@ enum tokenpos_e
    TP_JOIN        = 16,    /* remove newlines on both sides */
 };
 
+/** tristate values */
+enum tristate_t
+{
+   TB_FALSE = 0,
+   TB_TRUE  = 1,
+   TB_NOCHANGE = -1,
+};
+
 union op_val_t
 {
    argval_t   a;
    int        n;
    bool       b;
+   tristate_t t;
    lineends_e le;
    tokenpos_e tp;
    const char *str;
@@ -645,11 +655,11 @@ struct group_map_value
 
 struct option_map_value
 {
+   int                min_val;
+   int                max_val;
    uncrustify_options id;
    uncrustify_groups  group_id;
    argtype_e          type;
-   int                min_val;
-   int                max_val;
    const char         *name;
    const char         *short_desc;
    const char         *long_desc;

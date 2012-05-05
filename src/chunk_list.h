@@ -5,6 +5,7 @@
  * @author  Ben Gardner
  * @license GPL v2+
  */
+
 #ifndef CHUNK_LIST_H_INCLUDED
 #define CHUNK_LIST_H_INCLUDED
 
@@ -130,6 +131,13 @@ static_inline
 bool chunk_is_blank(chunk_t *pc)
 {
    return((pc != NULL) && (pc->len() == 0));
+}
+
+
+static_inline
+bool chunk_is_space(chunk_t *pc)
+{
+   return((pc != NULL) && (pc->type == CT_SPACE));
 }
 
 

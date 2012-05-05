@@ -1568,6 +1568,7 @@ void space_text(void)
             {
                if (cpd.settings[UO_indent_relative_single_line_comments].b)
                {
+		          UNC_ASSERT(next->orig_col >= pc->orig_col_end);                     // [i_a]
                   LOG_FMT(LSPACE, " <relative adj>");
                   column = pc->column + (next->orig_col - pc->orig_col_end);
                }

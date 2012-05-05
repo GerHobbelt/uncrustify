@@ -18,6 +18,8 @@ static void split_for_stmt(chunk_t *start);
 
 static_inline bool is_past_width(chunk_t *pc)
 {
+	if (cpd.settings[UO_code_width].n == 0)
+		return false;
    // allow char to sit at last column by subtracting 1
    return((pc->column + pc->len() - 1) > cpd.settings[UO_code_width].n);
 }
