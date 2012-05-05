@@ -1195,12 +1195,10 @@ void register_options(void)
    unc_add_option("cmt_sp_after_star_cont", UO_cmt_sp_after_star_cont, AT_NUM,
                   "The number of spaces to insert after the optional star on subsequent comment\n"
 				  "lines.");
-   unc_add_option("cmt_sp_after_cpp_start", UO_cmt_sp_after_cpp_start, AT_NUM,
-                  "The number of spaces to insert after the '//' on comment lines.");
 
    unc_add_option("cmt_multi_check_last", UO_cmt_multi_check_last, AT_BOOL,
                   "For multi-line comments with a '*' lead, remove leading spaces if the first\n"
-				  "and last lines of the comment are the same length (while not conatining any\n"
+				  "and last lines of the comment are the same length (while not containing any\n"
 				  "human-readable text, i.e. no alphanumeric characters). Default=True");
 
    unc_add_option("cmt_insert_file_header", UO_cmt_insert_file_header, AT_STRING,
