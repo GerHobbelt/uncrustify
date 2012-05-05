@@ -1,135 +1,437 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\src\align.cpp" />
-    <ClCompile Include="..\src\align_stack.cpp" />
-    <ClCompile Include="..\src\args.cpp" />
-    <ClCompile Include="..\src\backup.cpp" />
-    <ClCompile Include="..\src\brace_cleanup.cpp" />
-    <ClCompile Include="..\src\braces.cpp" />
-    <ClCompile Include="..\src\chunk_list.cpp" />
-    <ClCompile Include="..\src\ChunkStack.cpp" />
-    <ClCompile Include="..\src\combine.cpp" />
-    <ClCompile Include="..\src\compat_win32.cpp" />
-    <ClCompile Include="..\src\defines.cpp" />
-    <ClCompile Include="..\src\detect.cpp" />
-    <ClCompile Include="..\src\indent.cpp" />
-    <ClCompile Include="..\src\keywords.cpp" />
-    <ClCompile Include="..\src\lang_pawn.cpp" />
-    <ClCompile Include="..\src\logger.cpp" />
-    <ClCompile Include="..\src\logmask.cpp" />
-    <ClCompile Include="..\src\md5.cpp" />
-    <ClCompile Include="..\src\newlines.cpp" />
-    <ClCompile Include="..\src\options.cpp" />
-    <ClCompile Include="..\src\output.cpp" />
-    <ClCompile Include="..\src\parens.cpp" />
-    <ClCompile Include="..\src\parse_frame.cpp" />
-    <ClCompile Include="..\src\punctuators.cpp" />
-    <ClCompile Include="..\src\semicolons.cpp" />
-    <ClCompile Include="..\src\sorting.cpp" />
-    <ClCompile Include="..\src\space.cpp" />
-    <ClCompile Include="..\src\tokenize.cpp" />
-    <ClCompile Include="..\src\tokenize_cleanup.cpp" />
-    <ClCompile Include="..\src\uncrustify.cpp" />
-    <ClCompile Include="..\src\unc_text.cpp" />
-    <ClCompile Include="..\src\unicode.cpp" />
-    <ClCompile Include="..\src\universalindentgui.cpp" />
-    <ClCompile Include="..\src\width.cpp" />
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{23c8a56a-5d5e-4d47-aff5-90cf48317581}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{3187e485-7fba-4945-ab6d-aa97751852b6}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Header Files\autoconf">
+      <UniqueIdentifier>{0969af4f-5bb0-422a-a3ef-b2ffe7ca84c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{cb857a23-4be6-452f-a3e3-8d1516e513d9}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="Documentation">
+      <UniqueIdentifier>{bfd1c076-0417-4217-9718-c8ea014819c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Documentation\htdocs">
+      <UniqueIdentifier>{f7fffe90-411b-45d4-9c57-350f1ece47ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Documentation\htdocs\images">
+      <UniqueIdentifier>{277fec34-b176-47bd-b840-f4d4312be91a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Documentation\man-page">
+      <UniqueIdentifier>{abf43b9b-c7c1-48e5-ba6d-f8f7669a7de9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extras">
+      <UniqueIdentifier>{f0e29d0d-f467-4375-9083-7d64fa5dd18a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extras\Scripts">
+      <UniqueIdentifier>{cf615941-a9d2-42c8-bd3e-74cac653b9c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extras\GNU autotools">
+      <UniqueIdentifier>{15ff7443-bd67-447c-8356-62e89b5d27fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extras\Tests">
+      <UniqueIdentifier>{fea5fc11-593d-4522-93f7-6a1da9ff714d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extras\Tests\C">
+      <UniqueIdentifier>{b4ee2061-341d-46b0-9cdd-013e1c855a75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extras\Tests\CPP">
+      <UniqueIdentifier>{aa9ee2dd-a0a4-40ef-b0c7-2d8dade95013}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extras\Tests\PHP">
+      <UniqueIdentifier>{bee3f9b2-dda0-4612-ba4c-49fdb5d920c5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\align_stack.h" />
-    <ClInclude Include="..\src\backup.h" />
-    <ClInclude Include="..\src\base_types.h" />
-    <ClInclude Include="..\src\char_table.h" />
-    <ClInclude Include="..\src\chunk_list.h" />
-    <ClInclude Include="..\src\ChunkStack.h" />
-    <ClInclude Include="..\src\config.h" />
-    <ClInclude Include="..\src\ListManager.h" />
-    <ClInclude Include="..\src\log_levels.h" />
-    <ClInclude Include="..\src\logger.h" />
-    <ClInclude Include="..\src\logmask.h" />
-    <ClInclude Include="..\src\md5.h" />
-    <ClInclude Include="..\src\options.h" />
-    <ClInclude Include="..\src\prototypes.h" />
-    <ClInclude Include="..\src\punctuators.h" />
-    <ClInclude Include="..\src\token_enum.h" />
-    <ClInclude Include="..\src\token_names.h" />
-    <ClInclude Include="..\src\uncrustify_types.h" />
-    <ClInclude Include="..\src\uncrustify_version.h" />
-    <ClInclude Include="..\src\unc_ctype.h" />
-    <ClInclude Include="..\src\unc_text.h" />
-    <ClInclude Include="windows_compat.h" />
+    <ClCompile Include="..\src\align.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\align_stack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\args.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\backup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\brace_cleanup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\braces.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\chunk_list.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ChunkStack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\combine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\defines.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\detect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\indent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\keywords.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lang_pawn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\logmask.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\md5.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\newlines.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\options.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\output.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\parens.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\parse_frame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\punctuators.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\reflow_text.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\semicolons.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sorting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\space.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tokenize.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tokenize_cleanup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\uncrustify.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\universalindentgui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\width.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\reflow_text_box.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\reflow_text_dbg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\reflow_text_para.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\reflow_text_utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\compat_win32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\unc_text.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\unicode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\align_stack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\args.h">
-      <Filter>x</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\backup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\base_types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\char_table.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\chunk_list.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ChunkStack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ListManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\log_levels.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\logmask.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\md5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\options.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\prototypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\punctuators.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\reflow_text.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\token_enum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\token_names.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\uncrustify_types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\uncrustify_version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="windows_compat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\reflow_text_internal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\unc_ctype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\unc_text.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Makefile.am" />
-    <None Include="..\make_punctuators.sh" />
-    <None Include="..\scripts\check_options.py" />
-    <None Include="..\scripts\cmpcfg.pl" />
-    <None Include="..\scripts\punc.py" />
-    <None Include="..\scripts\tokenize.py" />
-    <None Include="..\scripts\update-defaults.sh" />
-    <None Include="..\src\config.h.in" />
-    <None Include="..\src\Makefile.am" />
-    <None Include="..\src\uncrustify_version.h.in" />
-    <None Include="..\documentation\align-thresholds.txt" />
-    <None Include="..\AUTHORS" />
-    <None Include="..\autogen.sh" />
-    <None Include="..\bootstrap" />
-    <None Include="..\BUGS" />
-    <None Include="..\ChangeLog" />
-    <None Include="..\configure.in" />
-    <None Include="..\COPYING" />
-    <None Include="..\documentation\goals.txt" />
-    <None Include="..\HELP" />
-    <None Include="..\INSTALL" />
-    <None Include="..\make_token_names.sh" />
-    <None Include="..\make_win32.sh" />
-    <None Include="..\mk_all_distros.sh" />
-    <None Include="..\NEWS" />
-    <None Include="..\documentation\overview.odt" />
-    <None Include="..\documentation\paren_stack.txt" />
-    <None Include="..\README" />
-    <None Include="..\release-steps.txt" />
-    <None Include="..\run_tests.sh" />
-    <None Include="..\documentation\theory.txt" />
-    <None Include="..\tests\c-sharp.test" />
-    <None Include="..\tests\c.test" />
-    <None Include="..\tests\cpp.test" />
-    <None Include="..\tests\d.test" />
-    <None Include="..\tests\difftest.sh" />
-    <None Include="..\tests\ecma.test" />
-    <None Include="..\tests\fixtest.sh" />
-    <None Include="..\tests\java.test" />
-    <None Include="..\tests\objective-c.test" />
-    <None Include="..\tests\pawn.test" />
-    <None Include="..\tests\php.test" />
-    <None Include="..\tests\run_tests.py" />
-    <None Include="..\tests\tests.vpj" />
-    <None Include="..\tests\vala.test" />
-    <None Include="..\todo.txt" />
-    <None Include="..\update-default-cfg.sh" />
-    <None Include="..\working.txt" />
-    <None Include="..\documentation\htdocs\ben.cfg.txt" />
-    <None Include="..\documentation\htdocs\ChangeLog" />
-    <None Include="..\documentation\htdocs\config.txt" />
-    <None Include="..\documentation\htdocs\configuration.txt" />
-    <None Include="..\documentation\htdocs\default.cfg" />
-    <None Include="..\documentation\htdocs\index.html" />
-    <None Include="..\documentation\htdocs\linux.cfg.txt" />
-    <None Include="..\documentation\htdocs\project-support.jpg" />
-    <None Include="..\documentation\htdocs\uncrustify.css" />
-    <None Include="..\documentation\htdocs\uncrustify.html" />
-    <None Include="..\documentation\htdocs\images\linuxlinks.gif" />
-    <None Include="..\man\Makefile.am" />
-    <None Include="..\man\uncrustify.1" />
-    <None Include="..\man\uncrustify.1.in" />
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="x">
-      <UniqueIdentifier>{fa16eec3-c84c-4ea0-9c85-03a33b228844}</UniqueIdentifier>
-    </Filter>
+    <None Include="..\src\config.h.in">
+      <Filter>Header Files\autoconf</Filter>
+    </None>
+    <None Include="..\src\uncrustify_version.h.in">
+      <Filter>Header Files\autoconf</Filter>
+    </None>
+    <None Include="..\documentation\align-thresholds.txt">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="..\AUTHORS">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="..\BUGS">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="..\ChangeLog">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="..\COPYING">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="..\documentation\goals.txt">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="..\HELP">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="..\INSTALL">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="..\NEWS">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="..\documentation\overview.odt">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="..\documentation\paren_stack.txt">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="..\README">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="..\release-steps.txt">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="..\documentation\theory.txt">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="..\todo.txt">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="..\working.txt">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="..\documentation\htdocs\ben.cfg.txt">
+      <Filter>Documentation\htdocs</Filter>
+    </None>
+    <None Include="..\documentation\htdocs\ChangeLog">
+      <Filter>Documentation\htdocs</Filter>
+    </None>
+    <None Include="..\documentation\htdocs\config.txt">
+      <Filter>Documentation\htdocs</Filter>
+    </None>
+    <None Include="..\documentation\htdocs\configuration.txt">
+      <Filter>Documentation\htdocs</Filter>
+    </None>
+    <None Include="..\documentation\htdocs\default.cfg">
+      <Filter>Documentation\htdocs</Filter>
+    </None>
+    <None Include="..\documentation\htdocs\index.html">
+      <Filter>Documentation\htdocs</Filter>
+    </None>
+    <None Include="..\documentation\htdocs\linux.cfg.txt">
+      <Filter>Documentation\htdocs</Filter>
+    </None>
+    <None Include="..\documentation\htdocs\project-support.jpg">
+      <Filter>Documentation\htdocs</Filter>
+    </None>
+    <None Include="..\documentation\htdocs\uncrustify.css">
+      <Filter>Documentation\htdocs</Filter>
+    </None>
+    <None Include="..\documentation\htdocs\uncrustify.html">
+      <Filter>Documentation\htdocs</Filter>
+    </None>
+    <None Include="..\documentation\htdocs\images\linuxlinks.gif">
+      <Filter>Documentation\htdocs\images</Filter>
+    </None>
+    <None Include="..\man\Makefile.am">
+      <Filter>Documentation\man-page</Filter>
+    </None>
+    <None Include="..\man\uncrustify.1">
+      <Filter>Documentation\man-page</Filter>
+    </None>
+    <None Include="..\man\uncrustify.1.in">
+      <Filter>Documentation\man-page</Filter>
+    </None>
+    <None Include="..\mk_all_distros.sh">
+      <Filter>Extras\Scripts</Filter>
+    </None>
+    <None Include="..\make_win32.sh">
+      <Filter>Extras\Scripts</Filter>
+    </None>
+    <None Include="..\make_token_names.sh">
+      <Filter>Extras\Scripts</Filter>
+    </None>
+    <None Include="..\update-default-cfg.sh">
+      <Filter>Extras\Scripts</Filter>
+    </None>
+    <None Include="..\run_tests.sh">
+      <Filter>Extras\Scripts</Filter>
+    </None>
+    <None Include="..\autogen.sh">
+      <Filter>Extras\GNU autotools</Filter>
+    </None>
+    <None Include="..\bootstrap">
+      <Filter>Extras\GNU autotools</Filter>
+    </None>
+    <None Include="..\configure.in">
+      <Filter>Extras\GNU autotools</Filter>
+    </None>
+    <None Include="..\src\Makefile.am">
+      <Filter>Extras\GNU autotools</Filter>
+    </None>
+    <None Include="..\Makefile.am">
+      <Filter>Extras\GNU autotools</Filter>
+    </None>
+    <None Include="..\tests\run_tests.py">
+      <Filter>Extras\Scripts</Filter>
+    </None>
+    <None Include="..\scripts\check_options.py">
+      <Filter>Extras\Scripts</Filter>
+    </None>
+    <None Include="..\scripts\cmpcfg.pl">
+      <Filter>Extras\Scripts</Filter>
+    </None>
+    <None Include="..\scripts\punc.py">
+      <Filter>Extras\Scripts</Filter>
+    </None>
+    <None Include="..\scripts\tokenize.py">
+      <Filter>Extras\Scripts</Filter>
+    </None>
+    <None Include="..\scripts\update-defaults.sh">
+      <Filter>Extras\Scripts</Filter>
+    </None>
+    <None Include="..\tests\difftest.sh">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\fixtest.sh">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\c.test">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\cpp.test">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\c-sharp.test">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\d.test">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\ecma.test">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\java.test">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\objective-c.test">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\pawn.test">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\php.test">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\vala.test">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\tests\tests.vpj">
+      <Filter>Extras\Tests</Filter>
+    </None>
+    <None Include="..\make_punctuators.sh">
+      <Filter>Extras\Scripts</Filter>
+    </None>
   </ItemGroup>
 </Project>
