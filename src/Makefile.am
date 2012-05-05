@@ -1,12 +1,14 @@
 AUTOMAKE_OPTIONS = foreign no-dependencies
 
+
 DISTCLEANFILES =
-CLEANFILES = *.o *~ *.bak
+CLEANFILES = *.o *~ *.bak token_names.h punctuators.h
 MAINTAINERCLEANFILES = Makefile.in
+
 
 bin_PROGRAMS = uncrustify
 
-BUILT_SOURCES = token_names.h
+BUILT_SOURCES = token_names.h punctuators.h
 
 uncrustify_SOURCES = uncrustify.cpp chunk_list.cpp indent.cpp align.cpp combine.cpp \
 		tokenize.cpp tokenize_cleanup.cpp space.cpp newlines.cpp output.cpp \
@@ -29,4 +31,15 @@ token_names.h: token_enum.h ../make_token_names.sh
 	@echo "Rebuilding token_names.h"
 	@sh ../make_token_names.sh
 
-uncrustify_CPPFLAGS = -Wall
+punctuators.h: ../scripts/punc.py punctuators.cpp
+	@echo "Rebuilding punctuators.h"
+	@sh ../make_punctuators.sh
+
+# uncrustify_CPPFLAGS = -Wall
+
+depend:
+	ccmakedep -- $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(uncrustify_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -- $(uncrustify_SOURCES)
+
+
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.

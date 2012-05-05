@@ -1,5 +1,9 @@
 SUBDIRS =
 
+DISTCLEANFILES = 
+CLEANFILES = *~ *.bak
+MAINTAINERCLEANFILES = Makefile.in
+
 man_MANS = uncrustify.1
 
 uncrustify_man_mans = uncrustify.1

@@ -1016,3 +1016,7 @@ AC_SUBST([am__tar])
 AC_SUBST([am__untar])
 ]) # _AM_PROG_TAR
 
+m4_include([m4/ax_cflags_gcc_option.m4])
+m4_include([m4/ax_cflags_warn_all.m4])
+m4_include([m4/ax_cxxflags_gcc_option.m4])
+m4_include([m4/ax_cxxflags_warn_all.m4])
