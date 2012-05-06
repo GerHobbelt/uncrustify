@@ -30,9 +30,7 @@ int main(int argc, char *argv[])
 		case 'a':      /* Don't indent the case. */
 			aflag = 1; /* Indent case body one tab. */
 
-		/*
-		 * FALLTHROUGH
-		 */
+		/* FALLTHROUGH */
 		case 'b':
 			bflag = 1;
 			break;
@@ -54,9 +52,7 @@ int main(int argc, char *argv[])
 		case '?':
 		default:
 			usage();
-			/*
-			 * NOTREACHED
-			 */
+			/* NOTREACHED */
 		}
 	argc -= optind;
 	argv += optind;
@@ -140,9 +136,9 @@ int main(int argc, char *argv[])
 	// Exits should be 0 on success, or 1 on failure.
 
 	exit(0); /*
-              * Avoid obvious comments such as
-              * "Exit 0 on success."
-              */
+	          * Avoid obvious comments such as
+	          * "Exit 0 on success."
+	          */
 }
 
 static char *function(a1, a2, fl, a4)

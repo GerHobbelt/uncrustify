@@ -11,10 +11,10 @@
 #define V_ASN1_PRIMATIVE_TAG            0x1f
 
 #define V_ASN1_APP_CHOOSE               -2    /* let the recipient
-	                                           *choose */
+	                                           * choose */
 #define V_ASN1_OTHER                    -3    /* used in ASN1_TYPE */
 #define V_ASN1_ANY                      -4    /* used in ASN1 template
-	                                           *code */
+	                                           * code */
 
 #define V_ASN1_NEG                      0x100 /* negative flag */
 
@@ -97,9 +97,9 @@ typedef struct asn1_ctx_st
 {
 	unsigned char *p;    /* work char pointer */
 	int    eos;          /* end of sequence read for indefinite
-	                      *encoding */
-	int    error;        /* error code to use when returning an error
-	                      **/
+	                      * encoding */
+	int    error;        /* error code to use when returning an
+	                      * error */
 	int    inf;          /* constructed if 0x20, indefinite is 0x21 */
 	int    tag;          /* tag from last 'get object' */
 	int    xclass;       /* class from last 'get object' */
@@ -114,11 +114,11 @@ typedef struct asn1_const_ctx_st
 {
 	const unsigned char *p;    /* work char pointer */
 	int    eos;                /* end of sequence read for indefinite
-	                            *encoding */
+	                            * encoding */
 	int    error;              /* error code to use when returning an
-	                            *error */
+	                            * error */
 	int    inf;                /* constructed if 0x20, indefinite is
-	                            *0x21 */
+	                            * 0x21 */
 	int    tag;                /* tag from last 'get object' */
 	int    xclass;             /* class from last 'get object' */
 	size_t slen;               /* length of last 'get object' */
@@ -132,7 +132,7 @@ typedef struct asn1_const_ctx_st
  * whether the names and data need to be free()ed */
 #define ASN1_OBJECT_FLAG_DYNAMIC         0x01 /* internal use */
 #define ASN1_OBJECT_FLAG_CRITICAL        0x02 /* critical x509v3
-	                                           *object id */
+	                                           * object id */
 #define ASN1_OBJECT_FLAG_DYNAMIC_STRINGS 0x04 /* internal use */
 #define ASN1_OBJECT_FLAG_DYNAMIC_DATA    0x08 /* internal use */
 typedef struct asn1_object_st
@@ -141,25 +141,21 @@ typedef struct asn1_object_st
 	int nid;
 	size_t      length;
 	const unsigned char *data;          /* data remains const after
-	                                     *init */
+	                                     * init */
 	int flags;                          /* Should we free this one */
 } ASN1_OBJECT;
 
 #define ASN1_STRING_FLAG_BITS_LEFT 0x08 /* Set if 0x07 has bits left
-	                                     *value */
+	                                     * value */
 /* This indicates that the ASN1_STRING is not a real value but just a
- * place
- * holder for the location where indefinite length constructed data
- *should
- * be inserted in the memory buffer
- */
+ * place holder for the location where indefinite length constructed
+ * data should be inserted in the memory buffer */
 #define ASN1_STRING_FLAG_NDEF 0x010
 
 /* This flag is used by the CMS code to indicate that a string is not
  * complete and is a place holder for content when it had all been
  * accessed. The flag will be reset when content has been written to
- *it.
- */
+ * it. */
 
 #define ASN1_STRING_FLAG_CONT 0x020
 
@@ -179,8 +175,7 @@ typedef struct asn1_string_st
 
 /* ASN1_ENCODING structure: this is used to save the received
  * encoding of an ASN1 type. This is useful to get round
- * problems with invalid encodings which can break signatures.
- */
+ * problems with invalid encodings which can break signatures. */
 
 typedef struct ASN1_ENCODING_st
 {
@@ -199,8 +194,7 @@ typedef struct ASN1_ENCODING_st
 #define PKCS9STRING_TYPE (DIRSTRING_TYPE | B_ASN1_IA5STRING)
 
 /* Declarations for template structures: for full definitions
- * see asn1t.h
- */
+ * see asn1t.h */
 typedef struct ASN1_TEMPLATE_st ASN1_TEMPLATE;
 typedef struct ASN1_ITEM_st ASN1_ITEM;
 typedef struct ASN1_TLC_st ASN1_TLC;
@@ -255,22 +249,16 @@ typedef struct ASN1_VALUE_st ASN1_VALUE;
  * WARNING WARNING WARNING
  *
  * uncrustify still introduces whitespace in here at some spots, but
- *then
- * one might ask how crazy we want to go regarding ## encumbered
- *parsing?
+ * then one might ask how crazy we want to go regarding ## encumbered
+ * parsing?
  * There's always the copout of INDENT-OFF markers for files like
- *these,
- * once you've got them 95% right through uncrustify and that extra 5%
- * by hand ;-)
+ * these, once you've got them 95% right through uncrustify and that
+ * extra 5% by hand ;-)
  */
 #define TYPEDEF_D2I_OF(type) typedef type *d2i_of_##type (type **, const unsigned char **, size_t)
 #define TYPEDEF_I2D_OF(type) typedef int i2d_of_##type (type *, unsigned char **)
-#define TYPEDEF_I2D_OF_CONST(type) typedef int i2d_of_const_##type (const type *, unsigned char **)   /*
-	                                                                                                   *[i_a]
-	                                                                                                   **/
-#define TYPEDEF_D2I2D_OF(type) TYPEDEF_D2I_OF(type); TYPEDEF_I2D_OF(type); TYPEDEF_I2D_OF_CONST(type) /*
-	                                                                                                   *[i_a]
-	                                                                                                   **/
+#define TYPEDEF_I2D_OF_CONST(type) typedef int i2d_of_const_##type (const type *, unsigned char **)   /* [i_a] */
+#define TYPEDEF_D2I2D_OF(type) TYPEDEF_D2I_OF(type); TYPEDEF_I2D_OF(type); TYPEDEF_I2D_OF_CONST(type) /* [i_a] */
 
 
 /* Macro to include ASN1_ITEM pointer from base type */

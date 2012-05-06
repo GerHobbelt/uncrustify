@@ -1,4 +1,6 @@
-/* Make the structure name match the typedef. */
+/*
+ * Make the structure name match the typedef.
+ */
 typedef struct bar
 {
 	int level;
@@ -89,8 +91,7 @@ int main(int argc, char *argv[])
 	/* Indentation is an 8 character tab.  Second level indents are
 	 * four spaces.
 	 * If you have to wrap a long statement, put the operator at the
-	 *end of the
-	 * line.
+	 * end of the line.
 	 */
 
 	while (cnt < 20 && this_variable_name_is_too_long &&
@@ -100,14 +101,12 @@ int main(int argc, char *argv[])
 		        on + the + second + and + subsequent + lines;
 
 	// Do not add whitespace at the end of a line, and only use tabs
-	// followed by
-	// spaces to form the indentation.  Do not use more spaces than a
-	// tab will
-	// produce and do not use spaces in front of tabs.
+	// followed by spaces to form the indentation.  Do not use more
+	// spaces than a tab will produce and do not use spaces in front
+	// of tabs.
 	//
 	// Closing and opening braces go on the same line as the else.
-	//  Braces that
-	// are not necessary may be left out.
+	// Braces that are not necessary may be left out.
 
 	if (test)
 		stmt;
@@ -120,20 +119,18 @@ int main(int argc, char *argv[])
 		stmt;
 
 	// No spaces after function names.  Commas have a space after
-	// them.  No spa-
-	// ces after `(' or `[' or preceding `]' or `)' characters.
+	// them.  No spaces after `(' or `[' or preceding `]' or `)'
+	// characters.
 
 	error = function(a1, a2);
 	if (error != 0)
 		exit(error);
 
 	// Unary operators do not require spaces, binary operators do.  Do
-	// not use
-	// parentheses unless they are required for precedence or unless
-	// the state-
-	// ment is confusing without them.  Remember that other people may
-	// confuse
-	// easier than you.  Do YOU understand the following?
+	// not use parentheses unless they are required for precedence or
+	// unless the statement is confusing without them.  Remember that
+	// other people may confuse easier than you.  Do YOU understand
+	// the following?
 
 	a = b->c[0] + ~d == (e || f) || g && h ? i : j >> 1;
 	k = !(l & FLAGS);
