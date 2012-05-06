@@ -422,7 +422,7 @@ class words_collection : public items_collection<reflow_box>
 	friend class paragraph_collection;
 
 public:
-	words_collection(cmt_reflow &cmt)
+	words_collection(cmt_reflow_ex &cmt)
 		: items_collection<reflow_box>(4 + cmt.m_comment_len / 4 /* heuristic (test cases average a ratio of 0.227) */)
 	{
 	}

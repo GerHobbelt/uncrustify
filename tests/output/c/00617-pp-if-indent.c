@@ -20,7 +20,6 @@ void COMINL_vidInit(void)
 {
    uint8 u8LocalMsgIdx;
 
-
    if (COMINL_kastrVarReceiveMsg[u8LocalMsgIdx].udtDeadlineMonTimer
        < COMINL_udtNB_MESSAGES_RX)
    {

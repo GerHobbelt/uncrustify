@@ -49,6 +49,15 @@
     <Filter Include="Extras\Tests\PHP">
       <UniqueIdentifier>{bee3f9b2-dda0-4612-ba4c-49fdb5d920c5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Extras\Tests\CONFIG">
+      <UniqueIdentifier>{35402edd-84df-4c95-9cb4-45fbd217279c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extras\GNU autotools\src">
+      <UniqueIdentifier>{413c79e3-89e8-4e61-9249-9aafc5935421}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extras\etc">
+      <UniqueIdentifier>{3d98b3b9-54af-4cf9-bb68-60b6802841d3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\align.cpp">
@@ -120,9 +129,6 @@
     <ClCompile Include="..\src\punctuators.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\reflow_text.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\semicolons.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -147,6 +153,18 @@
     <ClCompile Include="..\src\width.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\compat_win32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\unc_text.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\unicode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\reflow_text.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\reflow_text_box.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -157,15 +175,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\reflow_text_utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\compat_win32.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\unc_text.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\unicode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -218,9 +227,6 @@
     <ClInclude Include="..\src\punctuators.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\reflow_text.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\token_enum.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -236,13 +242,16 @@
     <ClInclude Include="windows_compat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\reflow_text_internal.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\unc_ctype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\unc_text.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\reflow_text_internal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\reflow_text.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -302,9 +311,6 @@
       <Filter>Documentation</Filter>
     </None>
     <None Include="..\documentation\htdocs\ben.cfg.txt">
-      <Filter>Documentation\htdocs</Filter>
-    </None>
-    <None Include="..\documentation\htdocs\ChangeLog">
       <Filter>Documentation\htdocs</Filter>
     </None>
     <None Include="..\documentation\htdocs\config.txt">
@@ -367,12 +373,6 @@
     <None Include="..\configure.in">
       <Filter>Extras\GNU autotools</Filter>
     </None>
-    <None Include="..\src\Makefile.am">
-      <Filter>Extras\GNU autotools</Filter>
-    </None>
-    <None Include="..\Makefile.am">
-      <Filter>Extras\GNU autotools</Filter>
-    </None>
     <None Include="..\tests\run_tests.py">
       <Filter>Extras\Scripts</Filter>
     </None>
@@ -432,6 +432,795 @@
     </None>
     <None Include="..\make_punctuators.sh">
       <Filter>Extras\Scripts</Filter>
+    </None>
+    <None Include="..\tests\config\1liner-no-split.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\1liner-split.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\add_long_closebrace_comment_1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\al.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\align_attr.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\align_fcall.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\align_fcall-2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\align_left_shift.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\align_right_cmt_gap-1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\align_right_cmt_gap-2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\align_typedef_func-0.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\align_typedef_func-1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\align_typedef_func-2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\align-1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\align-2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\align-3.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\amxmodx.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\avalon.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\avalon2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\avalon3.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\avalon4.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\ben.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\ben2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\blc-1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\bool-pos-eol.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\bool-pos-eol-break.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\bool-pos-eol-force.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\bool-pos-sol.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\bool-pos-sol-break.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\bool-pos-sol-force.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\brace-allman.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\brace-banner.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\brace-gnu.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\brace-kr.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\brace-kr-br.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\brace-remove-2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\brace-remove-all.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\brace-ws.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\brace-ws2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\byref-center.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\byref-left.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\byref-right.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\case-1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\case-2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\case-3.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\cast-sp-a.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\cast-sp-r.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\cast-type.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\cast-types.txt">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\cgal.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\clark.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\class-colon-pos-eol.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\class-colon-pos-eol-add.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\class-colon-pos-sol.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\class-colon-pos-sol-add.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\class-nl_func-add.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\class-nl_func-del.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\cmt_indent-1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\cmt_indent-2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\cmt_indent-3.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\cmt_multi-1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\cmt_multi-2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\cmt_nl_end.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\cmt_right.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\comment-align.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\cond-1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\cond-2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\const_throw.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\cpp_to_c-1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\cpp_to_c-2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\cpp_to_c-3.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\cs_generics.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\cu.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\custom_types_ssl.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\custom-open.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\custom-open2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\d.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\d_sp_paren.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\d2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\d3.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\d3a.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\del_semicolon.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\delete.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\d-tst2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\else-if-1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\else-if-2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\empty.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\empty_body.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\endif.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\file_footer.txt">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\file_header.txt">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\freebsd.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\func_call_user.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\func_param.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\func_wrap1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\func_wrap2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\func-def-1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\func-def-2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\func-def-3.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\function_header.txt">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\ger.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\ger-full-cmt-reflow.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\getset.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\if_chain.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\indent.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\indent_braces_no.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\indent_ctor_init.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\indent_func_call_param.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\indent_func_def_param.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\indent_func_param.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\indent_func_proto_param.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\indent_namespace-f.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\indent_namespace-t.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\indent_paren_close-0.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\indent_paren_close-1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\indent_paren_close-2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\indent_var_def.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\indent_var_def_cont.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\indent-1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\js-nil.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\kw_subst.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\kw_subst2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\kw_subst3.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\lambda1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\long_namespace.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\misc6.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\mod_case_brace_add.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\mod_case_brace_rm.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\mod_move_case_brace.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\mod-paren.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\mod-paren2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\mono.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\multi.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nepenthes.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\newline_after_endif.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_access_spec.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_after_func_body.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_after_func_body-2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_assign1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_assign2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_brace_brace-a.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_brace_test.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_brace_test-2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_class-a.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_class-r.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_create_one_liner.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_ds_struct_enum-1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_ds_struct_enum-2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_endif.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_func_decl_1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_func_decl_2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_func_scope_name.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_func_type_name_class.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_func_type_name_force.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_func_type_name_remove.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_namespace-a.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_namespace-r.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_semicolon.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_template_class-force.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_template_class-remove.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl_try-a.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nl-comment.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\nSolve.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\obj-c.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\objc_complex_method.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\oc-split.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\op-space-force.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\op-space-remove.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\pascal_ptr.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\pawn.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\pawn-escape.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\pbtech.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\pos_compare-eol.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\pos_compare-sol.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\pos_conditional-eol.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\pos_conditional-sol.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\pp_define_at_level-1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\pp_if_indent-0.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\pp_if_indent-1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\pp_if_indent-2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\pp_if_indent-3.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\pp_ret.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\pp-indent-1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\pp-indent-2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\pp-indent-3.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\pp-space.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\preproc-cleanup.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\ptr_star-1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\ptr_star-2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\ptr_star-3.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\rdan.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\region-0.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\region-1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\region-2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\region-3.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\return-1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\return-2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\return-3.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\return-4.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sef.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sf.3266678.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sf.3315874.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sim.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sort_imports.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_after_cast.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_after_oc_at_sel_add.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_after_oc_at_sel_force.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_after_oc_at_sel_remove.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_after_oc_block_caret_add.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_after_oc_block_caret_force.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_after_oc_block_caret_remove.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_after_oc_return_type_add.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_after_oc_return_type_force.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_after_oc_return_type_remove.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_before_after_oc_block_caret_remove.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_before_ellipsis-f.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_before_ellipsis-r.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_before_oc_block_caret_add.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_before_oc_block_caret_force.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_before_oc_block_caret_remove.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_before_tr_emb_cmt-a.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_before_tr_emb_cmt-f.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_cmt_cpp_start_add.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_cmt_cpp_start_force.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_cmt_cpp_start_remove.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_func_call_empty.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_throw_paren-f.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp_throw_paren-r.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\sp-for-semi.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\star_pos-0.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\star_pos-1.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\star_pos-2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\tcf.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\template_sp-force.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\template_sp-remove.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\template4.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\type_wrap.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\var_def_gap.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\wessex.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\width.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\width-2.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\width-3.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\tests\config\xml-str.cfg">
+      <Filter>Extras\Tests\CONFIG</Filter>
+    </None>
+    <None Include="..\etc\amxmodx.cfg">
+      <Filter>Extras\etc</Filter>
+    </None>
+    <None Include="..\etc\ben.cfg">
+      <Filter>Extras\etc</Filter>
+    </None>
+    <None Include="..\etc\ben2.cfg">
+      <Filter>Extras\etc</Filter>
+    </None>
+    <None Include="..\etc\d.cfg">
+      <Filter>Extras\etc</Filter>
+    </None>
+    <None Include="..\etc\defaults.cfg">
+      <Filter>Extras\etc</Filter>
+    </None>
+    <None Include="..\etc\dofiles.sh">
+      <Filter>Extras\etc</Filter>
+    </None>
+    <None Include="..\etc\freebsd.cfg">
+      <Filter>Extras\etc</Filter>
+    </None>
+    <None Include="..\etc\gnu-indent.cfg">
+      <Filter>Extras\etc</Filter>
+    </None>
+    <None Include="..\etc\klaus.cfg">
+      <Filter>Extras\etc</Filter>
+    </None>
+    <None Include="..\etc\kr-indent.cfg">
+      <Filter>Extras\etc</Filter>
+    </None>
+    <None Include="..\etc\linux.cfg">
+      <Filter>Extras\etc</Filter>
+    </None>
+    <None Include="..\etc\linux-indent.cfg">
+      <Filter>Extras\etc</Filter>
+    </None>
+    <None Include="..\etc\mono.cfg">
+      <Filter>Extras\etc</Filter>
+    </None>
+    <None Include="..\etc\objc.cfg">
+      <Filter>Extras\etc</Filter>
+    </None>
+    <None Include="..\etc\sun.cfg">
+      <Filter>Extras\etc</Filter>
+    </None>
+    <None Include="..\etc\types.txt">
+      <Filter>Extras\etc</Filter>
+    </None>
+    <None Include="..\etc\uncrust-files.sh">
+      <Filter>Extras\etc</Filter>
+    </None>
+    <None Include="..\etc\xsupplicant.cfg">
+      <Filter>Extras\etc</Filter>
+    </None>
+    <None Include="..\src\Makefile.am">
+      <Filter>Extras\GNU autotools\src</Filter>
+    </None>
+    <None Include="..\Makefile.am">
+      <Filter>Extras\GNU autotools</Filter>
     </None>
   </ItemGroup>
 </Project>

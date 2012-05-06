@@ -45,11 +45,8 @@
 #include <stdlib.h>   // free
 
 
-#define USE_NEW_COMMENT_FORMATTER  0
 
 
-
-#if USE_NEW_COMMENT_FORMATTER
 
 struct reflow_box;
 struct paragraph_box;
@@ -57,7 +54,7 @@ class words_collection;
 class break_suggestions;
 struct reflow_tune_parameters_t;
 
-class cmt_reflow
+class cmt_reflow_ex
 {
 	friend class words_collection;
 	friend struct reflow_tune_parameters_t;
@@ -78,9 +75,9 @@ protected:
    //const char *m_cont_text;  /* fixed text to output at the start of a line (0 to 3 chars) */
    enum cmt_reflow_mode_t
    {
-		CMT_REFLOW_MODE_DO_ONLY_LINEWRAP = 0,
-		CMT_REFLOW_MODE_DO_NOT_REFLOW = 1,
-		CMT_REFLOW_MODE_DO_FULL_REFLOW = 2
+		CMT_REFLOW_MODE_DO_ONLY_LINEWRAP = 3,
+		CMT_REFLOW_MODE_DO_NOT_REFLOW = 4,
+		CMT_REFLOW_MODE_DO_FULL_REFLOW = 5
    }		  m_reflow_mode; /* reflow mode for the current text */
    bool       m_is_cpp_comment;
 public:
@@ -153,8 +150,8 @@ protected:
 	static const int NONBREAKING_SPACE_CHAR = 0x07;
 
 public:
-   cmt_reflow();
-   ~cmt_reflow();
+   cmt_reflow_ex();
+   ~cmt_reflow_ex();
 
    void set_reflow_mode(int mode);
 
@@ -270,6 +267,5 @@ protected:
 
 
 
-#endif
 
 #endif

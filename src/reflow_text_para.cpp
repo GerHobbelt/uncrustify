@@ -45,9 +45,6 @@
 #include "args.h"
 #include "reflow_text.h"
 
-
-#if USE_NEW_COMMENT_FORMATTER
-
 #include "reflow_text_internal.h"
 
 
@@ -124,6 +121,3 @@ bool paragraph_box::para_is_a_usual_piece_of_text(void) const
 }
 
 
-
-
-#endif

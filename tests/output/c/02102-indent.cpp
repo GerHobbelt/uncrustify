@@ -569,7 +569,8 @@ void indent_text(void)
 
         if (chunk_is_newline(prev))
           frm.pse[frm.pse_tos].indent += 2;
-          /* don't change indent of current line */
+
+        /* don't change indent of current line */
         }
       }
     else if ((pc->type == CT_PAREN_OPEN) ||
@@ -667,7 +668,7 @@ void indent_text(void)
           (pc->type == CT_DC_MEMBER) ||
           ((prev != NULL) &&
            ((prev->type == CT_MEMBER) ||
-               (prev->type == CT_DC_MEMBER))))
+            (prev->type == CT_DC_MEMBER))))
         {
         tmp = cpd.settings[UO_indent_member].n + indent_column;
         LOG_FMT(LINDENT, "%s: %d] member => %d\n",

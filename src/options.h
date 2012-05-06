@@ -619,7 +619,7 @@ enum uncrustify_options
    UO_cmt_width,                // column to wrap comments
    UO_cmt_inline_width,                // column to wrap inline comments
    UO_cmt_reflow_mode,          // comment reflow style
-	UO_cmt_reflow_mode_cpp, // cmt_reflow_mode override for C++ comments
+	UO_cmt_reflow_mode_cpp, // cmt_reflow_mode equivalent for C++ comments
 	UO_cmt_reflow_orphans,		// minimum number of words to keep on a first (any!) line
 	UO_cmt_reflow_widows,		// minimum number of words to keep on a last line
     UO_cmt_reflow_minimum_words_per_line,			// minimum number of words per comment line (prevent odd line wrapping for comments positioned towards the right edge --> allow those to overshoot the configured right edge

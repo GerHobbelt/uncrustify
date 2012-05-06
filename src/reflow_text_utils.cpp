@@ -45,9 +45,6 @@
 #include "args.h"
 #include "reflow_text.h"
 
-
-#if USE_NEW_COMMENT_FORMATTER
-
 #include "reflow_text_internal.h"
 
 
@@ -500,7 +497,7 @@ bool is_html_entity_name(const char *text, int *word_length)
 
 
 
-bool cmt_reflow::chunk_is_inline_comment(const chunk_t *pc)
+bool cmt_reflow_ex::chunk_is_inline_comment(const chunk_t *pc)
 {
 	//bool is_inline_comment = ((pc->flags & PCF_RIGHT_COMMENT) != 0);
 	bool is_inline_comment = ((pc->parent_type == CT_COMMENT_END) || (pc->parent_type == CT_COMMENT_EMBED));
@@ -508,7 +505,7 @@ bool cmt_reflow::chunk_is_inline_comment(const chunk_t *pc)
 	return is_inline_comment;
 }
 
-bool cmt_reflow::is_doxygen_tagmarker(const char *text, char doxygen_tag_marker)
+bool cmt_reflow_ex::is_doxygen_tagmarker(const char *text, char doxygen_tag_marker)
 {
 	return (doxygen_tag_marker
 					    ? *text == doxygen_tag_marker
@@ -522,7 +519,7 @@ non-alphanumeric character.
 
 Nope, chapter numbering and that sort of stuff is not recognized as 'viable' bullets.
 */
-bool cmt_reflow::is_viable_bullet_marker(const char *text, size_t len)
+bool cmt_reflow_ex::is_viable_bullet_marker(const char *text, size_t len)
 {
 	const char *s = text;
 	if (unc_isdigit(*s))
@@ -588,7 +585,7 @@ bool cmt_reflow::is_viable_bullet_marker(const char *text, size_t len)
 
 
 
-void cmt_reflow::resize_buffer(size_t extralen)
+void cmt_reflow_ex::resize_buffer(size_t extralen)
 {
 	size_t newlen = m_comment_len + extralen;
 	if (newlen < m_comment_size && newlen > 0) /* makes sure the 'comment' pointer is always initialized, even for empty comments */
@@ -632,14 +629,14 @@ Helper functions: expands all TABs in the input text so we can be sure where
 each input character was expected to be, at least visually.
 */
 
-void cmt_reflow::push(const char *text)
+void cmt_reflow_ex::push(const char *text)
 {
 	size_t len = strlen(text);
 
 	push(text, len);
 }
 
-void cmt_reflow::push(const char *text, size_t len)
+void cmt_reflow_ex::push(const char *text, size_t len)
 {
 	resize_buffer(len);
 
@@ -655,7 +652,7 @@ void cmt_reflow::push(const char *text, size_t len)
 	m_comment_len = dst - m_comment;
 }
 
-void cmt_reflow::push(char c, size_t len)
+void cmt_reflow_ex::push(char c, size_t len)
 {
 	resize_buffer(len);
 
@@ -679,7 +676,7 @@ void cmt_reflow::push(char c, size_t len)
  * If the arg list is '()' or '(void)', then no @params are added.
  * Likewise, if the return value is 'void', then no @return is added.
  */
-void cmt_reflow::add_javaparam(chunk_t *pc)
+void cmt_reflow_ex::add_javaparam(chunk_t *pc)
 {
    chunk_t *fpo;
    chunk_t *fpc;
@@ -766,7 +763,7 @@ void cmt_reflow::add_javaparam(chunk_t *pc)
  *
  * @return the number of characters eaten from the text
  */
-int cmt_reflow::add_kw(const char *text) /* [i_a] */
+int cmt_reflow_ex::add_kw(const char *text) /* [i_a] */
 {
 	/* [i_a] strncmp vs. memcmp + len - now we don't need to scan to the end of the keyword in the caller! */
    if (strncmp(text, "$(filename)", 11) == 0)
@@ -851,7 +848,7 @@ int cmt_reflow::add_kw(const char *text) /* [i_a] */
    return(0);
 }
 
-bool cmt_reflow::detect_as_javadoc_chunk(chunk_t *pc, bool setup)
+bool cmt_reflow_ex::detect_as_javadoc_chunk(chunk_t *pc, bool setup)
 {
 	size_t marker_len = 0;
 	bool backref = false;
@@ -950,7 +947,7 @@ Extra: replace '/'+'*' and '*'+'/' by a different non-breaking sequence when the
 
 Be aware that 'first_column' is 1-based!
 */
-size_t cmt_reflow::expand_tabs_and_clean(char **dst_ref, size_t *dstlen_ref, const char *src, size_t srclen, int first_column, bool part_of_preproc_continuation)
+size_t cmt_reflow_ex::expand_tabs_and_clean(char **dst_ref, size_t *dstlen_ref, const char *src, size_t srclen, int first_column, bool part_of_preproc_continuation)
 {
 	int pos = 0;
 	const int tabsize = m_tab_width;
@@ -1086,7 +1083,7 @@ default_case:
 Remove the first and last NEWLINEs (empty lines, really) from the
 comment text.
 */
-void cmt_reflow::strip_first_and_last_nl_from_text(void)
+void cmt_reflow_ex::strip_first_and_last_nl_from_text(void)
 {
 	char * const text = m_comment;
 	UNC_ASSERT_EX(strlen(text) <= m_comment_len, ("(%d != %d)", (int)strlen(text), (int)m_comment_len));
@@ -1159,7 +1156,7 @@ NOTE: each block of (merged) comment does or does not have a leader character, b
       have one MUST have the same leader character, because once determined, it stays that way for the
 entire comment!
 */
-int cmt_reflow::strip_nonboxed_lead_markers(char *text, int at_column)
+int cmt_reflow_ex::strip_nonboxed_lead_markers(char *text, int at_column)
 {
 	char *second_line = strchrnn(text, '\n');
     int lead_cnt = 0; /* number of '*' lead characters used for each comment line [0..2] */
@@ -1382,7 +1379,7 @@ int cmt_reflow::strip_nonboxed_lead_markers(char *text, int at_column)
 }
 
 
-void cmt_reflow::set_doxygen_marker(const char *marker, size_t len)
+void cmt_reflow_ex::set_doxygen_marker(const char *marker, size_t len)
 {
 	/* only set the the marker once per comment */
 	if (!m_doxygen_marker)
@@ -1410,7 +1407,7 @@ void cmt_reflow::set_doxygen_marker(const char *marker, size_t len)
 
 
 
-void cmt_reflow::push_chunk(chunk_t *pc)
+void cmt_reflow_ex::push_chunk(chunk_t *pc)
 {
 	if (!m_first_pc)
 	{
@@ -1454,7 +1451,7 @@ void cmt_reflow::push_chunk(chunk_t *pc)
  specified input column, so as to produce a comment text which can be inspected by the
  generic reflowing engine.
  */
-void cmt_reflow::push_text(const char *text, int len, bool esc_close, int first_extra_offset, int at_column, chunk_t *pc)
+void cmt_reflow_ex::push_text(const char *text, int len, bool esc_close, int first_extra_offset, int at_column, chunk_t *pc)
 {
    bool was_star   = false;
    bool was_slash  = false;
@@ -1667,7 +1664,7 @@ void cmt_reflow::push_text(const char *text, int len, bool esc_close, int first_
 
 
 
-void cmt_reflow::write2output(const char *text, size_t len)
+void cmt_reflow_ex::write2output(const char *text, size_t len)
 {
 	UNC_ASSERT(text);
 
@@ -1704,12 +1701,12 @@ void cmt_reflow::write2output(const char *text, size_t len)
 	}
 }
 
-void cmt_reflow::write2output(const char *text)
+void cmt_reflow_ex::write2output(const char *text)
 {
 	write2output(text, strlen(text));
 }
 
-void cmt_reflow::write_line_to_initial_column(void)
+void cmt_reflow_ex::write_line_to_initial_column(void)
 {
 	int left_col = m_left_global_output_column;
 	int diff = left_col - get_global_block_left_column();
@@ -1790,7 +1787,7 @@ void cmt_reflow::write_line_to_initial_column(void)
 
 
 
-void cmt_reflow::output_start(chunk_t *pc)
+void cmt_reflow_ex::output_start(chunk_t *pc)
 {
 	m_first_pc = pc;
 
@@ -1806,7 +1803,7 @@ void cmt_reflow::output_start(chunk_t *pc)
  *  3. They are indented to the same level
  *  4. Neither is a doxygen/javadoc comment (when recognition for those is turned on)
  */
-bool cmt_reflow::can_combine_comment(chunk_t *pc)
+bool cmt_reflow_ex::can_combine_comment(chunk_t *pc)
 {
 	/*
 	Don't permit merging comment chunks when the first block is a
@@ -1893,7 +1890,7 @@ bool cmt_reflow::can_combine_comment(chunk_t *pc)
 
 
 
-int cmt_reflow::write2out_comment_start(paragraph_box *para, words_collection &words)
+int cmt_reflow_ex::write2out_comment_start(paragraph_box *para, words_collection &words)
 {
 	UNC_ASSERT(para);
 
@@ -1925,7 +1922,7 @@ int cmt_reflow::write2out_comment_start(paragraph_box *para, words_collection &w
 }
 
 
-int cmt_reflow::write2out_comment_next_line(void)
+int cmt_reflow_ex::write2out_comment_next_line(void)
 {
 	write2output("\n");
 
@@ -1954,7 +1951,7 @@ int cmt_reflow::write2out_comment_next_line(void)
 }
 
 
-void cmt_reflow::write2out_comment_end(int deferred_whitespace, int deferred_nl)
+void cmt_reflow_ex::write2out_comment_end(int deferred_whitespace, int deferred_nl)
 {
 	int j;
 
@@ -1994,6 +1991,3 @@ void cmt_reflow::write2out_comment_end(int deferred_whitespace, int deferred_nl)
 }
 
 
-
-
-#endif

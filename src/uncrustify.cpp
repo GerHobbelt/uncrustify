@@ -564,64 +564,6 @@ int main(int argc, char *argv[])
 }
 #endif
 
-#if defined(WIN32) && 0
-#if 0
-   char *new_argv[] =
-   {
-	   argv[0],
-		"--update-config-with-doc",
-		"-c",
-		"..\\..\\hamsterdb\\uncrustify.v2.cfg",
-		"-o",
-		"..\\..\\hamsterdb\\uncrustify.v2.cfg",
-		NULL
-   };
-#elif 0
-   char *new_argv[] =
-   {
-	   argv[0],
-		"-c",
-		"..\\..\\hamsterdb\\uncrustify.v2.cfg",
-		"-f",
-		"..\\..\\hamsterdb\\uncrustify_in.c",
-		"-o",
-		"..\\..\\hamsterdb\\uncrustify_out.c",
-		NULL
-   };
-#elif 0
-/*
-20302 cpp_to_c-1.cfg           c/nl-cont.c
-20303 cpp_to_c-1.cfg           c/nl-cont2.c
-*/
-   char *new_argv[] =
-   {
-	   argv[0],
-		"-c",
-		"..\\tests\\config\\cpp_to_c-1.cfg",
-		"-f",
-		"..\\tests\\input\\c\\nl-cont.c",
-		"-o",
-		"..\\tests\\results\\c\\20302-nl-cont.c",
-		NULL
-   };
-#elif 01
-   char *new_argv[] =
-   {
-	   argv[0],
-		"-c",
-		"..\\tests\\config\\d.cfg",
-		"-f",
-		"..\\tests\\input\\d\\HashMap.d",
-		"-o",
-		"..\\tests\\results\\d\\40000-HashMap.d",
-		NULL
-   };
-#endif
-   argc = sizeof(new_argv)/sizeof(new_argv[0]);
-   argv = new_argv;
-   argc--;
-#endif
-
 #if defined(WIN32) || defined(_WIN32) || defined(_WIN64) || defined(WIN64)
 
    /*

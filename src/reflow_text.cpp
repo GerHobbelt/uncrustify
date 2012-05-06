@@ -45,9 +45,6 @@
 #include "args.h"
 #include "reflow_text.h"
 
-
-#if USE_NEW_COMMENT_FORMATTER
-
 #include "reflow_text_internal.h"
 
 
@@ -55,7 +52,7 @@
 
 
 
-cmt_reflow::cmt_reflow()
+cmt_reflow_ex::cmt_reflow_ex()
    : m_first_pc(NULL), m_last_pc(NULL),
    m_left_global_output_column(0),
    //m_brace_col(0),
@@ -106,7 +103,7 @@ cmt_reflow::cmt_reflow()
    set_cmt_config_params();
 }
 
-cmt_reflow::~cmt_reflow()
+cmt_reflow_ex::~cmt_reflow_ex()
 {
    if (m_comment)
 	   free((void *)m_comment);
@@ -131,14 +128,14 @@ cmt_reflow::~cmt_reflow()
 
 
 
-void cmt_reflow::set_reflow_mode(int mode)
+void cmt_reflow_ex::set_reflow_mode(int mode)
 {
 	switch (mode)
 	{
 	case CMT_REFLOW_MODE_DO_NOT_REFLOW:
 	case CMT_REFLOW_MODE_DO_ONLY_LINEWRAP:
 	case CMT_REFLOW_MODE_DO_FULL_REFLOW:
-		m_reflow_mode = (cmt_reflow::cmt_reflow_mode_t)mode;
+		m_reflow_mode = (cmt_reflow_ex::cmt_reflow_mode_t)mode;
 		break;
 
 	default:
@@ -149,14 +146,14 @@ void cmt_reflow::set_reflow_mode(int mode)
 
 
 
-int cmt_reflow::get_global_block_left_column(void)
+int cmt_reflow_ex::get_global_block_left_column(void)
 {
 	UNC_ASSERT(m_first_pc);
 	return cpd.column; // m_first_pc->column;
 }
 
 
-bool cmt_reflow::comment_is_part_of_preproc_macro(void) const
+bool cmt_reflow_ex::comment_is_part_of_preproc_macro(void) const
 {
 	return m_comment_is_part_of_preproc_macro;
 }
@@ -168,7 +165,7 @@ Estimate the width consumed by this bit of text.
 Take into account any keep-with-prev/next and other reflow limitations, such as localized 'non-reflow' series of boxes;
 this box is assumed to be the first one in such a series.
 */
-int cmt_reflow::estimate_box_print_width(paragraph_box *para, words_collection &words, int box_idx, int *last_box_for_this_bit)
+int cmt_reflow_ex::estimate_box_print_width(paragraph_box *para, words_collection &words, int box_idx, int *last_box_for_this_bit)
 {
 	reflow_box *box;
 
@@ -336,7 +333,7 @@ int cmt_reflow::estimate_box_print_width(paragraph_box *para, words_collection &
 
 
 
-paragraph_box *cmt_reflow::get_last_sibling(paragraph_box *para)
+paragraph_box *cmt_reflow_ex::get_last_sibling(paragraph_box *para)
 {
 	if (!para)
 		return NULL;
@@ -364,7 +361,7 @@ should occur.
 When @a last_box_idx == 0, this routine assumes it needs to render until the first 'preferred break'
 position (and it will still also determine the next preferred break position & width after that).
 */
-void cmt_reflow::estimate_render_width(paragraph_box *para, words_collection &words, int start_box_idx, int last_box_idx, int deferred_whitespace, render_estimates_t &info)
+void cmt_reflow_ex::estimate_render_width(paragraph_box *para, words_collection &words, int start_box_idx, int last_box_idx, int deferred_whitespace, render_estimates_t &info)
 {
 	int i;
 	int render_width = 0;
@@ -504,7 +501,7 @@ Determine the index of the box which is the last word of the series of 'widow/or
 
 Also estimate the 'rendered' width consumed by the widows/orphans.
 */
-void cmt_reflow::calculate_widow_and_orphan_aspects(paragraph_box *para, words_collection &words, int line_width, window_orphan_info_t &info)
+void cmt_reflow_ex::calculate_widow_and_orphan_aspects(paragraph_box *para, words_collection &words, int line_width, window_orphan_info_t &info)
 {
 	int i;
 	int orphan_count = (!para->para_is_a_usual_piece_of_text() ? 0 : cpd.settings[UO_cmt_reflow_orphans].n);
@@ -697,7 +694,7 @@ void cmt_reflow::calculate_widow_and_orphan_aspects(paragraph_box *para, words_c
 
 
 
-void cmt_reflow::push_tag_piece_and_possible_newlines(words_collection &words, const char *&s, int &word_idx, reflow_box *&current_word, const char *&last_nl)
+void cmt_reflow_ex::push_tag_piece_and_possible_newlines(words_collection &words, const char *&s, int &word_idx, reflow_box *&current_word, const char *&last_nl)
 {
 	// UNC_ASSERT(unc_isspace(*s) || in_set("/>", *s));
 
@@ -749,7 +746,7 @@ void cmt_reflow::push_tag_piece_and_possible_newlines(words_collection &words, c
 }
 
 
-void cmt_reflow::count_graphics_nonreflow_and_printable_chars(const char *text, int len, int *graph_countref, int *nonreflow_countref, int *print_countref)
+void cmt_reflow_ex::count_graphics_nonreflow_and_printable_chars(const char *text, int len, int *graph_countref, int *nonreflow_countref, int *print_countref)
 {
 	int graph_count = 0;
 	int nonreflow_count = 0;
@@ -776,7 +773,7 @@ void cmt_reflow::count_graphics_nonreflow_and_printable_chars(const char *text, 
 /*
 convert the specified tag set as a configuration string to arrays of tags, ready to be used.
 */
-void cmt_reflow::set_no_reflow_markers(const char *start_tags, const char *end_tags)
+void cmt_reflow_ex::set_no_reflow_markers(const char *start_tags, const char *end_tags)
 {
 	UNC_ASSERT(start_tags);
 	UNC_ASSERT(end_tags);
@@ -816,7 +813,7 @@ TODO: the interface is ugly as it assumes the existence of global 'cpd'; this (a
       chunks of code) make this comment/text reflow engine highly dependent on uncrustify,
 	  which is not all that desirable, both from an interface and re-use point of view...
 */
-void cmt_reflow::set_cmt_config_params(void)
+void cmt_reflow_ex::set_cmt_config_params(void)
 {
 	m_tab_width = cpd.settings[UO_input_tab_size].n;
 
@@ -852,7 +849,7 @@ void cmt_reflow::set_cmt_config_params(void)
 /*
 Set the parameters which depend on the initial chunk of text being known.
 */
-void cmt_reflow::set_deferred_cmt_config_params_phase1(void)
+void cmt_reflow_ex::set_deferred_cmt_config_params_phase1(void)
 {
 	chunk_t *pc = m_first_pc;
 
@@ -991,7 +988,7 @@ int col_diff;
 
 
 
-void cmt_reflow::infer_pre_and_post_star_spacing_from_input(int pre, int post)
+void cmt_reflow_ex::infer_pre_and_post_star_spacing_from_input(int pre, int post)
 {
 	UNC_ASSERT(m_lead_marker);
 
@@ -1008,7 +1005,7 @@ void cmt_reflow::infer_pre_and_post_star_spacing_from_input(int pre, int post)
 /*
 Set the parameters which depend on the entire input text being known.
 */
-void cmt_reflow::set_deferred_cmt_config_params_phase2(void)
+void cmt_reflow_ex::set_deferred_cmt_config_params_phase2(void)
 {
 	m_is_single_line_comment = !strchr(m_comment, '\n');
 
@@ -1290,7 +1287,7 @@ void cmt_reflow::set_deferred_cmt_config_params_phase2(void)
 /*
 Set the parameters which depend on the text being chopped into words and the initial parse having finished.
 */
-void cmt_reflow::set_deferred_cmt_config_params_phase3(void)
+void cmt_reflow_ex::set_deferred_cmt_config_params_phase3(void)
 {
 	if (!m_is_cpp_comment)
 	{
@@ -1390,7 +1387,7 @@ Alas, it complicates this otherwise simple function a tad, but you can't have it
 All other box-based paragraph-extraction/reflow/non-reflow/layout logic is done in the subsequent stages (functions),
 this is just the beginning. Chop chop. :-)
 */
-void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
+void cmt_reflow_ex::chop_text_into_reflow_boxes(words_collection &words)
 {
 	const char *text = m_comment;
 	UNC_ASSERT(m_comment);
@@ -3955,7 +3952,7 @@ void cmt_reflow::chop_text_into_reflow_boxes(words_collection &words)
 correct/spread the already calculated lead/trail whitespace counts
 and merge boxes which only register superfluous whitespace on empty lines.
 */
-void cmt_reflow::optimize_reflow_boxes(words_collection &words)
+void cmt_reflow_ex::optimize_reflow_boxes(words_collection &words)
 {
 	int i;
 	reflow_box *prev = NULL;
@@ -4012,7 +4009,7 @@ Find the math, code, etc. markers and make sure those expressions / statements a
 This means that keywords, etc. which are not yet marked as being 'is_math' or 'is_code' should be marked as such when occurring in
 a math/code/... expression.
 */
-void cmt_reflow::expand_math_et_al_markers(words_collection &words)
+void cmt_reflow_ex::expand_math_et_al_markers(words_collection &words)
 {
 	int box_idx;
 	reflow_box *box = NULL;
@@ -4777,7 +4774,7 @@ always spans the box range of their parent.
     XML take on a new line; the occurrence of one or more (unclosed) XML tags in
 	a larger text paragraph don't make the entire thing a [X]HTML para!
 */
-void cmt_reflow::fixup_paragraph_tree(paragraph_box *para)
+void cmt_reflow_ex::fixup_paragraph_tree(paragraph_box *para)
 {
 	UNC_ASSERT(para);
 	UNC_ASSERT(para->m_previous_sibling ? para->m_previous_sibling->m_last_box < para->m_first_box : 1);
@@ -5072,7 +5069,7 @@ void cmt_reflow::fixup_paragraph_tree(paragraph_box *para)
 Scan the 'words' (the atomic text boxes) and detect the 'paragraph' hierarchy; store
 this hierarchy in the paragraph_collection as a tree, ready for traversal.
 */
-void cmt_reflow::grok_the_words(paragraph_box *root, words_collection &words)
+void cmt_reflow_ex::grok_the_words(paragraph_box *root, words_collection &words)
 {
 	UNC_ASSERT(root);
 	UNC_ASSERT(words.count() >= 2);
@@ -5409,7 +5406,7 @@ void cmt_reflow::grok_the_words(paragraph_box *root, words_collection &words)
 /**
  adjust the last_box for the paragraph and any children, if there are any
 */
-void cmt_reflow::adjust_para_last_box(paragraph_box *para, int pos)
+void cmt_reflow_ex::adjust_para_last_box(paragraph_box *para, int pos)
 {
 	for (;;)
 	{
@@ -5433,7 +5430,7 @@ void cmt_reflow::adjust_para_last_box(paragraph_box *para, int pos)
 
 
 
-int cmt_reflow::skip_tailing_newline_box(paragraph_box *para, words_collection &words, int box_idx, int min_nl_count, int &deferred_newlines)
+int cmt_reflow_ex::skip_tailing_newline_box(paragraph_box *para, words_collection &words, int box_idx, int min_nl_count, int &deferred_newlines)
 {
 	UNC_ASSERT(box_idx >= 0);
 	UNC_ASSERT(box_idx < (int)words.count());
@@ -5479,7 +5476,7 @@ int cmt_reflow::skip_tailing_newline_box(paragraph_box *para, words_collection &
 
  Since the second is the most important to get right from the get go, it is done first.
 */
-int cmt_reflow::find_the_paragraph_boundaries(paragraph_box *parent, words_collection &words, int box_start_idx, int &deferred_newlines)
+int cmt_reflow_ex::find_the_paragraph_boundaries(paragraph_box *parent, words_collection &words, int box_start_idx, int &deferred_newlines)
 {
 	paragraph_box *para = new paragraph_box();
 
@@ -6749,7 +6746,7 @@ struct reflow_tune_parameters_t
 	int width_delta; //< current adjustment from the mean
 
 public:
-	reflow_tune_parameters_t(const cmt_reflow *cmt, int delta = 0) :
+	reflow_tune_parameters_t(const cmt_reflow_ex *cmt, int delta = 0) :
 			deferred_whitespace(0),
 			deferred_nl(0),
 			mandatory_deferred_nl(0),
@@ -7013,7 +7010,7 @@ Return 1 when there isn't, i.e. 'push' a deferred newline.
 	  of newlines being printed between them as pending/pushed newlines would have been 'printed'
 	  already before when the first para (as is usual) carries a last newline-containing box.
 */
-int cmt_reflow::there_is_no_newline_up_ahead(paragraph_box *para, words_collection &words, int current_box_idx)
+int cmt_reflow_ex::there_is_no_newline_up_ahead(paragraph_box *para, words_collection &words, int current_box_idx)
 {
 	reflow_box *box = &words[current_box_idx];
 
@@ -7094,7 +7091,7 @@ int cmt_reflow::there_is_no_newline_up_ahead(paragraph_box *para, words_collecti
 
 
 
-int cmt_reflow::reflow_a_single_para_4_trial(paragraph_box *para, words_collection &words, break_suggestions &scoring, reflow_tune_parameters_t &tuning)
+int cmt_reflow_ex::reflow_a_single_para_4_trial(paragraph_box *para, words_collection &words, break_suggestions &scoring, reflow_tune_parameters_t &tuning)
 {
 	int i;
 
@@ -7420,7 +7417,7 @@ int cmt_reflow::reflow_a_single_para_4_trial(paragraph_box *para, words_collecti
 
 
 
-int cmt_reflow::reflow_para_tree_4_trial(paragraph_box *para, words_collection &words, break_suggestions &scoring, reflow_tune_parameters_t &tuning)
+int cmt_reflow_ex::reflow_para_tree_4_trial(paragraph_box *para, words_collection &words, break_suggestions &scoring, reflow_tune_parameters_t &tuning)
 {
 	int rv = SUCCESS;
 	paragraph_box *root = para;
@@ -7532,7 +7529,7 @@ int cmt_reflow::reflow_para_tree_4_trial(paragraph_box *para, words_collection &
 }
 
 
-void cmt_reflow::determine_optimal_para_reflow(paragraph_box *para, words_collection &words, reflow_tune_parameters_t &tuning)
+void cmt_reflow_ex::determine_optimal_para_reflow(paragraph_box *para, words_collection &words, reflow_tune_parameters_t &tuning)
 {
 	break_suggestions best(para, words, tuning);
 	break_suggestions current(para, words, tuning);
@@ -7647,7 +7644,7 @@ void cmt_reflow::determine_optimal_para_reflow(paragraph_box *para, words_collec
 
 
 
-void cmt_reflow::reflow_para_hierarchy(paragraph_box *para, words_collection &words)
+void cmt_reflow_ex::reflow_para_hierarchy(paragraph_box *para, words_collection &words)
 {
 	reflow_tune_parameters_t tuning(this);
 
@@ -7675,7 +7672,7 @@ set up in each text box by the reflow engine before this method is invoked.
 
 TODO: The only tough bit is handling 'boxed comments' in here...
 */
-void cmt_reflow::write_comment_to_output(paragraph_box *para, words_collection &words)
+void cmt_reflow_ex::write_comment_to_output(paragraph_box *para, words_collection &words)
 {
 	UNC_ASSERT(para);
 
@@ -7810,7 +7807,7 @@ game here.
   number of lines, etc. statistics, which are used by the box renderer (and
 possibly a few others too).
 */
-void cmt_reflow::render(void)
+void cmt_reflow_ex::render(void)
 {
 	push(""); // make sure 'comment' is initialized properly, even for empty comments!
 	UNC_ASSERT(m_comment);
@@ -7922,7 +7919,3 @@ void cmt_reflow::render(void)
 }
 
 
-
-
-
-#endif

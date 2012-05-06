@@ -45,9 +45,6 @@
 #include "args.h"
 #include "reflow_text.h"
 
-
-#if USE_NEW_COMMENT_FORMATTER
-
 #include "reflow_text_internal.h"
 
 
@@ -60,7 +57,7 @@
 
 
 
-void cmt_reflow::show_diagnostics(paragraph_box *para, words_collection &words)
+void cmt_reflow_ex::show_diagnostics(paragraph_box *para, words_collection &words)
 {
 	char buf[256];
 	double ppwr;
@@ -113,7 +110,7 @@ void cmt_reflow::show_diagnostics(paragraph_box *para, words_collection &words)
 }
 
 
-void cmt_reflow::dump2output(words_collection &words, int mode, int start_idx, int end_idx)
+void cmt_reflow_ex::dump2output(words_collection &words, int mode, int start_idx, int end_idx)
 {
 	int idx;
 
@@ -446,7 +443,7 @@ void cmt_reflow::dump2output(words_collection &words, int mode, int start_idx, i
 
 
 
-void cmt_reflow::dump2output(paragraph_box *para, words_collection &words)
+void cmt_reflow_ex::dump2output(paragraph_box *para, words_collection &words)
 {
 	UNC_ASSERT(para);
 
@@ -586,7 +583,7 @@ dump text to output while escaping anything non-printable.
 
 NOTE: this includes newlines as well!
 */
-size_t cmt_reflow::write_offender_text2output(const char *offender, size_t offender_len, size_t *marker_start, size_t *marker_end, bool do_print)
+size_t cmt_reflow_ex::write_offender_text2output(const char *offender, size_t offender_len, size_t *marker_start, size_t *marker_end, bool do_print)
 {
 	size_t printed_len = 0;
 	size_t i = 0;
@@ -787,7 +784,7 @@ size_t cmt_reflow::write_offender_text2output(const char *offender, size_t offen
 /*
 write diagnostic to the output as a comment.
 */
-void cmt_reflow::pretty_print_diagnostic2output(const char *text, size_t text_len,
+void cmt_reflow_ex::pretty_print_diagnostic2output(const char *text, size_t text_len,
 												const char *offender, size_t offender_len,
 												const char *report_header,
 												words_collection &words,
@@ -905,6 +902,3 @@ void cmt_reflow::pretty_print_diagnostic2output(const char *text, size_t text_le
 }
 
 
-
-
-#endif

@@ -921,7 +921,8 @@ void register_options(void)
                   "The number of newlines after '}' of a multi-line function body.\n"
                   "0 = No change.");
    unc_add_option("nl_after_func_body_class", UO_nl_after_func_body_class, AT_NUM,
-                  "The number of newlines after '}' of a multi-line function body in a class declaration.\n"
+                  "The number of newlines after '}' of a multi-line function body in a\n"
+				  "class declaration.\n"
                   "0 = No change.");
    unc_add_option("nl_after_func_body_one_liner", UO_nl_after_func_body_one_liner, AT_NUM,
                   "The minimum number of newlines after '}' of a single line function body.\n"
@@ -987,9 +988,11 @@ void register_options(void)
                   "1: Remove most newlines not handled by other config\n"
                   "2: Remove all newlines and reformat completely by config");
    unc_add_option("nl_before_return", UO_nl_before_return, AT_BOOL,
-                  "Whether to put a blank line before 'return' statements, unless after an open brace.");
+                  "Whether to put a blank line before 'return' statements, unless after an\n"
+				  "open brace.");
    unc_add_option("nl_after_return", UO_nl_after_return, AT_BOOL,
-                  "Whether to put a blank line after 'return' statements, unless followed by a close brace.");
+                  "Whether to put a blank line after 'return' statements, unless followed by\n"
+				  "a close brace.");
 
    unc_begin_group(UG_position, "Positioning options");
    unc_add_option("pos_arith", UO_pos_arith, AT_POS,
@@ -1146,19 +1149,22 @@ void register_options(void)
    unc_begin_group(UG_comment, "Comment modifications");
    unc_add_option("cmt_width", UO_cmt_width, AT_NUM,
                   "Try to wrap comments at cmt_width columns", "", -1, 5000);
+
    unc_add_option("cmt_inline_width", UO_cmt_inline_width, AT_NUM,
                   "Try to wrap in-line comments at cmt_inline_width columns\n"
 				  "(equal to cmt_width by default)", "", -1, 5000);
+
    unc_add_option("cmt_reflow_mode", UO_cmt_reflow_mode, AT_NUM,
                   "Set the comment reflow mode (default: 0)\n"
                   "0: no reflowing (apart from the line wrapping due to cmt_width)\n"
                   "1: no touching at all\n"
-                  "2: full reflow", "", 0, 2);
+                  "2: full reflow", "", 0, 5 /* transitional hack */);
+
    unc_add_option("cmt_reflow_mode_cpp", UO_cmt_reflow_mode_cpp, AT_NUM,
                   "Set the comment reflow mode (default: 1) for C++ comments\n"
                   "0: no reflowing (apart from the line wrapping due to cmt_width)\n"
                   "1: no touching at all\n"
-                  "2: full reflow", "", 0, 2);
+                  "2: full reflow", "", 0, 5 /* transitional hack */);
 
 	unc_add_option("cmt_reflow_orphans", UO_cmt_reflow_orphans, AT_NUM,
 					"minimum number of words to keep on a first (any!) line",
@@ -1245,7 +1251,7 @@ void register_options(void)
 					"reflow (this includes grouped multiple C\n"
 					"comments)");
 
-	unc_add_option("cmt_indent_multi", UO_cmt_indent_multi, AT_BOOL,
+   unc_add_option("cmt_indent_multi", UO_cmt_indent_multi, AT_BOOL,
                   "If false, disable all multi-line comment changes, including cmt_width,\n"
 				  "keyword substitution, and leading chars.\n"
                   "Default is true.");
@@ -1315,8 +1321,10 @@ void register_options(void)
 				  "preceded with a C/C++ comment.\n"
                   "Will substitute $(class) with the class name.");
    unc_add_option("cmt_insert_oc_msg_header", UO_cmt_insert_oc_msg_header, AT_STRING,
-                  "The filename that contains text to insert before a Obj-C message specification if the method isn't preceeded with a C/C++ comment.\n"
-                  "Will substitute $(message) with the function name and $(javaparam) with the javadoc @param and @return stuff.");
+                  "The filename that contains text to insert before a Obj-C message\n"
+				  "specification if the method isn't preceeded with a C/C++ comment.\n"
+                  "Will substitute $(message) with the function name and $(javaparam) with\n"
+				  "the javadoc @param and @return stuff.");
    unc_add_option("cmt_insert_before_preproc", UO_cmt_insert_before_preproc, AT_BOOL,
                   "If a preprocessor is encountered when stepping backwards from a function\n"
 				  "name, then this option decides whether the comment should be inserted.\n"
