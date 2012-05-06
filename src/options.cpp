@@ -1132,7 +1132,7 @@ void register_options(void)
                   "Whether to align macros wrapped with a backslash and a newline.\n"
                   "This will not work right if the macro contains a multi-line comment.");
    unc_add_option("align_pp_define_together", UO_align_pp_define_together, AT_BOOL,
-                  "# Align macro functions and variables together\n");
+                  "Align macro functions and variables together\n");
    unc_add_option("align_pp_define_gap", UO_align_pp_define_gap, AT_NUM,
                   "The minimum space between label and value of a preprocessor define", "", -5000, 5000);
    unc_add_option("align_pp_define_span", UO_align_pp_define_span, AT_NUM,

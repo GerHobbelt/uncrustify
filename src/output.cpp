@@ -1147,7 +1147,7 @@ static chunk_t *output_comment_c(chunk_t *first)
    }
 
    add_text("/*");
-   if (cpd.settings[UO_cmt_c_nl_start].b)
+   if (cpd.settings[UO_cmt_c_nl_start].a != AV_REMOVE)
    {
       add_comment_text("\n", cmt, false);
    }
@@ -1162,7 +1162,7 @@ static chunk_t *output_comment_c(chunk_t *first)
    }
    tmp.set(pc->str, 2, pc->len() - 4);
    add_comment_text(tmp, cmt, false);
-   if (cpd.settings[UO_cmt_c_nl_end].b)
+   if (cpd.settings[UO_cmt_c_nl_end].a != AV_REMOVE)
    {
       cmt.cont_text = " ";
       LOG_CONTTEXT();
@@ -1255,7 +1255,7 @@ static chunk_t *output_comment_cpp(chunk_t *first)
    }
 
    add_text("/*");
-   if (cpd.settings[UO_cmt_cpp_nl_start].b)
+   if (cpd.settings[UO_cmt_cpp_nl_start].a != AV_REMOVE)
    {
       add_comment_text("\n", cmt, false);
    }
@@ -1277,7 +1277,7 @@ static chunk_t *output_comment_cpp(chunk_t *first)
    offs = unc_isspace(pc->str[2]) ? 1 : 0;
    tmp.set(pc->str, 2 + offs, pc->len() - (2 + offs));
    add_comment_text(tmp, cmt, true);
-   if (cpd.settings[UO_cmt_cpp_nl_end].b)
+   if (cpd.settings[UO_cmt_cpp_nl_end].a != AV_REMOVE)
    {
       cmt.cont_text = "";
       LOG_CONTTEXT();
@@ -1541,7 +1541,7 @@ static void output_comment_multi(chunk_t *pc)
                /* Empty line - just a '\n' */
                if (cpd.settings[UO_cmt_star_cont].t == TB_TRUE)
                {
-                  cmt.column = cmt_col + cpd.settings[UO_cmt_sp_before_star_cont].n;
+                  cmt.column = cmt_col + max(0, cpd.settings[UO_cmt_sp_before_star_cont].n);
                   cmt_output_indent(cmt.brace_col, cmt.base_col, cmt.column);
                   if (cmt.xtra_indent)
                   {
@@ -1560,7 +1560,7 @@ static void output_comment_multi(chunk_t *pc)
                    (line[0] != '*') && (line[0] != '|') && (line[0] != '#') &&
                    ((line[0] != '\\') || unc_isalpha(line[1])) && (line[0] != '+'))
                {
-                  int start_col = cmt_col + cpd.settings[UO_cmt_sp_before_star_cont].n;
+                  int start_col = cmt_col + max(0, cpd.settings[UO_cmt_sp_before_star_cont].n);
 
                   if (cpd.settings[UO_cmt_star_cont].t == TB_TRUE)
                   {
@@ -1571,7 +1571,7 @@ static void output_comment_multi(chunk_t *pc)
                         add_char(' ');
                      }
                      add_text(cmt.cont_text);
-                     output_to_column(ccol + cpd.settings[UO_cmt_sp_after_star_cont].n,
+                     output_to_column(ccol + max(0, cpd.settings[UO_cmt_sp_after_star_cont].n),
                                       false);
                   }
                   else
@@ -1582,7 +1582,7 @@ static void output_comment_multi(chunk_t *pc)
                }
                else
                {
-                  cmt.column = cmt_col + cpd.settings[UO_cmt_sp_before_star_cont].n;
+                  cmt.column = cmt_col + max(0, cpd.settings[UO_cmt_sp_before_star_cont].n);
                   cmt_output_indent(cmt.brace_col, cmt.base_col, cmt.column);
                   if (cmt.xtra_indent)
                   {

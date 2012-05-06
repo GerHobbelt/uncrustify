@@ -63,15 +63,10 @@ am_uncrustify_OBJECTS = uncrustify.$(OBJEXT) chunk_list.$(OBJEXT) \
 	lang_pawn.$(OBJEXT) md5.$(OBJEXT) backup.$(OBJEXT) \
 	parens.$(OBJEXT) universalindentgui.$(OBJEXT) \
 	semicolons.$(OBJEXT) sorting.$(OBJEXT) detect.$(OBJEXT) \
-<<<<<<< HEAD
 	unicode.$(OBJEXT) unc_text.$(OBJEXT) reflow_text.$(OBJEXT) \
 	reflow_text_dbg.$(OBJEXT) reflow_text_utils.$(OBJEXT) \
 	reflow_text_box.$(OBJEXT) reflow_text_para.$(OBJEXT) \
 	compat_posix.$(OBJEXT) compat_win32.$(OBJEXT)
-=======
-	unicode.$(OBJEXT) unc_text.$(OBJEXT) compat_posix.$(OBJEXT) \
-	compat_win32.$(OBJEXT)
->>>>>>> intermediate
 uncrustify_OBJECTS = $(am_uncrustify_OBJECTS)
 uncrustify_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@

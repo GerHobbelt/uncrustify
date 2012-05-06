@@ -842,7 +842,7 @@ align_nl_cont                            { False, True }
   This will not work right if the macro contains a multi-line comment.
 
 align_pp_define_together                 { False, True }
-  # Align macro functions and variables together
+  Align macro functions and variables together
   
 
 align_pp_define_gap                      Number
@@ -1293,7 +1293,8 @@ nl_after_func_body                       Number
   0 = No change.
 
 nl_after_func_body_class                 Number
-  The number of newlines after '}' of a multi-line function body in a class declaration.
+  The number of newlines after '}' of a multi-line function body in a
+  class declaration.
   0 = No change.
 
 nl_after_func_body_one_liner             Number
@@ -1372,10 +1373,12 @@ nl_remove_extra_newlines                 Number
   2: Remove all newlines and reformat completely by config
 
 nl_before_return                         { False, True }
-  Whether to put a blank line before 'return' statements, unless after an open brace.
+  Whether to put a blank line before 'return' statements, unless after an
+  open brace.
 
 nl_after_return                          { False, True }
-  Whether to put a blank line after 'return' statements, unless followed by a close brace.
+  Whether to put a blank line after 'return' statements, unless followed by
+  a close brace.
 
 #
 # Code modifying options (non-whitespace)
@@ -1469,7 +1472,8 @@ cmt_width                                Number
   Try to wrap comments at cmt_width columns
 
 cmt_inline_width                         Number
-  Try to wrap in-line comments at cmt_inline_width columns (equal to cmt_width by default)
+  Try to wrap in-line comments at cmt_inline_width columns
+  (equal to cmt_width by default)
 
 cmt_reflow_mode                          Number
   Set the comment reflow mode (default: 0)
@@ -1482,7 +1486,6 @@ cmt_reflow_mode_cpp                      Number
   0: no reflowing (apart from the line wrapping due to cmt_width)
   1: no touching at all
   2: full reflow
-  
 
 cmt_reflow_orphans                       Number
   minimum number of words to keep on a first (any!) line
@@ -1496,7 +1499,6 @@ cmt_reflow_minimum_words_per_line        Number
   towards the right edge --> allow those to overshoot the
   configured right column edge.
   0: disables this
-  
 
 cmt_reflow_overshoot                     Number
   number of characters that comment line may overshoot
@@ -1639,9 +1641,12 @@ cmt_sp_after_star_cont                   Number
   The number of spaces to insert after the optional star on subsequent comment
   lines.
 
+cmt_sp_after_cpp_start                   Number
+  The number of spaces to insert after the '//' on comment lines.
+
 cmt_multi_check_last                     { False, True }
   For multi-line comments with a '*' lead, remove leading spaces if the first
-  and last lines of the comment are the same length (while not containing any
+  and last lines of the comment are the same length (while not conatining any
   human-readable text, i.e. no alphanumeric characters). Default=True
 
 cmt_insert_file_header                   String
@@ -1667,8 +1672,10 @@ cmt_insert_class_header                  String
   Will substitute $(class) with the class name.
 
 cmt_insert_oc_msg_header                 String
-  The filename that contains text to insert before a Obj-C message specification if the method isn't preceeded with a C/C++ comment.
-  Will substitute $(message) with the function name and $(javaparam) with the javadoc @param and @return stuff.
+  The filename that contains text to insert before a Obj-C message
+  specification if the method isn't preceeded with a C/C++ comment.
+  Will substitute $(message) with the function name and $(javaparam) with
+  the javadoc @param and @return stuff.
 
 cmt_insert_before_preproc                { False, True }
   If a preprocessor is encountered when stepping backwards from a function

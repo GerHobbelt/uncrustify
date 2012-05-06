@@ -583,12 +583,12 @@ dump text to output while escaping anything non-printable.
 
 NOTE: this includes newlines as well!
 */
-size_t cmt_reflow_ex::write_offender_text2output(const char *offender, size_t offender_len, size_t *marker_start, size_t *marker_end, bool do_print)
+int cmt_reflow_ex::write_offender_text2output(const char *offender, int offender_len, int *marker_start, int *marker_end, bool do_print)
 {
-	size_t printed_len = 0;
-	size_t i = 0;
-	size_t mark_s = (marker_start ? *marker_start : 0);
-	size_t mark_e = (marker_end ? *marker_end : 0);
+	int printed_len = 0;
+	int i = 0;
+	int mark_s = (marker_start ? *marker_start : 0);
+	int mark_e = (marker_end ? *marker_end : 0);
 
 	UNC_ASSERT(mark_s < offender_len);
 	UNC_ASSERT(mark_e >= mark_s);
@@ -664,7 +664,7 @@ size_t cmt_reflow_ex::write_offender_text2output(const char *offender, size_t of
 		unsigned int utfchar = illegal_unicode_char;
 		unsigned int c;
 		const unsigned char *b = (const unsigned char *)(offender + i);
-		size_t charlen = 0;
+		int charlen = 0;
 
 		/*
 		see if this is a UTF-8 or some such, i.e. decode non-ASCII as if UTF-8 and hexdump the remainder.
@@ -785,7 +785,7 @@ size_t cmt_reflow_ex::write_offender_text2output(const char *offender, size_t of
 write diagnostic to the output as a comment.
 */
 void cmt_reflow_ex::pretty_print_diagnostic2output(const char *text, size_t text_len,
-												const char *offender, size_t offender_len,
+												const char *offender, int offender_len,
 												const char *report_header,
 												words_collection &words,
 												paragraph_box *para)
@@ -797,10 +797,10 @@ void cmt_reflow_ex::pretty_print_diagnostic2output(const char *text, size_t text
 		report_header = "**DIAG**";
 	}
 
-	size_t printed_len;
+	int printed_len;
 	write2output("    ");
 	write2output(report_header);
-	printed_len = 4 + strlen(report_header);
+	printed_len = 4 + (int)strlen(report_header);
 
 	if (offender && offender_len)
 	{
@@ -809,18 +809,20 @@ void cmt_reflow_ex::pretty_print_diagnostic2output(const char *text, size_t text
 		'lead in' and 'lead out' sizes are balanced, that is: these numbers can be considered a /ratio/ -- currently
 		set at 1/3rd.
 		*/
-		const size_t dump_len = 40;
+		const int dump_len = 40;
 		const int dump_leadin = 1;
 		const int dump_leadout = 3;
 
 		UNC_ASSERT(text);
-		UNC_ASSERT(offender_len <= text_len);
+		UNC_ASSERT(offender_len > 0);
+		UNC_ASSERT(text_len > 0);
+		UNC_ASSERT(offender_len <= (int)text_len);
 		UNC_ASSERT(offender >= text);
 		UNC_ASSERT(offender < text + text_len);
 		UNC_ASSERT(offender + offender_len >= text);
 		UNC_ASSERT(offender + offender_len <= text + text_len);
 
-		if (3 /* guestimate */ + printed_len + 4 + 2 + dump_len >= (size_t)max(78, m_line_wrap_column))
+		if (3 /* guestimate */ + printed_len + 4 + 2 + dump_len >= max(78, m_line_wrap_column))
 		{
 			write2output(" at:");
 			write2output("\n");
@@ -838,13 +840,14 @@ void cmt_reflow_ex::pretty_print_diagnostic2output(const char *text, size_t text
 
 		But first calculate/guestimate the lead-in and lead-out, depending on offender size and the lead-in/lead-out ratio.
 		*/
-		size_t leadin = 0;
-		size_t leadout = 0;
-		size_t offender_print_len = write_offender_text2output(offender, offender_len, NULL, NULL, false);
+		int leadin = 0;
+		int leadout = 0;
+		int offender_print_len = write_offender_text2output(offender, offender_len, NULL, NULL, false);
 
 		if (offender_print_len < dump_len)
 		{
-			size_t surplus = dump_len - offender_print_len;
+			UNC_ASSERT(offender_print_len >= 0);
+			int surplus = dump_len - offender_print_len;
 
 			// assume the same encoding ratio for the 'context':
 			surplus *= offender_len;
@@ -855,22 +858,22 @@ void cmt_reflow_ex::pretty_print_diagnostic2output(const char *text, size_t text
 			leadin /= dump_leadin + dump_leadout;
 			leadout /= dump_leadin + dump_leadout;
 
-			if ((size_t)(offender - text) < leadin)
+			if ((offender - text) < leadin)
 			{
-				leadout += leadin - (size_t)(offender - text);
-				leadin = (size_t)(offender - text);
+				leadout += leadin - (offender - text);
+				leadin = (offender - text);
 			}
 			if (text + text_len < offender + offender_len + leadout)
 			{
 				// leadin += ... - don't do this as we may fall below 'text' and this approximate anyway.
 				UNC_ASSERT(text + text_len >= offender + offender_len);
-				leadout = (size_t)(text + text_len - offender - offender_len);
+				leadout = (text + text_len) - (offender + offender_len);
 			}
 		}
 
-		size_t start_column = cpd.column;
-		size_t offender_start_pos = leadin;
-		size_t offender_end_pos = leadin + offender_len; // EXclusive edge!
+		int start_column = cpd.column;
+		int offender_start_pos = leadin;
+		int offender_end_pos = leadin + offender_len; // EXclusive edge!
 		offender_print_len = write_offender_text2output(offender - leadin, offender_len + leadin + leadout,
 								&offender_start_pos, &offender_end_pos);
 		if (printed_len > 0)
@@ -884,7 +887,7 @@ void cmt_reflow_ex::pretty_print_diagnostic2output(const char *text, size_t text
 		now advance to the offending start column again:
 		*/
 		start_column += offender_start_pos;
-		size_t upper_loop_bound = start_column + 1;
+		int upper_loop_bound = start_column + 1;
 
 		for ( ; upper_loop_bound > 0 && cpd.column < start_column; upper_loop_bound--)
 		{

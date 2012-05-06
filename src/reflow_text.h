@@ -260,8 +260,8 @@ protected:
 	void write(const char *str);
 	void write(char ch);
 
-	void pretty_print_diagnostic2output(const char *text, size_t len, const char *offender, size_t offender_len, const char *report_header, words_collection &words, paragraph_box *para);
-	size_t write_offender_text2output(const char *offender, size_t offender_len, size_t *marker_start, size_t *marker_end, bool do_print = true);
+	void pretty_print_diagnostic2output(const char *text, size_t len, const char *offender, int offender_len, const char *report_header, words_collection &words, paragraph_box *para);
+	int write_offender_text2output(const char *offender, int offender_len, int *marker_start, int *marker_end, bool do_print = true);
 	void show_diagnostics(paragraph_box *root, words_collection &words);
 };
 
