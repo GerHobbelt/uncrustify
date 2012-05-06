@@ -921,7 +921,8 @@ void register_options(void)
                   "The number of newlines after '}' of a multi-line function body.\n"
                   "0 = No change.");
    unc_add_option("nl_after_func_body_class", UO_nl_after_func_body_class, AT_NUM,
-                  "The number of newlines after '}' of a multi-line function body in a class declaration.\n"
+                  "The number of newlines after '}' of a multi-line function body in a\n"
+				  "class declaration.\n"
                   "0 = No change.");
    unc_add_option("nl_after_func_body_one_liner", UO_nl_after_func_body_one_liner, AT_NUM,
                   "The minimum number of newlines after '}' of a single line function body.\n"
@@ -987,9 +988,11 @@ void register_options(void)
                   "1: Remove most newlines not handled by other config\n"
                   "2: Remove all newlines and reformat completely by config");
    unc_add_option("nl_before_return", UO_nl_before_return, AT_BOOL,
-                  "Whether to put a blank line before 'return' statements, unless after an open brace.");
+                  "Whether to put a blank line before 'return' statements, unless after an\n"
+				  "open brace.");
    unc_add_option("nl_after_return", UO_nl_after_return, AT_BOOL,
-                  "Whether to put a blank line after 'return' statements, unless followed by a close brace.");
+                  "Whether to put a blank line after 'return' statements, unless followed by\n"
+				  "a close brace.");
 
    unc_begin_group(UG_position, "Positioning options");
    unc_add_option("pos_arith", UO_pos_arith, AT_POS,
@@ -1220,8 +1223,10 @@ void register_options(void)
 				  "preceded with a C/C++ comment.\n"
                   "Will substitute $(class) with the class name.");
    unc_add_option("cmt_insert_oc_msg_header", UO_cmt_insert_oc_msg_header, AT_STRING,
-                  "The filename that contains text to insert before a Obj-C message specification if the method isn't preceeded with a C/C++ comment.\n"
-                  "Will substitute $(message) with the function name and $(javaparam) with the javadoc @param and @return stuff.");
+                  "The filename that contains text to insert before a Obj-C message\n"
+				  "specification if the method isn't preceeded with a C/C++ comment.\n"
+                  "Will substitute $(message) with the function name and $(javaparam) with\n"
+				  "the javadoc @param and @return stuff.");
    unc_add_option("cmt_insert_before_preproc", UO_cmt_insert_before_preproc, AT_BOOL,
                   "If a preprocessor is encountered when stepping backwards from a function\n"
 				  "name, then this option decides whether the comment should be inserted.\n"

@@ -4,7 +4,19 @@ AUTOMAKE_OPTIONS=foreign no-dependencies 1.11
 
 SUBDIRS = src man
 
-pkgdata_DATA = etc/ben.cfg etc/d.cfg etc/defaults.cfg etc/gnu-indent.cfg etc/kr-indent.cfg etc/linux-indent.cfg etc/linux.cfg etc/mono.cfg etc/xsupplicant.cfg
+pkgdata_DATA = \
+	etc/ben.cfg \
+	etc/d.cfg \
+	etc/defaults.cfg \
+	etc/gnu-indent.cfg \
+	etc/kr-indent.cfg \
+	etc/linux-indent.cfg \
+	etc/linux.cfg \
+	etc/mono.cfg \
+	etc/xsupplicant.cfg \
+	documentation/htdocs/config.txt \
+	documentation/htdocs/default.cfg
+
 
 # INCLUDES = @INCLUDES@
 
@@ -39,6 +51,10 @@ EXTRA_DIST = etc m4 scripts run_tests.sh make_token_names.sh $(pkgdata_DATA) \
 		install-sh make_token_names.sh mk_all_distros.sh \
 		NEWS README release-steps.txt todo.txt uncrustify.vpj uncrustify.vpw \
 		update-default-cfg.sh
+
+
+$(pkgdata_DATA): src/uncrustify
+	./update-default-cfg.sh
 
 
 check-local: 
