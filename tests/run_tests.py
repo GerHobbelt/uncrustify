@@ -96,11 +96,19 @@ def run_tests(test_name, config_name, input_name, lang):
 		config_name = os.path.join('config', config_name)
 
 	resultname = os.path.join('results', expected_name)
+	resultinputname = os.path.join('results.input', expected_name)
 	outputname = os.path.join('output', expected_name)
 	try:
 		os.makedirs(os.path.dirname(resultname))
 	except:
 		pass
+	try:
+		os.makedirs(os.path.dirname(resultinputname))
+	except:
+		pass
+
+	cmd = "cat input/%s > %s" % (input_name, resultinputname)
+	os.system(cmd)
 
 	cmd = "%s/uncrustify -q -c %s -f input/%s %s > %s" % (os.path.abspath('../src'), config_name, input_name, lang, resultname)
 	if log_level & 2:
