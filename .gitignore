@@ -35,7 +35,8 @@ config.log
 config.status
 *.vtg
 *.vpwh*
-tests/results
+tests/results/
+tests/results.input/
 .waf*
 .lock*
 build

@@ -1744,7 +1744,7 @@ static void fix_typedef(chunk_t *start)
    chunk_t   *next;
    chunk_t   *prev;
    chunk_t   *the_type = NULL;
-   chunk_t   *open_paren;
+   chunk_t   *open_paren = NULL;
    c_token_t tag;
 
    LOG_FMT(LTYPEDEF, "%s: looking at line %d\n", __func__, start->orig_line);
@@ -1813,7 +1813,7 @@ static void fix_typedef(chunk_t *start)
                     the_type->str.c_str(), the_type->orig_line);
 
             /* If we are aligning on the open paren, grab that instead */
-            if (cpd.settings[UO_align_typedef_func].n == 1)
+            if (cpd.settings[UO_align_typedef_func].n == 1 && open_paren != NULL)
             {
                the_type = open_paren;
             }
