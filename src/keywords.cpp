@@ -365,9 +365,11 @@ static const chunk_tag_t *kw_static_match(const chunk_tag_t *tag)
 /**
  * Search first the dynamic and then the static table for a matching keyword
  *
- * @param word    Pointer to the text -- NOT zero terminated
- * @param len     The length of the text
- * @return        CT_WORD (no match) or the keyword token
+ * @param word    Pointer to the text -- zero terminated, though probably NOT at len
+ * @param len     The length of the text (WARNING: this function will scan
+ *                beyond the given len when trying to match dynamic, i.e.
+ *                user-specified 'keywords' to a maximum width of strlen(word)!)
+ * @return        NULL (no match) or the keyword entry
  */
 const chunk_tag_t *find_keyword(const char *word, int len)
 {
@@ -379,6 +381,45 @@ const chunk_tag_t *find_keyword(const char *word, int len)
    {
       return NULL;
    }
+
+#if 0 // this was the old code with special support for macro def's in the config file (whitespaces!)
+
+   if (len > (int)(sizeof(buf) - 1))
+   {
+      LOG_FMT(LNOTE, "%s: keyword too long at %d char (%d max) : %.*s\n",
+              __func__, len, (int)sizeof(buf), len, word);
+      return(NULL);
+   }
+   tag.tag = word; /* allow the tail end to be compared as well! */
+
+   /* check the dynamic word list first */
+   p_ret = NULL;
+   if (wl.p_tags)
+   {
+      p_ret = (const chunk_tag_t *)bsearch(&tag, wl.p_tags, wl.active,
+                                           sizeof(chunk_tag_t), kw_compare_ex);
+   }
+
+   if (p_ret == NULL)
+   {
+	memcpy(buf, word, len); /* [i_a] */
+	buf[len] = 0;
+
+	tag.tag = buf; /* just plain keyword match from here */
+
+      /* check the static word list */
+      p_ret = (const chunk_tag_t *)bsearch(&tag, keywords, ARRAY_SIZE(keywords),
+                                           sizeof(keywords[0]), kw_compare);
+      if (p_ret != NULL)
+      {
+         //fprintf(stderr, "%s: match %s -", __func__, p_ret->tag);
+         p_ret = kw_static_match(p_ret);
+         //fprintf(stderr, "\n");
+      }
+   }
+
+   return(p_ret);
+ #endif
 
    /* check the dynamic word list first */
    dkwmap::iterator it = dkwm.find(ss);

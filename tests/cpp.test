@@ -181,3 +181,42 @@
 30950 sp_before_tr_emb_cmt-f.cfg       cpp/sp_before_tr_emb_cmt_input.cpp
 30951 sp_before_tr_emb_cmt-a.cfg       cpp/sp_before_tr_emb_cmt_input.cpp
 30955 indent_ctor_init.cfg             cpp/indent_ctor_init.cpp
+
+31950 ben.cfg                          cpp/comidl___event.cpp
+31951 ben.cfg                          cpp/comidl___hook.cpp
+31952 ben.cfg                          cpp/comidl___hook.h
+31953 ben.cfg                          cpp/comidl___uuidof.cpp
+
+31960 ben.cfg                          cpp/dotnet_boxed.cpp
+31961 ben.cfg                          cpp/dotnet_for_each.cpp
+31962 ben.cfg                          cpp/dotnet_generic_1.cpp
+31963 ben.cfg                          cpp/dotnet_generic_where.cpp
+31964 ben.cfg                          cpp/dotnet_initonly.cpp
+31965 ben.cfg                          cpp/dotnet_literal.cpp
+31966 ben.cfg                          cpp/dotnet_nullptr.cpp
+31967 ben.cfg                          cpp/dotnet_nullptr_2.cpp
+31968 ben.cfg                          cpp/dotnet_nullptr_3.cpp
+31969 ben.cfg                          cpp/dotnet_nullptr_4.cpp
+31970 ben.cfg                          cpp/dotnet_safe_cast.cpp
+31971 ben.cfg                          cpp/dotnet___delegate.cpp
+31972 ben.cfg                          cpp/dotnet___event_1.cpp
+31973 ben.cfg                          cpp/dotnet___event_2.cpp
+31974 ben.cfg                          cpp/dotnet___event_3.cpp
+31975 ben.cfg                          cpp/dotnet___gc_1.cpp
+31976 ben.cfg                          cpp/dotnet___identifier.cpp
+31977 ben.cfg                          cpp/dotnet___property.cpp
+31978 ben.cfg                          cpp/dotnet___sealed.cpp
+31979 ben.cfg                          cpp/dotnet___try_cast.cpp
+31980 ben.cfg                          cpp/dotnet___value.cpp
+
+31990 ben.cfg                          cpp/msvc___assume.cpp
+31991 ben.cfg                          cpp/msvc___based.cpp
+
+31992 ben.cfg                          cpp/__hook.cpp
+31993 ben.cfg                          cpp/__if_exists.cpp
+31994 ben.cfg                          cpp/__leave.cpp
+31995 ben.cfg                          cpp/__noop.cpp
+31996 ben.cfg                          cpp/__raise.cpp
+31997 ben.cfg                          cpp/__single_inheritance.cpp
+31998 ben.cfg                          cpp/__unaligned.cpp
+31999 ben.cfg                          cpp/force_inline.cpp
