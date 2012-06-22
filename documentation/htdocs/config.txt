@@ -198,7 +198,19 @@ indent_paren_nl                          { False, True }
   lines up after the open paren (not recommended)
 
 indent_paren_close                       Number
-  Controls the indent of a close paren after a newline.
+  Controls the indent of a close paren after a newline (except for function and macro function prototype).
+  0: Indent to body level
+  1: Align under the open paren
+  2: Indent to the brace level
+
+indent_paren_close_func                  Number
+  Controls the indent of the close paren after a newline in a function prototype (declaration and definition).
+  0: Indent to body level
+  1: Align under the open paren
+  2: Indent to the brace level
+
+indent_paren_close_macro_func            Number
+  Controls the indent of the close paren after a newline in a macro function prototype.
   0: Indent to body level
   1: Align under the open paren
   2: Indent to the brace level
@@ -331,7 +343,7 @@ sp_before_byref_func                     { Ignore, Add, Remove, Force }
   func proto/def.
 
 sp_after_type                            { Ignore, Add, Remove, Force }
-  Add or remove space between type and word. Default=Force
+  Add or remove space after 'typedef', a qualifier, a type if not followed by '*'. Default=Force
 
 sp_before_template_paren                 { Ignore, Add, Remove, Force }
   Add or remove space before the paren in the D constructs 'template Foo(' and 'class Foo('.
@@ -499,7 +511,8 @@ sp_fparen_brace                          { Ignore, Add, Remove, Force }
   Add or remove space between ')' and '{' of function
 
 sp_func_call_paren                       { Ignore, Add, Remove, Force }
-  Add or remove space between function name and '(' on function calls
+  Add or remove space between function name and '(' on function calls.
+  Applied also for 'TYPE_WRAP', 'FUNC_WRAP', 'FUNC_PTR_WRAP', 'PROTO_WRAP'.
 
 sp_func_call_paren_empty                 { Ignore, Add, Remove, Force }
   Add or remove space between function name and '()' on function calls
@@ -849,7 +862,7 @@ align_pp_define_gap                      Number
   The minimum space between label and value of a preprocessor define
 
 align_pp_define_span                     Number
-  The span for aligning on '#define' bodies (0=don't align)
+  The span for aligning on '#define' bodies (0=don't align, other=number of lines including comments between blocks)
 
 align_left_shift                         { False, True }
   Align lines that start with '<<' with previous '<<'. Default=true
@@ -1688,15 +1701,16 @@ cmt_insert_before_preproc                { False, True }
 #
 
 pp_indent                                { Ignore, Add, Remove, Force }
-  Control indent of preprocessors inside #if blocks at brace level 0
+  Control indent of preprocessors inside #if blocks at brace level 0 (file-level)
 
 pp_indent_at_level                       { False, True }
   Whether to indent #if/#else/#endif at the brace level (true) or from
   column 1 (false).
 
 pp_indent_count                          Number
-  If pp_indent_at_level=false, specifies the number of columns to indent
-  per level. Default=1.
+  Specifies the number of columns to indent preprocessors per level at brace level 0 (file-level).
+  If pp_indent_at_level=false, specifies the number of columns to indent preprocessors per level at brace level > 0 (function-level).
+  Default=1.
 
 pp_space                                 { Ignore, Add, Remove, Force }
   Add or remove space after # based on pp_level of #if blocks
@@ -1711,8 +1725,9 @@ pp_region_indent_code                    { False, True }
   Whether to indent the code between #region and #endregion
 
 pp_indent_if                             Number
-  If pp_indent_at_level=true, sets the indent for #if, #else, and #endif when
-  not at file-level.
+  If pp_indent_at_level=true, sets the indent for #if, #else, and #endif when not at file-level.
+  0:  indent preprocessors using output_tab_size.
+  >0: column at which all preprocessors will be indented.
 
 pp_if_indent_code                        { False, True }
   Control whether to indent the code between #if, #else and #endif when not
@@ -1721,4 +1736,7 @@ pp_if_indent_code                        { False, True }
 pp_define_at_level                       { False, True }
   Whether to indent '#define' at the brace level (true) or from
   column 1 (false)
+
+pp_indent_macro_func_dowhile0_skip       { False, True }
+  If true, don't indent the 'do' in 'do/while(0)' construction (default = false)
 
