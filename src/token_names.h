@@ -160,6 +160,7 @@ const char *token_names[] =
    "FUNC_CLASS",
    "FUNC_CTOR_VAR",
    "FUNC_WRAP",
+   "FUNC_PTR_WRAP",
    "PROTO_WRAP",
    "MACRO_FUNC",
    "MACRO",

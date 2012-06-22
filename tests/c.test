@@ -134,6 +134,8 @@
 00431   indent_paren_close-1.cfg c/paren-indent.c
 00432   indent_paren_close-2.cfg c/paren-indent.c
 
+00440   align-type-wrap-func-data-1.cfg c/align-type-wrap-func-data.c
+
 # boolean and comma positioning
 00501   bool-pos-eol.cfg        c/bool-pos.c
 00502   bool-pos-sol.cfg        c/bool-pos.c
@@ -156,6 +158,7 @@
 00615  pp-indent-2.cfg         c/pp-nest.c
 00616  pp_if_indent-1.cfg      c/pp-if-indent.c
 00617  rdan.cfg                c/pp-if-indent.c
+00618  pp_if_indent-4.cfg      c/pp-if-indent.c
 
 00620  ben.cfg                 c/indent-assign.c
 00621  nl_endif.cfg            c/nl_endif.c
@@ -247,6 +250,9 @@
 02400 ben.cfg                  sql/mysql.sqc
 02401 ben.cfg                  sql/sta-select.sqc
 
+02405 pp_define_indent-0.cfg   c/pp-indent-define.c
+02406 pp_define_indent-1.cfg   c/pp-indent-define.c
+02407 pp_define_indent-2.cfg   c/pp-indent-define.c
 
 02410 pp_if_indent-0.cfg       c/ifdef-indent.c
 02411 pp_if_indent-1.cfg       c/ifdef-indent.c
