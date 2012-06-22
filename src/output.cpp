@@ -358,10 +358,10 @@ void output_text(FILE *pfile)
 
                if ((prev != NULL) && (prev->nl_count == 0))
                {
-				  UNC_ASSERT(pc->orig_col >= prev->orig_col_end);
+				  //UNC_ASSERT(pc->orig_col >= prev->orig_col_end);
                   int orig_sp = (pc->orig_col - prev->orig_col_end);
                   pc->column = cpd.column + orig_sp;
-				  UNC_ASSERT(pc->column >= 0);
+				  //UNC_ASSERT(pc->column >= 0);
                   if ((cpd.settings[UO_sp_before_nl_cont].a != AV_IGNORE) &&
                       (pc->column < (int)(cpd.column + 1)))
                   {

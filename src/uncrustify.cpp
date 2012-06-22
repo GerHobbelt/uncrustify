@@ -325,7 +325,7 @@ bfc_dbg_report_function(int report_type, char *usermsg, int *retval)
 	case _CRT_ERRCNT:
 		fwrite(usermsg, 1, strlen(usermsg), stderr);
 		fflush(stderr);
-		OutputDebugStringA(usermsg);
+		//OutputDebugStringA(usermsg);
 		dump_linecounter++;
 		if (dump_linecounter % 10000 == 50)
 		{
@@ -338,7 +338,7 @@ bfc_dbg_report_function(int report_type, char *usermsg, int *retval)
 	case _CRT_ASSERT:
 		fwrite(usermsg, 1, strlen(usermsg), stderr);
 		fflush(stderr);
-		OutputDebugStringA(usermsg);
+		//OutputDebugStringA(usermsg);
 		break;
 	}
 	return 1;
@@ -1457,7 +1457,7 @@ static void do_source_file(const char *filename_in,
          else
          {
             /* Change - rename filename_tmp to filename_out */
-            if (unc_rename(filename_tmp.c_str(), filename_out) != 0)
+            if (rename(filename_tmp.c_str(), filename_out) != 0)
             {
                LOG_FMT(LERR, "%s: Unable to rename '%s' to '%s'\n",
                        __func__, filename_tmp.c_str(), filename_out);

@@ -139,7 +139,7 @@ enum align_mode
 /* Same as indent_to_column, except we can move both ways */
 void align_to_column(chunk_t *pc, int column)
 {
-  UNC_ASSERT(column >= 0);
+   //UNC_ASSERT(column >= 0);
    if (column == pc->column)
    {
       return;
@@ -194,9 +194,9 @@ void align_to_column(chunk_t *pc, int column)
          {
             orig_delta = min_delta;
          }
-		  UNC_ASSERT(orig_delta >= 0);
+		 //UNC_ASSERT(orig_delta >= 0);
          pc->column = prev->column + orig_delta;
-		  UNC_ASSERT(pc->column >= 0);
+		 //UNC_ASSERT(pc->column >= 0);
       }
       else /* ALMODE_SHIFT */
       {

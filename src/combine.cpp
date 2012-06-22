@@ -2077,7 +2077,7 @@ static void fix_fcn_def_params(chunk_t *start)
       start = chunk_get_next_ncnl(start);
    }
 
-   UNC_ASSERT((start->len() == 1) && (start->str[0] == '('));
+   //UNC_ASSERT((start->len() == 1) && (start->str[0] == '('));
 
    ChunkStack cs;
 

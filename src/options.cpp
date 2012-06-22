@@ -1195,8 +1195,6 @@ void register_options(void)
    unc_add_option("cmt_sp_after_star_cont", UO_cmt_sp_after_star_cont, AT_NUM,
                   "The number of spaces to insert after the optional star on subsequent comment\n"
 				  "lines.");
-   unc_add_option("cmt_sp_after_cpp_start", UO_cmt_sp_after_cpp_start, AT_NUM,
-                  "The number of spaces to insert after the '//' on comment lines.");
 
    unc_add_option("cmt_multi_check_last", UO_cmt_multi_check_last, AT_BOOL,
                   "For multi-line comments with a '*' lead, remove leading spaces if the first\n"
@@ -1633,13 +1631,13 @@ static void convert_value(const option_map_value *entry, const char *val, op_val
 	  {
 		  free((void *)dest->str);
 	  }
-	  UNC_ASSERT(val);
+	  //UNC_ASSERT(val);
       dest->str = strdup(val);
       return;
 
    default:
 	   /* Must be AT_IARF */
-	   UNC_ASSERT(!"Unknown entry type");
+	   //UNC_ASSERT(!"Unknown entry type");
 
    case AT_IARF:
 	   if ((strcasecmp(val, "add") == 0) || (strcasecmp(val, "a") == 0))

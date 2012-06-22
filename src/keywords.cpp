@@ -369,7 +369,7 @@ static const chunk_tag_t *kw_static_match(const chunk_tag_t *tag)
  * @param len     The length of the text
  * @return        CT_WORD (no match) or the keyword token
  */
-c_token_t find_keyword_type(const char *word, int len)
+const chunk_tag_t *find_keyword(const char *word, int len)
 {
    string            ss(word, len);
    chunk_tag_t       key;
@@ -377,14 +377,21 @@ c_token_t find_keyword_type(const char *word, int len)
 
    if (len <= 0)
    {
-      return(CT_NONE);
+      return NULL;
    }
 
    /* check the dynamic word list first */
    dkwmap::iterator it = dkwm.find(ss);
    if (it != dkwm.end())
    {
-      return((*it).second);
+	   static chunk_tag_t tt = {0};
+	   static string cts;
+
+	   cts = ss.c_str();  // make sure the string is cloned!
+	   tt.tag = cts.c_str();
+	   tt.lang_flags = LANG_ALL;
+	   tt.type = ((*it).second);
+	   return &tt;
    }
 
    key.tag = ss.c_str();
@@ -396,7 +403,7 @@ c_token_t find_keyword_type(const char *word, int len)
    {
       p_ret = kw_static_match(p_ret);
    }
-   return((p_ret != NULL) ? p_ret->type : CT_WORD);
+   return p_ret;
 }
 
 
