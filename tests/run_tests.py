@@ -96,10 +96,15 @@ def run_tests(test_name, config_name, input_name, lang):
 		config_name = os.path.join('config', config_name)
 
 	resultname = os.path.join('results', expected_name)
+	resultname_1 = os.path.join('results.initial', expected_name)
 	resultinputname = os.path.join('results.input', expected_name)
 	outputname = os.path.join('output', expected_name)
 	try:
 		os.makedirs(os.path.dirname(resultname))
+	except:
+		pass
+	try:
+		os.makedirs(os.path.dirname(resultname_1))
 	except:
 		pass
 	try:
@@ -115,6 +120,10 @@ def run_tests(test_name, config_name, input_name, lang):
 		print "RUN: " + cmd
 	sys.stdout.flush()
 	a = os.system(cmd)
+
+	cmd = "cat %s > %s" % (resultname, resultname_1)
+	os.system(cmd)
+
 	if a != 0:
 		print FAIL_COLOR + "FAILED: " + NORMAL + test_name
 		return -1
