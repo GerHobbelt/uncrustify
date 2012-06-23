@@ -2097,7 +2097,7 @@ static void mark_variable_stack(ChunkStack& cs, log_sev_t sev)
 	  {
          word_type = cs.Pop();
 	  }
-      
+
       do
       {
          LOG_FMT(LFCNP, " <%s>", word_type->str.c_str());
@@ -2168,7 +2168,7 @@ static void fix_fcn_def_params(chunk_t *start)
       {
          handle_type_wrap(pc);
       }
-      
+
       if (chunk_is_star(pc))
       {
          pc->type = CT_PTR_TYPE;

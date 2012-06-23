@@ -600,12 +600,12 @@ void indent_text(void)
       {
          frm.level++;
          indent_pse_push(frm, pc);
-         
+
          frm.pse[frm.pse_tos].indent_tmp = frm.pse[frm.pse_tos - 1].indent_tmp;
          frm.pse[frm.pse_tos].indent     = frm.pse[frm.pse_tos - 1].indent_tmp;
          frm.pse[frm.pse_tos].indent_tab = frm.pse[frm.pse_tos - 1].indent_tmp;
       }
-      
+
       /* Check for close XML tags "</..." */
       if (cpd.settings[UO_indent_xml_string].n > 0)
       {

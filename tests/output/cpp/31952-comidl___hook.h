@@ -2,12 +2,14 @@
 #pragma once
 
 [dual, uuid("00000000-0000-0000-0000-000000000001")]
-__interface IEvents {
+__interface IEvents
+{
    [id(1)] HRESULT MyEvent([in] int value);
 };
 
 [dual, uuid("00000000-0000-0000-0000-000000000002")]
-__interface IEventSource {
+__interface IEventSource
+{
    [id(1)] HRESULT FireEvent();
 };
 

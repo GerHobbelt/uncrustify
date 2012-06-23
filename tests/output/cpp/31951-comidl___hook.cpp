@@ -17,7 +17,6 @@ class CSource : public IEventSource {
    HRESULT FireEvent()
    {
       __raise MyEvent(123);
-
       return(S_OK);
    }
 };
