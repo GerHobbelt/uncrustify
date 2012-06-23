@@ -71,6 +71,8 @@ chunk_t *chunk_get_prev_str(chunk_t *cur, const char *str, int len, int level, c
 chunk_t *chunk_get_next_nvb(chunk_t *cur, chunk_nav_t nav = CNAV_ALL);
 chunk_t *chunk_get_prev_nvb(chunk_t *cur, chunk_nav_t nav = CNAV_ALL);
 
+chunk_t *chunk_get_prev_nisl(chunk_t *cur, chunk_nav_t nav = CNAV_ALL);
+
 /**
  * Skips to the closing match for the current paren/brace/square.
  *

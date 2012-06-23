@@ -375,6 +375,7 @@ void output_text(FILE *pfile)
 
                if ((prev != NULL) && (prev->nl_count == 0))
                {
+				  UNC_ASSERT(prev->orig_col_end > 0);
 				  UNC_ASSERT(pc->orig_col >= prev->orig_col_end);
                   int orig_sp = (pc->orig_col - prev->orig_col_end);
                   pc->column = cpd.column + orig_sp;
@@ -1026,18 +1027,29 @@ static void output_cmt_start(cmt_reflow& cmt, chunk_t *pc)
    else if (pc->parent_type == CT_COMMENT_END)
    {
       /* Make sure we have at least one space past the last token */
-      chunk_t *prev = chunk_get_prev(pc);
+      chunk_t *prev = chunk_get_prev_nisl(pc);
+	  int col_min;
+	  int space_min;
+
       if (prev != NULL)
       {
-         while (prev->prev && prev->type == CT_VBRACE_CLOSE)
-         {
-            prev = prev->prev;
-         }
-         int col_min = prev->column + prev->len() + 1;
+         col_min = prev->column + prev->len() + 1;
          if (cmt.column < col_min)
          {
             cmt.column = col_min;
          }
+      }
+	  space_min = 1;
+	  if (cpd.settings[UO_indent_relative_single_line_comments].b &&
+		  (pc->flags & (PCF_RIGHT_COMMENT | PCF_WAS_ALIGNED)) == PCF_RIGHT_COMMENT &&
+		  pc->orig_ws_lead > space_min)
+	  {
+		 space_min = pc->orig_ws_lead;
+	  }
+      col_min = cpd.column + space_min;
+      if (cmt.column < col_min)
+      {
+         cmt.column = col_min;
       }
    }
 

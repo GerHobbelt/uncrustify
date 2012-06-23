@@ -15,6 +15,7 @@
 #include <cstdio>
 #include <stdarg.h>
 #include "unc_ctype.h"
+#include "log_levels.h"
 
 
 /** Private log structure */
@@ -45,9 +46,9 @@ void log_init(FILE *log_file)
 {
    /* set the top 3 severities */
    logmask_set_all(g_log.mask, false);
-   log_set_sev(0, true);
-   log_set_sev(1, true);
-   log_set_sev(2, true);
+   log_set_sev(LSYS, true);
+   log_set_sev(LERR, true);
+   log_set_sev(LWARN, true);
 
    g_log.log_file = (log_file != NULL) ? log_file : stderr;
 }

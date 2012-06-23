@@ -361,19 +361,23 @@ void align_right_comments(void)
          skip = false;
          if (pc->parent_type == CT_COMMENT_END)
          {
-            prev = chunk_get_prev(pc);
-            if (pc->orig_col < (prev->orig_col_end + cpd.settings[UO_align_right_cmt_gap].n))
-            {
-               LOG_FMT(LALTC, "NOT changing END comment on line %d (%d <= %d + %d)\n",
-                       pc->orig_line,
-                       pc->orig_col, prev->orig_col_end, cpd.settings[UO_align_right_cmt_gap].n);
-               skip = true;
-            }
-            if (!skip)
-            {
-               LOG_FMT(LALTC, "Changing END comment on line %d into a RIGHT-comment\n",
-                       pc->orig_line);
-               pc->flags |= PCF_RIGHT_COMMENT;
+            prev = chunk_get_prev_nisl(pc);
+			if (prev)
+			{
+			   UNC_ASSERT(prev->orig_col_end >= 1);
+               if (pc->orig_col < (prev->orig_col_end + cpd.settings[UO_align_right_cmt_gap].n))
+               {
+                  LOG_FMT(LALTC, "NOT changing END comment on line %d (%d <= %d + %d)\n",
+                          pc->orig_line,
+                          pc->orig_col, prev->orig_col_end, cpd.settings[UO_align_right_cmt_gap].n);
+                  skip = true;
+               }
+               if (!skip)
+               {
+                  LOG_FMT(LALTC, "Changing END comment on line %d into a RIGHT-comment\n",
+                          pc->orig_line);
+                  pc->flags |= PCF_RIGHT_COMMENT;
+			   }
             }
          }
 
@@ -392,6 +396,28 @@ void align_right_comments(void)
             }
          }
       }
+   }
+
+   // shrink whitespace leading right comments to the original amount again:
+   if (cpd.settings[UO_indent_relative_single_line_comments].b)
+   {
+      pc = chunk_get_head();
+      while (pc != NULL)
+      {
+         if ((pc->flags & (PCF_RIGHT_COMMENT | PCF_WAS_ALIGNED)) == PCF_RIGHT_COMMENT)
+         {
+	        int inter_sp = pc->orig_ws_lead;
+		    if (inter_sp >= 0)
+		    {
+               prev = chunk_get_prev_nisl(pc);
+			   if (prev)
+			   {
+		          pc->column = prev->column + prev->len() + inter_sp;
+			   }
+		    }
+         }
+         pc = chunk_get_next(pc);
+	  }
    }
 
    pc = chunk_get_head();

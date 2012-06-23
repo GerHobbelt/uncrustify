@@ -37,6 +37,7 @@ config.status
 *.vpwh*
 tests/results/
 tests/results.input/
+tests/results.initial/
 .waf*
 .lock*
 build

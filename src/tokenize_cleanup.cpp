@@ -101,6 +101,7 @@ void tokenize_cleanup(void)
             pc->type = CT_TSQUARE;
             pc->str  = "[]";
             chunk_del(next);
+			UNC_ASSERT(pc->orig_col_end > 0);
             pc->orig_col_end += 1;
          }
       }
@@ -338,6 +339,7 @@ void tokenize_cleanup(void)
                next->type = CT_OPERATOR_VAL;
 #if 0
                chunk_del(tmp);
+			   UNC_ASSERT(pc->orig_col_end > 0);
                next->orig_col_end += 1;
 #else
                next->orig_col_end = tmp->orig_col_end;

@@ -537,6 +537,8 @@ static void convert_brace(chunk_t *br)
  */
 static void convert_vbrace(chunk_t *vbr)
 {
+   chunk_t *prev;
+
    if (vbr == NULL)
    {
       return;
@@ -545,6 +547,14 @@ static void convert_vbrace(chunk_t *vbr)
    {
       vbr->type = CT_BRACE_OPEN;
       vbr->str  = "{";
+	  
+	  prev = chunk_get_prev_nisl(vbr);
+	  if (prev != NULL)
+	  {
+		 UNC_ASSERT(prev->orig_col_end > 0);
+	     vbr->orig_col = prev->orig_col_end;
+		 vbr->orig_col_end = vbr->orig_col + 1;
+	  }
 
       /* If the next chunk is a preprocessor, then move the open brace after the
        * preprocessor.
@@ -561,6 +571,14 @@ static void convert_vbrace(chunk_t *vbr)
    {
       vbr->type = CT_BRACE_CLOSE;
       vbr->str  = "}";
+	  
+	  prev = chunk_get_prev_nisl(vbr);
+	  if (prev != NULL)
+	  {
+		 UNC_ASSERT(prev->orig_col_end > 0);
+	     vbr->orig_col = prev->orig_col_end;
+		 vbr->orig_col_end = vbr->orig_col + 1;
+	  }
 
       /* If the next chunk is a comment, followed by a newline, then
        * move the brace after the newline and add another newline after
@@ -681,6 +699,7 @@ chunk_t *insert_comment_after(chunk_t *ref, c_token_t cmt_type,
 
    new_cmt.column   = ref->column + ref->len() + 1;
    new_cmt.orig_col = new_cmt.column;
+   new_cmt.orig_ws_lead = 1;
 
    return(chunk_add_after(&new_cmt, ref));
 }

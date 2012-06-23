@@ -1659,7 +1659,7 @@ cmt_sp_after_cpp_start                   Number
 
 cmt_multi_check_last                     { False, True }
   For multi-line comments with a '*' lead, remove leading spaces if the first
-  and last lines of the comment are the same length (while not conatining any
+  and last lines of the comment are the same length (while not containing any
   human-readable text, i.e. no alphanumeric characters). Default=True
 
 cmt_insert_file_header                   String

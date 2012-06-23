@@ -450,6 +450,7 @@ static chunk_t *pawn_process_func_def(chunk_t *pc)
       chunk             = *last;
       chunk.str.clear();
       chunk.column     += last->len();
+	  chunk.orig_col_end = 0;
       chunk.type        = CT_VBRACE_CLOSE;
       chunk.level       = 0;
       chunk.brace_level = 0;

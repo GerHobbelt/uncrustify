@@ -186,8 +186,15 @@ void chunk_move_after(chunk_t *pc_in, chunk_t *ref)
 
    /* HACK: Adjust the original column */
    pc_in->column       = ref->column + space_col_align(ref, pc_in);
-   pc_in->orig_col     = pc_in->column;
-   pc_in->orig_col_end = pc_in->orig_col + pc_in->len();
+   //UNC_ASSERT(pc_in->orig_col_end >= 1); // do not juggle the orig_col settings for injected chunks, or we won't be able to recognize those any more
+   if (pc_in->orig_col_end >= 1)
+   {
+	  chunk_t *next = pc_in->next;
+
+      pc_in->orig_col     = pc_in->column;
+      pc_in->orig_col_end = pc_in->orig_col + pc_in->len();
+      pc_in->orig_line    = ((chunk_is_newline(ref) && next != NULL) ? next->orig_line : ref->orig_line);
+   }
 }
 
 
@@ -646,5 +653,26 @@ chunk_t *chunk_get_prev_nvb(chunk_t *cur, chunk_nav_t nav)
    {
       pc = chunk_get_prev(pc, nav);
    } while (chunk_is_vbrace(pc));
+   return(pc);
+}
+
+
+/**
+ * Gets the prev non-injected chunk (no vbraces, etc.) on the same line
+ */
+chunk_t *chunk_get_prev_nisl(chunk_t *cur, chunk_nav_t nav)
+{
+   chunk_t *pc = cur;
+
+   do
+   {
+      pc = chunk_get_prev(pc, nav);
+	  UNC_ASSERT(chunk_is_vbrace(pc) ? pc->orig_col_end < 1 : 1);
+   } while (pc && pc->orig_col_end <= 1 && !chunk_is_newline(pc));
+
+   if (chunk_is_newline(pc))
+   {
+	  return NULL;
+   }
    return(pc);
 }

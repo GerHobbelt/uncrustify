@@ -225,6 +225,7 @@ struct chunk_t
       orig_line = 0;
       orig_col = 0;
       orig_col_end = 0;
+	  orig_ws_lead = 0;
       flags = 0;
       column = 0;
       column_indent = 0;
@@ -252,6 +253,7 @@ struct chunk_t
    UINT32      orig_line;
    UINT32      orig_col;
    UINT32      orig_col_end;
+   int         orig_ws_lead;
    UINT64      flags;            /* see PCF_xxx */
    int         column;           /* column of chunk */
    int         column_indent;    /* if 1st on a line, set to the 'indent'

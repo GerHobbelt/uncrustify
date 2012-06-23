@@ -1470,6 +1470,7 @@ void tokenize(const deque<int>& data, chunk_t *ref, const char *parsed_file)
    chunk_t            *rprev = NULL;
    struct parse_frame frm;
    bool               last_was_tab = false;
+   int				  last_non_ws_end = 1;
 
    memset(&frm, 0, sizeof(frm));
 
@@ -1491,20 +1492,32 @@ void tokenize(const deque<int>& data, chunk_t *ref, const char *parsed_file)
          continue;
       }
 
+	  if (last_non_ws_end > 1)
+	  {
+	     chunk.orig_ws_lead = chunk.orig_col - last_non_ws_end;
+	  }
+	  else
+	  {
+		 chunk.orig_ws_lead = -1;
+	  }
+
       if (chunk.type == CT_NEWLINE)
       {
+		 last_non_ws_end = 1;
          last_was_tab    = chunk.after_tab;
          chunk.after_tab = false;
          chunk.str.clear();
       }
       else if (chunk.type == CT_NL_CONT)
       {
+		 last_non_ws_end = 1;
          last_was_tab    = chunk.after_tab;
          chunk.after_tab = false;
          chunk.str       = "\\\n";
       }
       else
       {
+		 last_non_ws_end = ctx.c.col;
          chunk.after_tab = last_was_tab;
          last_was_tab    = false;
       }
@@ -1519,6 +1532,10 @@ void tokenize(const deque<int>& data, chunk_t *ref, const char *parsed_file)
 
       /* Store off the end column */
       chunk.orig_col_end = ctx.c.col;
+	  if (last_non_ws_end > 1)
+	  {
+         last_non_ws_end = chunk.orig_col_end = chunk.orig_col + chunk.len();
+	  }
 
       /* Add the chunk to the list */
       rprev = pc;
