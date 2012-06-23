@@ -1310,7 +1310,7 @@ void register_options(void)
 
    unc_add_option("cmt_multi_check_last", UO_cmt_multi_check_last, AT_BOOL,
                   "For multi-line comments with a '*' lead, remove leading spaces if the first\n"
-				  "and last lines of the comment are the same length (while not conatining any\n"
+				  "and last lines of the comment are the same length (while not containing any\n"
 				  "human-readable text, i.e. no alphanumeric characters). Default=True");
 
    unc_add_option("cmt_insert_file_header", UO_cmt_insert_file_header, AT_STRING,

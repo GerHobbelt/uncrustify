@@ -7823,7 +7823,7 @@ void cmt_reflow_ex::render(void)
 	First remove the first and last NEWLINEs (empty lines, really) to ensure
 	single line and block comments are reformatted properly: these first and last
 	newlines are solely determined by the UO_cmt_c_nl_start/UO_cmt_c_nl_end
-	settings (and those of their C++ equivalents UO_cmt_cpp_nl_start/UO_cmt_cpp_nl_start)
+	settings (and those of their C++ equivalents UO_cmt_cpp_nl_start/UO_cmt_cpp_nl_end)
 	*/
 	strip_first_and_last_nl_from_text();
 	UNC_ASSERT(m_comment_len == strlen(m_comment));
