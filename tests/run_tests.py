@@ -113,6 +113,7 @@ def run_tests(test_name, config_name, input_name, lang):
 	cmd = "%s/uncrustify -q -c %s -f input/%s %s > %s" % (os.path.abspath('../src'), config_name, input_name, lang, resultname)
 	if log_level & 2:
 		print "RUN: " + cmd
+	sys.stdout.flush()
 	a = os.system(cmd)
 	if a != 0:
 		print FAIL_COLOR + "FAILED: " + NORMAL + test_name
@@ -123,6 +124,7 @@ def run_tests(test_name, config_name, input_name, lang):
 			print MISMATCH_COLOR + "MISMATCH: " + NORMAL + test_name
 			if log_level & 1:
 				cmd = "diff -u %s %s" % (outputname, resultname)
+				sys.stdout.flush()
 				os.system(cmd)
 			return -1
 	except:
@@ -134,6 +136,7 @@ def run_tests(test_name, config_name, input_name, lang):
 	cmd = "%s/uncrustify -q -c %s -f %s %s > %s" % (os.path.abspath('../src'), config_name, outputname, lang, resultname)
 	if log_level & 2:
 		print "RUN: " + cmd
+	sys.stdout.flush()
 	a = os.system(cmd)
 	if a != 0:
 		print FAIL_COLOR + "FAILED2: " + NORMAL + test_name
@@ -144,6 +147,7 @@ def run_tests(test_name, config_name, input_name, lang):
 			print UNSTABLE_COLOR + "UNSTABLE: " + NORMAL + test_name
 			if log_level & 1:
 				cmd = "diff -u %s %s" % (outputname, resultname)
+				sys.stdout.flush()
 				os.system(cmd)
 			return -2
 	except:
