@@ -589,13 +589,12 @@ const chunk_tag_t *find_keyword(const char *word, int len)
 int load_keyword_file(const char *filename)
 {
    FILE *pf;
-   char buf[256];
-   char *ptr;
+   char buf[512];
    const char *args[3];
    int  argc;
    int  line_no = 0;
 
-   pf = fopen(filename, "r");
+   pf = unc_fopen(filename, "r");
    if (pf == NULL)
    {
       LOG_FMT(LERR, "%s: fopen(%s) failed: %s (%d)\n",
@@ -607,12 +606,6 @@ int load_keyword_file(const char *filename)
    while (fgets(buf, sizeof(buf), pf) != NULL)
    {
       line_no++;
-
-      /* remove comments */
-      if ((ptr = strchr(buf, '#')) != NULL)
-      {
-         *ptr = 0;
-      }
 
       argc       = Args::SplitLine(buf, args, ARRAY_SIZE(args) - 1);
       args[argc] = 0;
@@ -632,7 +625,7 @@ int load_keyword_file(const char *filename)
       }
    }
 
-   fclose(pf);
+   unc_fclose(pf);
    return(SUCCESS);
 }
 

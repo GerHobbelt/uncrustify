@@ -235,7 +235,7 @@ static void version_exit(void)
 }
 
 
-static FILE *unc_fopen(const char *path, const char *mode)
+FILE *unc_fopen(const char *path, const char *mode)
 {
 	if (path == NULL || strcmp(path, "-") == 0)
 	{
@@ -257,7 +257,7 @@ static FILE *unc_fopen(const char *path, const char *mode)
 	return fopen(path, mode);
 }
 
-static int unc_fclose(FILE *fh)
+int unc_fclose(FILE *fh)
 {
 	if (fh && fh != stdin && fh != stderr && fh != stdout)
 	{
@@ -1063,13 +1063,31 @@ static void process_source_list(const char *source_list,
       }
       LOG_FMT(LFILELIST, "\n");
 
-      if ((argc == 1) && (*args[0] != '#'))
+      if (argc == 1)
       {
          char outbuf[1024];
          do_source_file(args[0],
                         make_output_filename(outbuf, sizeof(outbuf), args[0], prefix, suffix),
                         NULL, no_backup, keep_mtime);
       }
+      else if (argc == 2)
+      {
+         do_source_file(args[0],
+                        args[1], 
+                        NULL, no_backup, keep_mtime);
+      }
+      else if (argc == 3)
+      {
+         do_source_file(args[0],
+                        args[1], 
+                        args[2], no_backup, keep_mtime);
+      }
+	  else if (argc > 0)
+	  {
+         LOG_FMT(LERR, "%s: Invalid source list format at line %d of file %s: too many arguments (%d)\n",
+                 __func__, line, source_list, argc);
+         cpd.error_count++;
+	  }
    }
    unc_fclose(p_file);
 }

@@ -201,21 +201,27 @@ const char *Args::Unused(int& index)
  * @param text       The text to split (modified)
  * @param args       The char * array to populate
  * @param num_args   The number of items in args
+ * @param separators Any character in this set is accepted as an argument separator. Default set: any whitespace
+ * @param comment_marker   The string that starts a comment
  * @return           The number of arguments parsed (always <= num_args)
  */
-int Args::SplitLine(char *text, const char *args[], int num_args)
+int Args::SplitLine(char *text, const char *args[], int num_args, const char *separators, const char *comment_marker)
 {
    char cur_quote    = 0;
    bool in_backslash = false;
    bool in_arg       = false;
    int  argc         = 0;
    char *dest        = text;
-
+   int comment_marker_len = (int)strlen(comment_marker);
 
    while ((*text != 0) && (argc <= num_args))
    {
       /* Detect the start of an arg */
-      if (!in_arg && !unc_isspace(*text))
+	  if (!in_arg && !strncmp(comment_marker, text, comment_marker_len))
+	  {
+		 break;
+	  }
+      else if (!in_arg && (separators ? !strchr(separators, *text) : !unc_isspace(*text)))
       {
          in_arg     = true;
          args[argc] = dest;
@@ -234,12 +240,28 @@ int Args::SplitLine(char *text, const char *args[], int num_args)
          {
             in_backslash = true;
          }
+         else if (*text == cur_quote && text[1] == cur_quote)
+         {
+			// just another form of escaping quotes
+            *dest++ = *text++;
+         }
          else if (*text == cur_quote)
          {
+			// end of quoted argument
             cur_quote = 0;
-         }
-         else if ((*text == '\'') || (*text == '"') || (*text == '`'))
+
+            *dest = 0;
+            dest++;
+            in_arg = false;
+            if (argc == num_args)
+            {
+               break;
+            }
+		 }
+         else if (!cur_quote && args[argc - 1] == dest &&
+			      ((*text == '\'') || (*text == '"') || (*text == '`')))
          {
+			// only accept start of quoted string at argument start; any later quote is simply that: a character.
             cur_quote = *text;
          }
          else if (cur_quote != 0)
@@ -247,7 +269,7 @@ int Args::SplitLine(char *text, const char *args[], int num_args)
             *dest = *text;
             dest++;
          }
-         else if (unc_isspace(*text))
+         else if (separators ? !!strchr(separators, *text) : unc_isspace(*text))
          {
             *dest = 0;
             dest++;

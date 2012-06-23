@@ -25,6 +25,8 @@ const char *path_basename(const char *path);
 int path_dirname_len(const char *filename);
 const char *get_file_extension(int& idx);
 void dump_parsed_input(const char *fname, const char *parsed_file);
+FILE *unc_fopen(const char *path, const char *mode);
+int unc_fclose(FILE *fh);
 
 
 /*
@@ -59,6 +61,7 @@ const option_map_value *get_option_name(int uo);
 void print_options(FILE *pfile, bool verbose);
 void clear_options(void);
 
+string encode_string(const char *src);
 
 string argtype_to_string(argtype_e argtype);
 string bool_to_string(bool val);
@@ -66,7 +69,7 @@ string argval_to_string(argval_t argval);
 string number_to_string(int number);
 string lineends_to_string(lineends_e linends);
 string tokenpos_to_string(tokenpos_e tokenpos);
-string op_val_to_string(argtype_e argtype, op_val_t op_val);
+string op_val_to_string(argtype_e argtype, op_val_t op_val, bool encode_string = true);
 
 /*
  *  indent.cpp

@@ -64,13 +64,12 @@ void add_define(const char *tag, const char *value)
 int load_define_file(const char *filename)
 {
    FILE *pf;
-   char buf[160];
-   char *ptr;
+   char buf[512];
    const char *args[3];
    int  argc;
    int  line_no = 0;
 
-   pf = fopen(filename, "r");
+   pf = unc_fopen(filename, "r");
    if (pf == NULL)
    {
       LOG_FMT(LERR, "%s: fopen(%s) failed: %s (%d)\n",
@@ -82,12 +81,6 @@ int load_define_file(const char *filename)
    while (fgets(buf, sizeof(buf), pf) != NULL)
    {
       line_no++;
-
-      /* remove comments */
-      if ((ptr = strchr(buf, '#')) != NULL)
-      {
-         *ptr = 0;
-      }
 
       argc       = Args::SplitLine(buf, args, ARRAY_SIZE(args) - 1);
       args[argc] = 0;
@@ -108,7 +101,7 @@ int load_define_file(const char *filename)
       }
    }
 
-   fclose(pf);
+   unc_fclose(pf);
    return(SUCCESS);
 }
 
@@ -140,7 +133,7 @@ void print_defines(FILE *pfile)
    for (it = defines.begin(); it != defines.end(); ++it)
    {
       fprintf(pfile, "define %*.s%s \"%s\"\n",
-              cpd.max_option_name_len - 6, " ", (*it).first.c_str(), (*it).second.c_str());
+              cpd.max_option_name_len - 6, " ", (*it).first.c_str(), encode_string((*it).second.c_str()).c_str());
    }
 }
 

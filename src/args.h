@@ -108,9 +108,11 @@ public:
     * @param text       The text to split (modified)
     * @param args       The char * array to populate
     * @param num_args   The number of items in args
+    * @param separators Any character in this set is accepted as an argument separator. Default set: any whitespace
+    * @param comment_marker   The string that starts a comment
     * @return           The number of arguments parsed (always <= num_args)
     */
-   static int SplitLine(char *text, const char *args[], int num_args);
+   static int SplitLine(char *text, const char *args[], int num_args, const char *separators = 0, const char *comment_marker = "#");
 };
 
 #endif   /* ARGS_H_INCLUDED */

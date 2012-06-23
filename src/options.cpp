@@ -1848,7 +1848,7 @@ int load_option_file(const char *filename)
    }
 #endif
 
-   pfile = fopen(filename, "r");
+   pfile = unc_fopen(filename, "r");
    if (pfile == NULL)
    {
       LOG_FMT(LERR, "%s: fopen(%s) failed: %s (%d)\n",
@@ -1862,27 +1862,14 @@ int load_option_file(const char *filename)
    {
       cpd.line_number++;
 
-      /* Chop off trailing comments */
-      if ((ptr = strchr(buffer, '#')) != NULL)
-      {
-         *ptr = 0;
-      }
-
       /* Blow away the '=' to make things simple */
       if ((ptr = strchr(buffer, '=')) != NULL)
       {
          *ptr = ' ';
       }
 
-      /* Blow away all commas */
-      ptr = buffer;
-      while ((ptr = strchr(ptr, ',')) != NULL)
-      {
-         *ptr = ' ';
-      }
-
-      /* Split the line */
-      argc = Args::SplitLine(buffer, args, ARRAY_SIZE(args) - 1);
+      /* Split the line, treat commas as spaces ~ argument separators */
+      argc = Args::SplitLine(buffer, args, ARRAY_SIZE(args) - 1, ", \t\r\n");
       if (argc < 2)
       {
          if (argc > 0)
@@ -1958,7 +1945,7 @@ int load_option_file(const char *filename)
       }
    }
 
-   fclose(pfile);
+   unc_fclose(pfile);
    return(0);
 }
 
@@ -2450,7 +2437,7 @@ string tokenpos_to_string(tokenpos_e tokenpos)
 }
 
 
-string op_val_to_string(argtype_e argtype, op_val_t op_val)
+string op_val_to_string(argtype_e argtype, op_val_t op_val, bool encode_str)
 {
    switch (argtype)
    {
@@ -2473,10 +2460,47 @@ string op_val_to_string(argtype_e argtype, op_val_t op_val)
       return(tokenpos_to_string(op_val.tp));
 
    case AT_STRING:
-      return(op_val.str != NULL ? op_val.str : "");
+      if (op_val.str == NULL)
+	  {
+		 return "";
+	  }
+	  else if (encode_str)
+	  {
+		 return encode_string(op_val.str);
+	  }
+	  else
+	  {
+		 return op_val.str;
+	  }
 
    default:
       LOG_FMT(LWARN, "Unknown argtype '%d'\n", argtype);
       return("");
    }
 }
+
+string encode_string(const char *src)
+{
+   const char *s;
+   string d;
+
+   for (s = src; *s; s++)
+   {
+      switch (*s)
+	  {
+	  case '"':
+		 d.append("\\\"");
+		 continue;
+
+	  case '\\':
+		 d.append("\\\\");
+		 continue;
+
+	  default:
+		 d += *s;
+		 break;
+	  }
+   }
+   return d;
+}
+
