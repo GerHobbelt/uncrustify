@@ -818,6 +818,214 @@ void tokenize_cleanup(void)
          pc->type = CT_QUALIFIER;
       }
 
+	  /*
+	   * Translate various tokens to generic tokens which act the same from the
+	   * perspective of uncrustify: this simplifies the checks through the 
+	   * application as we don't have to check for these everywhere.
+	   */
+	  switch (pc->type)
+	  {
+	  case CT_BASED:			// TODO: ~ CT_QUALIFIER,
+		 pc->type = CT_QUALIFIER;
+		 break;
+
+	  case CT_DECLSPEC:			// TODO: ~ CT_ATTRIBUTE,
+		 pc->type = CT_ATTRIBUTE;
+		 break;
+
+	  case CT_EXCEPT:			// TODO: ~ CT_CATCH,
+		 pc->type = CT_CATCH;
+		 break;
+
+	  case CT_IF_EXISTS:		// TODO: ~ CT_FUNCTION,
+		 pc->type = CT_FUNCTION;
+		 break;
+
+	  case CT_LEAVE:			// TODO: ~ CT_BREAK,
+		 pc->type = CT_BREAK;
+		 break;
+
+	  case CT_INHERITANCE:		// TODO: ~ CT_QUALIFIER,
+		 pc->type = CT_QUALIFIER;
+		 break;
+
+	  case CT_UNALIGNED:		// TODO: ~ CT_QUALIFIER,
+		 pc->type = CT_QUALIFIER;
+		 break;
+
+	  case CT_CONCAT:           /* The '~' between strings */ // ~ CT_ARITH,
+		 pc->type = CT_ARITH;
+		 break;
+
+	  case CT_CS_ARRAY:		    // TODO: ~ CT_CLASS,
+		 pc->type = CT_CLASS;
+		 break;
+
+	  case CT_AS_FRIEND:		// TODO: ~ CT_QUALIFIER,
+		 pc->type = CT_QUALIFIER;
+		 break;
+
+	  case CT_GCNEW:			// TODO: ~ CT_NEW,
+		 pc->type = CT_NEW;
+		 break;
+
+	  case CT_GENERIC:			// TODO: ~ CT_WORD,
+		 pc->type = CT_WORD;
+		 break;
+
+	  case CT_WHERE:			// TODO: ~ CT_WORD,
+		 pc->type = CT_WORD;
+		 break;
+
+	  case CT_INITONLY:			// TODO: ~ CT_WORD,
+		 pc->type = CT_WORD;
+		 break;
+
+	  case CT_INTERIOR_PTR:		// TODO: ~ CT_WORD,
+		 pc->type = CT_WORD;
+		 break;
+
+	  case CT_LITERAL:			// TODO: ~ CT_WORD,
+		 pc->type = CT_WORD;
+		 break;
+
+	  case CT_NULLPTR:			// TODO: ~ CT_WORD,
+		 pc->type = CT_WORD;
+		 break;
+
+	  case CT_BOX:				// TODO: ~ CT_FUNCTION,
+		 pc->type = CT_FUNCTION;
+		 break;
+
+	  case CT_GC:				// TODO: ~ CT_QUALIFIER,
+		 pc->type = CT_QUALIFIER;
+		 break;
+
+	  case CT_IDENTIFIER:		// TODO: ~ CT_QUALIFIER,
+		 pc->type = CT_QUALIFIER;
+		 break;
+
+	  case CT_NOGC:				// TODO: ~ CT_QUALIFIER,
+		 pc->type = CT_QUALIFIER;
+		 break;
+
+	  case CT_PIN:				// TODO: ~ CT_QUALIFIER,
+		 pc->type = CT_QUALIFIER;
+		 break;
+
+	  case CT_PROPERTY:			// TODO: ~ CT_QUALIFIER,
+		 pc->type = CT_QUALIFIER;
+		 break;
+
+	  case CT_SEALED:			// TODO: ~ CT_QUALIFIER,
+		 pc->type = CT_QUALIFIER;
+		 break;
+
+	  case CT_VALUE:			// TODO: ~ CT_QUALIFIER,
+		 pc->type = CT_QUALIFIER;
+		 break;
+
+
+	  case CT_EVENT:			// TODO: ~ CT_QUALIFIER,
+		 pc->type = CT_QUALIFIER;
+		 break;
+
+	  case CT_HOOK:				// TODO: ~ CT_QUALIFIER,
+		 pc->type = CT_QUALIFIER;
+		 break;
+
+	  case CT_INTERFACE:		// TODO: ~ CT_FUNCTION,
+		 pc->type = CT_FUNCTION;
+		 break;
+
+	  case CT_RAISE:			// TODO: ~ CT_QUALIFIER,
+		 pc->type = CT_QUALIFIER;
+		 break;
+
+	  case CT_UNHOOK:			// TODO: ~ CT_QUALIFIER,
+		 pc->type = CT_QUALIFIER;
+		 break;
+
+	  case CT_UUIDOF:			// TODO: ~ CT_FUNCTION,
+		 pc->type = CT_FUNCTION;
+		 break;
+
+	  case CT_CONCATENATE:		/* . as in 'concatenate strings' */ // ~ CT_ARITH,
+		 pc->type = CT_ARITH;
+		 break;
+
+	  case CT_PHP_ARRAY:		// TODO: ~ CT_FUNCTION,
+		 pc->type = CT_FUNCTION;
+		 break;
+
+	  case CT_CFUNCTION:		// TODO: ~ CT_FUNCTION,
+		 pc->type = CT_FUNCTION;
+		 break;
+
+	  case CT_CLONE:			// TODO: ~ CT_OPERATOR,
+		 pc->type = CT_OPERATOR;
+		 break;
+
+	  case CT_DECLARE:			// TODO: ~ CT_FUNCTION,
+		 pc->type = CT_FUNCTION;
+		 break;
+
+	  case CT_ENDDECLARE:		// TODO: ~ CT_WORD,
+		 pc->type = CT_WORD;
+		 break;
+
+	  case CT_ENDFOR:			// TODO: ~ CT_WORD,
+		 pc->type = CT_WORD;
+		 break;
+
+	  case CT_ENDFOREACH:		// TODO: ~ CT_WORD,
+		 pc->type = CT_WORD;
+		 break;
+
+	  case CT_ENDIF:			// TODO: ~ CT_WORD,
+		 pc->type = CT_WORD;
+		 break;
+
+	  case CT_ENDSWITCH:		// TODO: ~ CT_WORD,
+		 pc->type = CT_WORD;
+		 break;
+
+	  case CT_ENDWHILE:			// TODO: ~ CT_WORD,
+		 pc->type = CT_WORD;
+		 break;
+
+	  case CT_GLOBAL:			// TODO: ~ CT_EXTERN,
+		 pc->type = CT_EXTERN;
+		 break;
+
+	  case CT_INCLUDE:			// TODO: ~ CT_FUNCTION,
+		 pc->type = CT_FUNCTION;
+		 break;
+
+	  case CT_INCLUDE_ONCE:		// TODO: ~ CT_FUNCTION,
+		 pc->type = CT_FUNCTION;
+		 break;
+
+	  case CT_OLD_FUNCTION:		// TODO: ~ CT_FUNCTION,
+		 pc->type = CT_FUNCTION;
+		 break;
+
+	  case CT_REQUIRE:			// TODO: ~ CT_FUNCTION,
+		 pc->type = CT_FUNCTION;
+		 break;
+
+	  case CT_REQUIRE_ONCE:		// TODO: ~ CT_FUNCTION,
+		 pc->type = CT_FUNCTION;
+		 break;
+
+	  case CT_USE:				// TODO: ~ CT_USING,
+		 pc->type = CT_USING;
+		 break;
+
+	  default:
+		 break;
+	  }
+
       /* TODO: determine other stuff here */
 
       prev = pc;

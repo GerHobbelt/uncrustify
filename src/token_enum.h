@@ -210,13 +210,13 @@ typedef enum
    CT_BIT_COLON,        /* a ':' in a variable declaration */
 
    /* TODO: */
-   CT_BASED,			// TODO: ~ CT_ATTRIBUTE,
-   CT_DECLSPEC,			// TODO: ~ CT_FUNCTION,
+   CT_BASED,			// TODO: ~ CT_QUALIFIER,
+   CT_DECLSPEC,			// TODO: ~ CT_ATTRIBUTE,
    CT_EXCEPT,			// TODO: ~ CT_CATCH,
    CT_IF_EXISTS,		// TODO: ~ CT_FUNCTION,
    CT_LEAVE,			// TODO: ~ CT_BREAK,
-   CT_INHERITANCE,		// TODO: ~ CT_ATTRIBUTE,
-   CT_UNALIGNED,		// TODO: ~ CT_ATTRIBUTE,
+   CT_INHERITANCE,		// TODO: ~ CT_QUALIFIER,
+   CT_UNALIGNED,		// TODO: ~ CT_QUALIFIER,
 
    CT_OC_DYNAMIC,
    CT_OC_END,           /* ObjC: @end */
@@ -296,10 +296,10 @@ typedef enum
    CT_CS_SQ_STMT,       /* '[assembly: xxx]' or '[Attribute()]' or '[Help()]', etc */
    CT_CS_SQ_COLON,      /* the colon in one of those [] thingys */
    CT_CS_PROPERTY,      /* word or ']' followed by '{' */
-   CT_CS_ARRAY = CT_CLASS,
+   CT_CS_ARRAY,		    // TODO: ~ CT_CLASS,
 
    /* C-sharp and Managed C++ */
-   CT_AS_FRIEND,		// TODO: ~ CT_ATTRIBUTE,
+   CT_AS_FRIEND,		// TODO: ~ CT_QUALIFIER,
    CT_GCNEW,			// TODO: ~ CT_NEW,
    CT_GENERIC,			// TODO: ~ CT_WORD,
    CT_WHERE,			// TODO: ~ CT_WORD,
@@ -308,19 +308,19 @@ typedef enum
    CT_LITERAL,			// TODO: ~ CT_WORD,
    CT_NULLPTR,			// TODO: ~ CT_WORD,
    CT_BOX,				// TODO: ~ CT_FUNCTION,
-   CT_GC,				// TODO: ~ CT_ATTRIBUTE,
-   CT_IDENTIFIER,		// TODO: ~ CT_ATTRIBUTE,
-   CT_NOGC,				// TODO: ~ CT_ATTRIBUTE,
-   CT_PIN,				// TODO: ~ CT_ATTRIBUTE,
-   CT_PROPERTY,			// TODO: ~ CT_ATTRIBUTE,
-   CT_SEALED,			// TODO: ~ CT_ATTRIBUTE,
-   CT_VALUE,			// TODO: ~ CT_ATTRIBUTE,
+   CT_GC,				// TODO: ~ CT_QUALIFIER,
+   CT_IDENTIFIER,		// TODO: ~ CT_QUALIFIER,
+   CT_NOGC,				// TODO: ~ CT_QUALIFIER,
+   CT_PIN,				// TODO: ~ CT_QUALIFIER,
+   CT_PROPERTY,			// TODO: ~ CT_QUALIFIER,
+   CT_SEALED,			// TODO: ~ CT_QUALIFIER,
+   CT_VALUE,			// TODO: ~ CT_QUALIFIER,
 
-   CT_EVENT,			// TODO: ~ CT_ATTRIBUTE,
-   CT_HOOK,				// TODO: ~ CT_ATTRIBUTE,
+   CT_EVENT,			// TODO: ~ CT_QUALIFIER,
+   CT_HOOK,				// TODO: ~ CT_QUALIFIER,
    CT_INTERFACE,		// TODO: ~ CT_FUNCTION,
-   CT_RAISE,			// TODO: ~ CT_ATTRIBUTE,
-   CT_UNHOOK,			// TODO: ~ CT_ATTRIBUTE,
+   CT_RAISE,			// TODO: ~ CT_QUALIFIER,
+   CT_UNHOOK,			// TODO: ~ CT_QUALIFIER,
    CT_UUIDOF,			// TODO: ~ CT_FUNCTION,
 
    /* Embedded SQL - always terminated with a semicolon */

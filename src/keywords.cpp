@@ -162,9 +162,9 @@ static const chunk_tag_t keywords[] =
    { "debugger",         CT_DEBUGGER,     LANG_ECMA                                                                   },
    { "declare",          CT_DECLARE,      LANG_PHP																	  },
    { "default",          CT_DEFAULT,      LANG_ALL                                                                    }, // PAWN
-   { "define",           CT_PP_DEFINE,    LANG_ALLC | FLAG_PP                                                         }, // PAWN
+   { "define",           CT_PP_DEFINE,    LANG_ALLC | LANG_PAWN | FLAG_PP                                             },
    { "defined",          CT_DEFINED,      LANG_PAWN | LANG_PHP                                                        }, // PAWN, PHP
-   { "defined",          CT_PP_DEFINED,   LANG_ALLC | FLAG_PP                                                         },
+   { "defined",          CT_PP_DEFINED,   LANG_ALLC | LANG_PAWN | FLAG_PP                                             },
    { "delegate",         CT_DELEGATE,     LANG_CS | LANG_D                                                            },
    { "delete",           CT_DELETE,       LANG_CPP | LANG_D | LANG_ECMA                                               },
    { "deprecated",       CT_QUALIFIER,    LANG_D                                                                      },
@@ -175,7 +175,7 @@ static const chunk_tag_t keywords[] =
    { "echo",			 CT_FUNCTION,     LANG_PHP																	  },
    { "elif",             CT_PP_ELSE,      LANG_ALLC | FLAG_PP                                                         },
    { "else",             CT_ELSE,         LANG_ALL                                                                    }, // PAWN
-   { "else",             CT_PP_ELSE,      LANG_ALLC | FLAG_PP                                                         }, // PAWN
+   { "else",             CT_PP_ELSE,      LANG_ALLC | LANG_PAWN | FLAG_PP                                             }, // PAWN
    { "elseif",           CT_ELSE,         LANG_PHP																	  },
    { "elseif",           CT_PP_ELSE,      LANG_PAWN | FLAG_PP                                                         }, // PAWN
    { "emit",             CT_PP_EMIT,      LANG_PAWN | FLAG_PP                                                         }, // PAWN
@@ -184,14 +184,14 @@ static const chunk_tag_t keywords[] =
    { "endfor",			 CT_ENDFOR,		  LANG_PHP																	  },
    { "endforeach",		 CT_ENDFOREACH,	  LANG_PHP																	  },
    { "endif",			 CT_ENDIF,		  LANG_PHP																	  },
-   { "endif",            CT_PP_ENDIF,     LANG_ALL | FLAG_PP                                                          }, // PAWN
+   { "endif",            CT_PP_ENDIF,     LANG_ALLC | LANG_PAWN | FLAG_PP                                             },
    { "endinput",         CT_PP_ENDINPUT,  LANG_PAWN | FLAG_PP                                                         }, // PAWN
-   { "endregion",        CT_PP_ENDREGION, LANG_ALL | FLAG_PP                                                          },
+   { "endregion",        CT_PP_ENDREGION, LANG_ALLC | LANG_PAWN | FLAG_PP                                             },
    { "endscript",        CT_PP_ENDINPUT,  LANG_PAWN | FLAG_PP                                                         }, // PAWN
    { "endswitch",		 CT_ENDSWITCH,	  LANG_PHP																	  },
    { "endwhile",		 CT_ENDWHILE,	  LANG_PHP																	  },
    { "enum",             CT_ENUM,         LANG_ALL                                                                    }, // PAWN
-   { "error",            CT_PP_ERROR,     LANG_PAWN | FLAG_PP                                                         }, // PAWN
+   { "error",            CT_PP_ERROR,     LANG_ALLC | LANG_PAWN | FLAG_PP                                             },
    { "eval",			 CT_FUNCTION,	  LANG_PHP																	  },
    { "event",            CT_TYPE,         LANG_CS                                                                     },
    { "exit",             CT_FUNCTION,     LANG_PAWN | LANG_PHP                                                        }, // PAWN
@@ -200,7 +200,7 @@ static const chunk_tag_t keywords[] =
    { "extends",          CT_QUALIFIER,    LANG_JAVA | LANG_ECMA | LANG_PHP                                            },
    { "extern",           CT_EXTERN,       LANG_C | LANG_CPP | LANG_CS | LANG_D | LANG_VALA                            },
    { "false",            CT_WORD,         LANG_CPP | LANG_CS | LANG_D | LANG_JAVA | LANG_VALA                         },
-   { "file",             CT_PP_FILE,      LANG_PAWN | FLAG_PP                                                         }, // PAWN
+   { "file",             CT_PP_FILE,      LANG_ALLC | LANG_PAWN | FLAG_PP                                             },
    { "final",            CT_QUALIFIER,    LANG_D | LANG_ECMA | LANG_PHP                                               },
    { "finally",          CT_FINALLY,      LANG_D | LANG_CS | LANG_ECMA                                                },
    { "flags",            CT_TYPE,         LANG_VALA                                                                   },
@@ -218,7 +218,7 @@ static const chunk_tag_t keywords[] =
    { "goto",             CT_GOTO,         LANG_ALL                                                                    }, // PAWN
    { "idouble",          CT_TYPE,         LANG_D                                                                      },
    { "if",               CT_IF,           LANG_ALL                                                                    }, // PAWN
-   { "if",               CT_PP_IF,        LANG_ALL | FLAG_PP                                                          }, // PAWN
+   { "if",               CT_PP_IF,        LANG_ALLC | LANG_PAWN | FLAG_PP                                             },
    { "ifdef",            CT_PP_IF,        LANG_ALLC | FLAG_PP                                                         },
    { "ifloat",           CT_TYPE,         LANG_D                                                                      },
    { "ifndef",           CT_PP_IF,        LANG_ALLC | FLAG_PP                                                         },
@@ -243,7 +243,7 @@ static const chunk_tag_t keywords[] =
    { "is",               CT_SCOMPARE,     LANG_D | LANG_CS | LANG_VALA                                                },
    { "isset",			 CT_FUNCTION,	  LANG_PHP																	  },
    { "lazy",             CT_LAZY,         LANG_D                                                                      },
-   { "line",             CT_PP_LINE,      LANG_PAWN | FLAG_PP                                                         }, // PAWN
+   { "line",             CT_PP_LINE,      LANG_ALLC | LANG_PAWN | FLAG_PP                                             },
    { "list",			 CT_FUNCTION,     LANG_PHP																	  },
    { "literal",          CT_LITERAL,      LANG_CPPNET																  },
    { "lock",             CT_LOCK,         LANG_CS | LANG_VALA                                                         },
@@ -270,7 +270,7 @@ static const chunk_tag_t keywords[] =
    { "override",         CT_QUALIFIER,    LANG_CS | LANG_D | LANG_VALA                                                },
    { "package",          CT_NAMESPACE,    LANG_D | LANG_JAVA | LANG_ECMA                                              },
    { "params",           CT_TYPE,         LANG_CS                                                                     },
-   { "pragma",           CT_PP_PRAGMA,    LANG_ALL | FLAG_PP                                                          }, // PAWN
+   { "pragma",           CT_PP_PRAGMA,    LANG_ALLC | LANG_PAWN | FLAG_PP                                             },
    { "print",			 CT_FUNCTION,	  LANG_PHP																	  },
    { "private",          CT_PRIVATE,      LANG_ALLC | LANG_PHP                                                        }, // not C
    { "protected",        CT_PRIVATE,      LANG_ALLC | LANG_PHP                                                        }, // not C
@@ -278,7 +278,7 @@ static const chunk_tag_t keywords[] =
    { "readonly",         CT_QUALIFIER,    LANG_CS                                                                     },
    { "real",             CT_TYPE,         LANG_D                                                                      },
    { "ref",              CT_QUALIFIER,    LANG_CPPNET | LANG_CS | LANG_VALA                                           },
-   { "region",           CT_PP_REGION,    LANG_ALL | FLAG_PP                                                          },
+   { "region",           CT_PP_REGION,    LANG_ALLC | LANG_PAWN | FLAG_PP                                             },
    { "register",         CT_QUALIFIER,    LANG_C | LANG_CPP                                                           },
    { "reinterpret_cast", CT_TYPE_CAST,    LANG_C | LANG_CPP                                                           },
    { "remove",           CT_GETSET,       LANG_CS                                                                     },
@@ -327,7 +327,7 @@ static const chunk_tag_t keywords[] =
    { "uint",             CT_TYPE,         LANG_CS | LANG_D                                                            },
    { "ulong",            CT_TYPE,         LANG_CS | LANG_D                                                            },
    { "unchecked",        CT_QUALIFIER,    LANG_CS                                                                     },
-   { "undef",            CT_PP_UNDEF,     LANG_ALL | FLAG_PP                                                          }, // PAWN
+   { "undef",            CT_PP_UNDEF,     LANG_ALLC | LANG_PAWN | FLAG_PP                                             },
    { "union",            CT_UNION,        LANG_C | LANG_CPP | LANG_D                                                  },
    { "unittest",         CT_UNITTEST,     LANG_D                                                                      },
    { "unsafe",           CT_UNSAFE,       LANG_CS                                                                     },
