@@ -29,7 +29,8 @@ utf8_bom                                 { Ignore, Add, Remove, Force }
   Control what to do with the UTF-8 BOM (recommend 'remove')
 
 utf8_byte                                { False, True }
-  If the file contains bytes with values between 128 and 255, but is not UTF-8, then output as UTF-8
+  If the file contains bytes with values between 128 and 255, but is not
+  UTF-8, then output as UTF-8
 
 utf8_force                               { False, True }
   Force the output encoding to UTF-8
@@ -198,22 +199,25 @@ indent_paren_nl                          { False, True }
   lines up after the open paren (not recommended)
 
 indent_paren_close                       Number
-  Controls the indent of a close paren after a newline (except for function and macro function prototype).
-  0: Indent to body level
-  1: Align under the open paren
-  2: Indent to the brace level
+  Controls the indent of a close paren after a newline (except for function
+  and macro function prototype).
+    0: Indent to body level
+    1: Align under the open paren
+    2: Indent to the brace level
 
 indent_paren_close_func                  Number
-  Controls the indent of the close paren after a newline in a function prototype (declaration and definition).
-  0: Indent to body level
-  1: Align under the open paren
-  2: Indent to the brace level
+  Controls the indent of the close paren after a newline in a function
+  prototype (declaration and definition).
+    0: Indent to body level
+    1: Align under the open paren
+    2: Indent to the brace level
 
 indent_paren_close_macro_func            Number
-  Controls the indent of the close paren after a newline in a macro function prototype.
-  0: Indent to body level
-  1: Align under the open paren
-  2: Indent to the brace level
+  Controls the indent of the close paren after a newline in a macro function
+  prototype.
+    0: Indent to body level
+    1: Align under the open paren
+    2: Indent to the brace level
 
 indent_comma_paren                       { False, True }
   Controls the indent of a comma when inside a paren.
@@ -250,7 +254,8 @@ sp_assign                                { Ignore, Add, Remove, Force }
   Add or remove space around assignment operator '=', '+=', etc
 
 sp_cpp_lambda_assign                     { Ignore, Add, Remove, Force }
-  Add or remove space around '=' in C++11 lambda capture specifications. Overrides sp_assign
+  Add or remove space around '=' in C++11 lambda capture specifications.
+  Overrides sp_assign
 
 sp_cpp_lambda_paren                      { Ignore, Add, Remove, Force }
   Add or remove space after the capture specification in C++11 lambda.
@@ -343,10 +348,12 @@ sp_before_byref_func                     { Ignore, Add, Remove, Force }
   func proto/def.
 
 sp_after_type                            { Ignore, Add, Remove, Force }
-  Add or remove space after 'typedef', a qualifier, a type if not followed by '*'. Default=Force
+  Add or remove space after 'typedef', a qualifier, a type if not followed
+  by '*'. Default=Force
 
 sp_before_template_paren                 { Ignore, Add, Remove, Force }
-  Add or remove space before the paren in the D constructs 'template Foo(' and 'class Foo('.
+  Add or remove space before the paren in the D constructs 'template Foo('
+  and 'class Foo('.
 
 sp_template_angle                        { Ignore, Add, Remove, Force }
   Add or remove space in 'template <' vs 'template<'.
@@ -372,7 +379,8 @@ sp_angle_shift                           { Ignore, Add, Remove, Force }
   (template stuff C++/C# only). Default=Add
 
 sp_permit_cpp11_shift                    { False, True }
-  Permit removal of the space between '>>' in 'foo<bar<int> >' (C++11 only). Default=False
+  Permit removal of the space between '>>' in 'foo<bar<int> >' (C++11 only).
+  Default=False
   sp_angle_shift cannot remove the space without this option.
 
 sp_before_sparen                         { Ignore, Add, Remove, Force }
@@ -862,7 +870,8 @@ align_pp_define_gap                      Number
   The minimum space between label and value of a preprocessor define
 
 align_pp_define_span                     Number
-  The span for aligning on '#define' bodies (0=don't align, other=number of lines including comments between blocks)
+  The span for aligning on '#define' bodies (0=don't align, other=number of
+  lines including comments between blocks)
 
 align_left_shift                         { False, True }
   Align lines that start with '<<' with previous '<<'. Default=true
@@ -924,32 +933,35 @@ nl_after_square_assign                   { Ignore, Add, Remove, Force }
   before the ']'
 
 nl_func_var_def_blk                      Number
-  The number of blank lines after a block of variable definitions at the top of a function body
-  0 = No change (default)
+  The number of blank lines after a block of variable definitions at the top
+  of a function body
+    0 = No change (default)
 
 nl_typedef_blk_start                     Number
   The number of newlines before a block of typedefs
-  0 = No change (default)
+    0 = No change (default)
 
 nl_typedef_blk_end                       Number
   The number of newlines after a block of typedefs
-  0 = No change (default)
+    0 = No change (default)
 
 nl_typedef_blk_in                        Number
   The maximum consecutive newlines within a block of typedefs
-  0 = No change (default)
+    0 = No change (default)
 
 nl_var_def_blk_start                     Number
-  The number of newlines before a block of variable definitions not at the top of a function body
-  0 = No change (default)
+  The number of newlines before a block of variable definitions not at the top
+  of a function body
+    0 = No change (default)
 
 nl_var_def_blk_end                       Number
-  The number of newlines after a block of variable definitions not at the top of a function body
-  0 = No change (default)
+  The number of newlines after a block of variable definitions not at the top
+  of a function body
+    0 = No change (default)
 
 nl_var_def_blk_in                        Number
   The maximum consecutive newlines within a block of variable definitions
-  0 = No change (default)
+    0 = No change (default)
 
 nl_fcall_brace                           { Ignore, Add, Remove, Force }
   Add or remove newline between a function call's ')' and '{', as in:
@@ -1281,7 +1293,8 @@ ls_func_split_full                       { False, True }
   Whether to fully split long function protos/calls at commas
 
 ls_code_width                            { False, True }
-  Whether to split lines as close to code_width as possible and ignore some groupings
+  Whether to split lines as close to code_width as possible and ignore some
+  groupings
 
 #
 # Blank line options
@@ -1649,13 +1662,15 @@ cmt_star_cont                            { False, True, NoChange }
 
 cmt_sp_before_star_cont                  Number
   The number of spaces to insert at the start of subsequent comment lines.
+    Default=-1 ~ don't care.
 
 cmt_sp_after_star_cont                   Number
   The number of spaces to insert after the optional star on subsequent comment
-  lines.
+  lines. Default=-1 ~ don't care.
 
 cmt_sp_after_cpp_start                   Number
   The number of spaces to insert after the '//' on comment lines.
+    Default=-1 ~ don't care.
 
 cmt_multi_check_last                     { False, True }
   For multi-line comments with a '*' lead, remove leading spaces if the first
@@ -1708,8 +1723,10 @@ pp_indent_at_level                       { False, True }
   column 1 (false).
 
 pp_indent_count                          Number
-  Specifies the number of columns to indent preprocessors per level at brace level 0 (file-level).
-  If pp_indent_at_level=false, specifies the number of columns to indent preprocessors per level at brace level > 0 (function-level).
+  Specifies the number of columns to indent preprocessors per level at brace
+  level 0 (file-level).
+  If pp_indent_at_level=false, specifies the number of columns to indent
+  preprocessors per level at brace level > 0 (function-level).
   Default=1.
 
 pp_space                                 { Ignore, Add, Remove, Force }
@@ -1725,7 +1742,8 @@ pp_region_indent_code                    { False, True }
   Whether to indent the code between #region and #endregion
 
 pp_indent_if                             Number
-  If pp_indent_at_level=true, sets the indent for #if, #else, and #endif when not at file-level.
+  If pp_indent_at_level=true, sets the indent for #if, #else, and #endif when
+  not at file-level.
   0:  indent preprocessors using output_tab_size.
   >0: column at which all preprocessors will be indented.
 

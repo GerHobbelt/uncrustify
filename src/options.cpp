@@ -189,7 +189,8 @@ void register_options(void)
    unc_add_option("utf8_bom", UO_utf8_bom, AT_IARF,
                   "Control what to do with the UTF-8 BOM (recommend 'remove')");
    unc_add_option("utf8_byte", UO_utf8_byte, AT_BOOL,
-                  "If the file contains bytes with values between 128 and 255, but is not UTF-8, then output as UTF-8");
+                  "If the file contains bytes with values between 128 and 255, but is not\n"
+				  "UTF-8, then output as UTF-8");
    unc_add_option("utf8_force", UO_utf8_force, AT_BOOL,
                   "Force the output encoding to UTF-8");
 
@@ -199,7 +200,8 @@ void register_options(void)
    unc_add_option("sp_assign", UO_sp_assign, AT_IARF,
                   "Add or remove space around assignment operator '=', '+=', etc");
    unc_add_option("sp_cpp_lambda_assign", UO_sp_cpp_lambda_assign, AT_IARF,
-                  "Add or remove space around '=' in C++11 lambda capture specifications. Overrides sp_assign");
+                  "Add or remove space around '=' in C++11 lambda capture specifications.\n"
+				  "Overrides sp_assign");
    unc_add_option("sp_cpp_lambda_paren", UO_sp_cpp_lambda_paren, AT_IARF,
                   "Add or remove space after the capture specification in C++11 lambda.");
    unc_add_option("sp_assign_default", UO_sp_assign_default, AT_IARF,
@@ -265,9 +267,11 @@ void register_options(void)
                   "Add or remove space before a reference sign '&', if followed by a\n"
 				  "func proto/def.");
    unc_add_option("sp_after_type", UO_sp_after_type, AT_IARF,
-                  "Add or remove space after 'typedef', a qualifier, a type if not followed by '*'. Default=Force");
+                  "Add or remove space after 'typedef', a qualifier, a type if not followed\n"
+				  "by '*'. Default=Force");
    unc_add_option("sp_before_template_paren", UO_sp_before_template_paren, AT_IARF,
-                  "Add or remove space before the paren in the D constructs 'template Foo(' and 'class Foo('.");
+                  "Add or remove space before the paren in the D constructs 'template Foo('\n"
+				  "and 'class Foo('.");
    unc_add_option("sp_template_angle", UO_sp_template_angle, AT_IARF,
                   "Add or remove space in 'template <' vs 'template<'.\n"
                   "If set to ignore, sp_before_angle is used.");
@@ -285,7 +289,8 @@ void register_options(void)
                   "Add or remove space between '>' and '>' in '>>'\n"
 				  "(template stuff C++/C# only). Default=Add");
    unc_add_option("sp_permit_cpp11_shift", UO_sp_permit_cpp11_shift, AT_BOOL,
-                  "Permit removal of the space between '>>' in 'foo<bar<int> >' (C++11 only). Default=False\n"
+                  "Permit removal of the space between '>>' in 'foo<bar<int> >' (C++11 only).\n"
+				  "Default=False\n"
                   "sp_angle_shift cannot remove the space without this option.");
    unc_add_option("sp_before_sparen", UO_sp_before_sparen, AT_IARF,
                   "Add or remove space before '(' of 'if', 'for', 'switch', and 'while'");
@@ -532,7 +537,7 @@ void register_options(void)
                   "The continuation indent. If non-zero, this overrides the indent of\n"
 				  "'(' and '=' continuation indents.\n"
                   "For FreeBSD, this is set to 4. Negative value is absolute and not\n"
-                  "increased for each (level).");
+                  "increased for each (level).", "", -16, 16);
    unc_add_option("indent_with_tabs", UO_indent_with_tabs, AT_NUM,
                   "How to use tabs when indenting code\n"
                   "0=spaces only\n"
@@ -627,7 +632,7 @@ void register_options(void)
    unc_add_option("indent_case_brace", UO_indent_case_brace, AT_NUM,
                   "Spaces to indent '{' from 'case'.\n"
                   "By default, the brace will appear under the 'c' in case.\n"
-                  "Usually set to 0 or indent_columns.");
+                  "Usually set to 0 or indent_columns.", "", -16, 16);
    unc_add_option("indent_col1_comment", UO_indent_col1_comment, AT_BOOL,
                   "Whether to indent comments found in first column");
    unc_add_option("indent_label", UO_indent_label, AT_NUM,
@@ -644,20 +649,23 @@ void register_options(void)
                   "If an open paren is followed by a newline, indent the next line so that it\n"
 				  "lines up after the open paren (not recommended)");
    unc_add_option("indent_paren_close", UO_indent_paren_close, AT_NUM,
-                  "Controls the indent of a close paren after a newline (except for function and macro function prototype).\n"
-                  "0: Indent to body level\n"
-                  "1: Align under the open paren\n"
-                  "2: Indent to the brace level");
+                  "Controls the indent of a close paren after a newline (except for function\n"
+				  "and macro function prototype).\n"
+                  "  0: Indent to body level\n"
+                  "  1: Align under the open paren\n"
+                  "  2: Indent to the brace level");
    unc_add_option("indent_paren_close_func", UO_indent_paren_close_func, AT_NUM,
-                  "Controls the indent of the close paren after a newline in a function prototype (declaration and definition).\n"
-                  "0: Indent to body level\n"
-                  "1: Align under the open paren\n"
-                  "2: Indent to the brace level");
+                  "Controls the indent of the close paren after a newline in a function\n"
+				  "prototype (declaration and definition).\n"
+                  "  0: Indent to body level\n"
+                  "  1: Align under the open paren\n"
+                  "  2: Indent to the brace level");
    unc_add_option("indent_paren_close_macro_func", UO_indent_paren_close_macro_func, AT_NUM,
-                  "Controls the indent of the close paren after a newline in a macro function prototype.\n"
-                  "0: Indent to body level\n"
-                  "1: Align under the open paren\n"
-                  "2: Indent to the brace level", "", 0, 2);
+                  "Controls the indent of the close paren after a newline in a macro function\n"
+				  "prototype.\n"
+                  "  0: Indent to body level\n"
+                  "  1: Align under the open paren\n"
+                  "  2: Indent to the brace level", "", 0, 2);
    unc_add_option("indent_comma_paren", UO_indent_comma_paren, AT_BOOL,
                   "Controls the indent of a comma when inside a paren.\n"
                   "If TRUE, aligns under the open paren");
@@ -712,26 +720,29 @@ void register_options(void)
                   "Add or remove newline after '= [' (D only). Will also affect the newline\n"
 				  "before the ']'");
    unc_add_option("nl_func_var_def_blk", UO_nl_func_var_def_blk, AT_NUM,
-                  "The number of blank lines after a block of variable definitions at the top of a function body\n"
-                  "0 = No change (default)");
+                  "The number of blank lines after a block of variable definitions at the top\n"
+				  "of a function body\n"
+                  "  0 = No change (default)");
    unc_add_option("nl_typedef_blk_start", UO_nl_typedef_blk_start, AT_NUM,
                   "The number of newlines before a block of typedefs\n"
-                  "0 = No change (default)");
+                  "  0 = No change (default)");
    unc_add_option("nl_typedef_blk_end", UO_nl_typedef_blk_end, AT_NUM,
                   "The number of newlines after a block of typedefs\n"
-                  "0 = No change (default)");
+                  "  0 = No change (default)");
    unc_add_option("nl_typedef_blk_in", UO_nl_typedef_blk_in, AT_NUM,
                   "The maximum consecutive newlines within a block of typedefs\n"
-                  "0 = No change (default)");
+                  "  0 = No change (default)");
    unc_add_option("nl_var_def_blk_start", UO_nl_var_def_blk_start, AT_NUM,
-                  "The number of newlines before a block of variable definitions not at the top of a function body\n"
-                  "0 = No change (default)");
+                  "The number of newlines before a block of variable definitions not at the top\n"
+				  "of a function body\n"
+                  "  0 = No change (default)");
    unc_add_option("nl_var_def_blk_end", UO_nl_var_def_blk_end, AT_NUM,
-                  "The number of newlines after a block of variable definitions not at the top of a function body\n"
-                  "0 = No change (default)");
+                  "The number of newlines after a block of variable definitions not at the top\n"
+				  "of a function body\n"
+                  "  0 = No change (default)");
    unc_add_option("nl_var_def_blk_in", UO_nl_var_def_blk_in, AT_NUM,
                   "The maximum consecutive newlines within a block of variable definitions\n"
-                  "0 = No change (default)");
+                  "  0 = No change (default)");
    unc_add_option("nl_fcall_brace", UO_nl_fcall_brace, AT_IARF,
                   "Add or remove newline between a function call's ')' and '{', as in:\n"
                   "list_for_each(item, &list) { }");
@@ -1032,7 +1043,8 @@ void register_options(void)
    unc_add_option("ls_func_split_full", UO_ls_func_split_full, AT_BOOL,
                   "Whether to fully split long function protos/calls at commas");
    unc_add_option("ls_code_width", UO_ls_code_width, AT_BOOL,
-                  "Whether to split lines as close to code_width as possible and ignore some groupings");
+                  "Whether to split lines as close to code_width as possible and ignore some\n"
+				  "groupings");
 
    unc_begin_group(UG_align, "Code alignment (not left column spaces/tabs)");
    unc_add_option("align_keep_tabs", UO_align_keep_tabs, AT_BOOL,
@@ -1147,7 +1159,8 @@ void register_options(void)
    unc_add_option("align_pp_define_gap", UO_align_pp_define_gap, AT_NUM,
                   "The minimum space between label and value of a preprocessor define", "", -5000, 5000);
    unc_add_option("align_pp_define_span", UO_align_pp_define_span, AT_NUM,
-                  "The span for aligning on '#define' bodies (0=don't align, other=number of lines including comments between blocks)", "", 0, 5000);
+                  "The span for aligning on '#define' bodies (0=don't align, other=number of\n"
+				  "lines including comments between blocks)", "", 0, 5000);
    unc_add_option("align_left_shift", UO_align_left_shift, AT_BOOL,
                   "Align lines that start with '<<' with previous '<<'. Default=true");
 
@@ -1301,12 +1314,17 @@ void register_options(void)
    unc_add_option("cmt_star_cont", UO_cmt_star_cont, AT_TRISTATE_BOOL,
                   "Whether to put a star on subsequent comment lines.");
    unc_add_option("cmt_sp_before_star_cont", UO_cmt_sp_before_star_cont, AT_NUM,
-                  "The number of spaces to insert at the start of subsequent comment lines.");
+                  "The number of spaces to insert at the start of subsequent comment lines.\n"
+				  "  Default=-1 ~ don't care.",
+				  "", -1, 16);
    unc_add_option("cmt_sp_after_star_cont", UO_cmt_sp_after_star_cont, AT_NUM,
                   "The number of spaces to insert after the optional star on subsequent comment\n"
-				  "lines.");
+				  "lines. Default=-1 ~ don't care.",
+				  "", -1, 16);
    unc_add_option("cmt_sp_after_cpp_start", UO_cmt_sp_after_cpp_start, AT_NUM,
-                  "The number of spaces to insert after the '//' on comment lines.");
+                  "The number of spaces to insert after the '//' on comment lines.\n"
+				  "  Default=-1 ~ don't care.",
+				  "", -1, 16);
 
    unc_add_option("cmt_multi_check_last", UO_cmt_multi_check_last, AT_BOOL,
                   "For multi-line comments with a '*' lead, remove leading spaces if the first\n"
@@ -1409,21 +1427,25 @@ void register_options(void)
                   "Whether to indent #if/#else/#endif at the brace level (true) or from\n"
 				  "column 1 (false).");
    unc_add_option("pp_indent_count", UO_pp_indent_count, AT_NUM,
-	              "Specifies the number of columns to indent preprocessors per level at brace level 0 (file-level).\n"
-                  "If pp_indent_at_level=false, specifies the number of columns to indent preprocessors per level at brace level > 0 (function-level).\n"
+	              "Specifies the number of columns to indent preprocessors per level at brace\n"
+				  "level 0 (file-level).\n"
+                  "If pp_indent_at_level=false, specifies the number of columns to indent\n"
+				  "preprocessors per level at brace level > 0 (function-level).\n"
 				  "Default=1.");
    unc_add_option("pp_space", UO_pp_space, AT_IARF,
                   "Add or remove space after # based on pp_level of #if blocks");
    unc_add_option("pp_space_count", UO_pp_space_count, AT_NUM,
                   "Sets the number of spaces added with pp_space");
    unc_add_option("pp_indent_region", UO_pp_indent_region, AT_NUM,
-                  "The indent for #region and #endregion in C# and '#pragma region' in C/C++");
+                  "The indent for #region and #endregion in C# and '#pragma region' in C/C++",
+				  "", -5000, 5000);
    unc_add_option("pp_region_indent_code", UO_pp_region_indent_code, AT_BOOL,
                   "Whether to indent the code between #region and #endregion");
    unc_add_option("pp_indent_if", UO_pp_indent_if, AT_NUM,
-                  "If pp_indent_at_level=true, sets the indent for #if, #else, and #endif when not at file-level.\n"
+                  "If pp_indent_at_level=true, sets the indent for #if, #else, and #endif when\n"
+				  "not at file-level.\n"
 				  "0:  indent preprocessors using output_tab_size.\n"
-				  ">0: column at which all preprocessors will be indented.");
+				  ">0: column at which all preprocessors will be indented.", "", -5000, 5000);
    unc_add_option("pp_if_indent_code", UO_pp_if_indent_code, AT_BOOL,
                   "Control whether to indent the code between #if, #else and #endif when not\n"
 				  "at file-level.");
