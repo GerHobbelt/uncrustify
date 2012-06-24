@@ -11,12 +11,14 @@
 
 #pragma some comment follows    // comment
 
+// This next bit should parse as '#', pp_error, preproc-body (multiline)
 #error Define EVERYTHING_OK if you would like to compile your code \
-    or not if you would like to stop!
+  or not if you would like to stop!
 
 #if !defined(EVERYTHING_OK)
+// This next bit should parse as '#', pp_error, preproc-body (multiline)
  #error Define EVERYTHING_OK if you would like to compile your code \
-    or not if you would like to stop!
+  or not if you would like to stop!
 #endif
 
 #define macro

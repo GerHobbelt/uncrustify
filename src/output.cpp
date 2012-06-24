@@ -486,6 +486,15 @@ void output_text(FILE *pfile)
 
          output_to_column(pc->column, allow_tabs);
          add_text(pc->str);
+		 if (cpd.did_newline && !chunk_is_newline(pc))
+		 {
+			 /* anything that produces a newline but isn't a NL type token
+			  * is very probably throwing a stick in the works (such as when
+			  * it is a CT_STRING_MULTI) and we should re-indent the trailing
+			  * bits on the last line to make it look good.
+			  */
+			 reindent_line(chunk_get_next(pc), cpd.column);
+		 }
          cpd.did_newline = chunk_is_newline(pc);
       }
    }

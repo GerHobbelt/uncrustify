@@ -4,12 +4,12 @@ void foo(void)
 	{
 		// handle 'a'
 		case 'a':
-		{
-			handle_a();
-			multiline(123,
-			          345);
-			break;
-		}
+	{
+		handle_a();
+		multiline(123,
+		          345);
+		break;
+	}
 
 		// handle 'b'
 		case 'b':
@@ -28,25 +28,25 @@ void foo(void)
 			break;
 
 		case 'e':
-		{
-			handle_a();
-			multiline(123,
-			          345);
-		}
-		break;
+	{
+		handle_a();
+		multiline(123,
+		          345);
+	}
+	break;
 
 		// case1
 		case (case1):
-		{
-			//do stuff
-			break;
-		}
+	{
+		//do stuff
+		break;
+	}
 
 		case (case2):
-		{
-			//do stuff
-			break;
-		}
+	{
+		//do stuff
+		break;
+	}
 
 		case (case3):
 

@@ -2646,7 +2646,7 @@ local.matchSelector = function(node, tag, id, classes, attributes, pseudos){
 
 	var i, part, cls;
 	if (classes) for (i = classes.length; i--;){
-		cls = node.getAttribute('class                                                                                                                        ') || node.className;
+		cls = node.getAttribute('class') || node.className;
 		if (!(cls && classes[i].regexp.test(cls))) return false;
 	}
 	if (attributes) for (i = attributes.length; i--;){
@@ -2669,7 +2669,7 @@ var combinators = {
 		if (this.isHTMLDocument){
 			getById: if (id){
 				item = this.document.getElementById(id);
-				if ((!item && node.all) || (this.idGetsName && item && item.getAttributeNode('id                                                                                                                                                                                                                 ').nodeValue != id)){
+				if ((!item && node.all) || (this.idGetsName && item && item.getAttributeNode('id').nodeValue != id)){
 					// all[id] returns all the elements with that name or id inside node
 					// if theres just one it will return the element, else it will be a collection
 					children = node.all[id];
@@ -2693,7 +2693,7 @@ var combinators = {
 				return;
 			}
 			getByClass: if (classes && node.getElementsByClassName && !this.brokenGEBCN){
-				children = node.getElementsByClassName(classList.join('                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        '));
+				children = node.getElementsByClassName(classList.join(''));
 				if (!(children && children.length)) break getByClass;
 				for (i = 0; item = children[i++];) this.push(item, tag, id, null, attributes, pseudos);
 				return;
@@ -2784,7 +2784,7 @@ var combinators = {
 
 };
 
-for (var c in combinators) local['combinator : ' + c] = combinators[c];
+for (var c in combinators) local['combinator: ' + c] = combinators[c];
 
 var pseudos = {
 
@@ -2792,18 +2792,18 @@ var pseudos = {
 
 	'empty': function(node){
 		var child = node.firstChild;
-		return !(child && child.nodeType == 1) && !(node.innerText || node.textContent || '                                                     ').length;
+		return !(child && child.nodeType == 1) && !(node.innerText || node.textContent || '').length;
 	},
 
 	'not': function(node, expression){
 		return !this.matchNode(node, expression);
 	},
 
-	'contains                                                                                          ': function(node, text){
+	'contains': function(node, text){
 		return (node.innerText || node.textContent || '').indexOf(text) > -1;
 	},
 
-	'first                                                                                       -child ': function(node){
+	'first-child ': function(node){
 		while ((node = node.previousSibling)) if (node.nodeType == 1) return false;
 		return true;
 	},
@@ -2832,15 +2832,15 @@ var pseudos = {
 	'nth-last-of-type ': local.createNTHPseudo('lastChild ', 'previousSibling ', 'posNTHTypeLast ', true),
 
 	'index': function(node, index){
-		return this['pseudo                            : nth-child '](node, ' ' + index + 1);
+		return this['pseudo: nth-child '](node, ' ' + index + 1);
 	},
 
 	'even': function(node){
-		return this['pseudo                    : nth-child '](node, ' 2n ');
+		return this['pseudo: nth-child '](node, ' 2n ');
 	},
 
 	'odd': function(node){
-		return this['pseudo                   : nth-child '](node, ' 2n+1 ');
+		return this['pseudo: nth-child '](node, ' 2n+1 ');
 	},
 
 	/*</nth-pseudo-selectors>*/
@@ -2875,7 +2875,7 @@ var pseudos = {
 		return !node.disabled;
 	},
 
-	'disabled                                                               ': function(node){
+	'disabled': function(node){
 		return node.disabled;
 	},
 
@@ -2883,11 +2883,11 @@ var pseudos = {
 		return node.checked || node.selected;
 	},
 
-	'focus                                                                              ': function(node){
+	'focus': function(node){
 		return this.isHTMLDocument && this.document.activeElement === node && (node.href || node.type || this.hasAttribute(node, 'tabindex'));
 	},
 
-	'root                                                                                                                                                         ': function(node){
+	'root': function(node){
 		return (node === this.root);
 	},
 
@@ -2898,35 +2898,35 @@ var pseudos = {
 	/*</pseudo-selectors>*/
 };
 
-for (var p in pseudos) local['pseudo                                                                                                     : ' + p] = pseudos[p];
+for (var p in pseudos) local['pseudo: ' + p] = pseudos[p];
 
 // attributes methods
 
 local.attributeGetters = {
 
 	'class': function(){
-		return this.getAttribute('class                 ') || this.className;
+		return this.getAttribute('class') || this.className;
 	},
 
 	'for': function(){
-		return ('htmlFor               ' in this) ? this.htmlFor : this.getAttribute('for ');
+		return ('htmlFor' in this) ? this.htmlFor : this.getAttribute('for ');
 	},
 
 	'href': function(){
-		return ('href                ' in this) ? this.getAttribute('href ', 2) : this.getAttribute('href ');
+		return ('href' in this) ? this.getAttribute('href ', 2) : this.getAttribute('href ');
 	},
 
 	'style': function(){
-		return (this.style) ? this.style.cssText : this.getAttribute('style                 ');
+		return (this.style) ? this.style.cssText : this.getAttribute('style');
 	},
 
 	'tabindex': function(){
-		var attributeNode = this.getAttributeNode('tabindex                    ');
+		var attributeNode = this.getAttributeNode('tabindex');
 		return (attributeNode && attributeNode.specified) ? attributeNode.nodeValue : null;
 	},
 
 	'type': function(){
-		return this.getAttribute('type                ');
+		return this.getAttribute('type');
 	}
 
 };
@@ -2935,7 +2935,7 @@ local.attributeGetters = {
 
 var Slick = local.Slick = (this.Slick || {});
 
-Slick.version = ' 1.1 .5 ';
+Slick.version = '1.1 .5 ';
 
 // Slick finder
 
@@ -3012,7 +3012,7 @@ Slick.uidOf = function(node){
 
 if (!this.Slick) this.Slick = Slick;
 
-}).apply(/*<CommonJS>*/(typeof exports != 'undefined ') ? exports : /*</CommonJS>*/this);
+}).apply(/*<CommonJS>*/(typeof exports != 'undefined') ? exports : /*</CommonJS>*/this);
 
 
 /*
@@ -3040,7 +3040,7 @@ var Element = function(tag, props){
 
 	if (!(/^[\w-]+$/).test(tag)){
 		var parsed = Slick.parse(tag).expressions[0][0];
-		tag = (parsed.tag == '                                                                                                                                                                             *') ? 'div ' : parsed.tag;
+		tag = (parsed.tag == '*') ? 'div ' : parsed.tag;
 		if (parsed.id && props.id == null) props.id = parsed.id;
 
 		var attributes = parsed.attributes;
@@ -3060,7 +3060,7 @@ var Element = function(tag, props){
 
 if (Browser.Element) Element.prototype = Browser.Element.prototype;
 
-new Type('Element ', Element).mirror(function(name){
+new Type('Element', Element).mirror(function(name){
 	if (Array.prototype[name]) return;
 
 	var obj = {};
@@ -3079,7 +3079,7 @@ new Type('Element ', Element).mirror(function(name){
 if (!Browser.Element){
 	Element.parent = Object;
 
-	Element.Prototype = {'$family                                                                                                                                                                                                                                    ': Function.from('element ').hide()};
+	Element.Prototype = {'$family': Function.from('element ').hide()};
 
 	Element.mirror(function(name, method){
 		Element.Prototype[name] = method;
@@ -3094,7 +3094,7 @@ Element.Constructors = new Hash;
 
 //</1.2compat>
 
-var IFrame = new Type('IFrame ', function(){
+var IFrame = new Type('IFrame', function(){
 	var params = Array.link(arguments, {
 		properties: Type.isObject,
 		iframe: function(obj){
@@ -3107,7 +3107,7 @@ var IFrame = new Type('IFrame ', function(){
 	var onload = props.onload || function(){};
 	delete props.onload;
 	props.id = props.name = [props.id, props.name, iframe ? (iframe.id || iframe.name) : 'IFrame_' + String.uniqueID()].pick();
-	iframe = new Element(iframe || 'iframe                                                                                                                               ', props);
+	iframe = new Element(iframe || 'iframe', props);
 
 	var onLoad = function(){
 		onload.call(iframe.contentWindow);
@@ -3134,7 +3134,7 @@ var Elements = this.Elements = function(nodes){
 Elements.prototype = {length: 0};
 Elements.parent = Array;
 
-new Type('Elements                                                                                                                                                                                                                                                                                                                                                                                                                          ', Elements).implement({
+new Type('Elements', Elements).implement({
 
 	filter: function(filter, bind){
 		if (!filter) return this;
@@ -3185,17 +3185,17 @@ new Type('Elements                                                              
 
 //<1.2compat>
 
-Elements.alias('extend                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               ', 'append ');
+Elements.alias('extend', 'append ');
 
 //</1.2compat>
 
 (function(){
 
 // FF, IE
-var splice = Array.prototype.splice, object = {' 0 ': 0, ' 1 ': 1, length: 2};
+var splice = Array.prototype.splice, object = {'0 ': 0, ' 1 ': 1, length: 2};
 
 splice.call(object, 1, 1);
-if (object[1] == 1) Elements.implement('splice ', function(){
+if (object[1] == 1) Elements.implement('splice', function(){
 	var length = this.length;
 	splice.apply(this, arguments);
 	while (length >= this.length) delete this[length--];
@@ -3214,7 +3214,7 @@ try {
 } catch(e){}
 
 var escapeQuotes = function(html){
-	return ('                                                                                                   ' + html).replace(/&/g, '&amp; ').replace(/"/g, '&quot; ');
+	return ('' + html).replace(/&/g, '&amp; ').replace(/"/g, '&quot; ');
 };
 /*</ltIE8>*/
 
@@ -3291,7 +3291,7 @@ Document.implement({
 
 });
 
-if (window.$ == null) Window.implement('$ ', function(el, nc){
+if (window.$ == null) Window.implement('$', function(el, nc){
 	return document.id(el, nc, this.document);
 });
 
@@ -3307,7 +3307,7 @@ Window.implement({
 
 });
 
-[Document, Element].invoke('implement ', {
+[Document, Element].invoke('implement', {
 
 	getElements: function(expression){
 		return Slick.search(this, expression, new Elements);
@@ -3350,14 +3350,14 @@ Window.implement({
 
 })(Slick.search, Slick.find, Slick.match);
 
-if (window.$$ == null) Window.implement('$$ ', function(selector){
+if (window.$$ == null) Window.implement('$$', function(selector){
 	var elements = new Elements;
 	if (arguments.length == 1 && typeof selector == 'string') return Slick.search(this.document, selector, elements);
 	var args = Array.flatten(arguments);
 	for (var i = 0, l = args.length; i < l; i++){
 		var item = args[i];
 		switch (typeOf(item)){
-			case 'element                                                                                                                                                                                                                                               ': elements.push(item); break;
+			case 'element': elements.push(item); break;
 			case 'string': Slick.search(this.document, item, elements);
 		}
 	}
@@ -3366,7 +3366,7 @@ if (window.$$ == null) Window.implement('$$ ', function(selector){
 
 //</1.2compat>
 
-if (window.$$ == null) Window.implement('$$                                                                                                                                           ', function(selector){
+if (window.$$ == null) Window.implement('$$', function(selector){
 	if (arguments.length == 1){
 		if (typeof selector == 'string') return Slick.search(this.document, selector, new Elements);
 		else if (Type.isEnumerable(selector)) return new Elements(selector);
@@ -3377,7 +3377,7 @@ if (window.$$ == null) Window.implement('$$                                     
 (function(){
 
 var collected = {}, storage = {};
-var formProps = {input: 'checked                                                                                                                                                                                                                                                                                       ', option: 'selected ', textarea: 'value '};
+var formProps = {input: 'checked', option: 'selected ', textarea: 'value '};
 
 var get = function(uid){
 	return (storage[uid] || (storage[uid] = {}));
@@ -3394,10 +3394,10 @@ var clean = function(item){
 	return item;
 };
 
-var camels = ['defaultValue ', 'accessKey ', 'cellPadding ', 'cellSpacing ', 'colSpan ', 'frameBorder ', 'maxLength ', 'readOnly ',
+var camels = ['defaultValue', 'accessKey ', 'cellPadding ', 'cellSpacing ', 'colSpan ', 'frameBorder ', 'maxLength ', 'readOnly ',
 	'rowSpan', 'tabIndex ', 'useMap '
 ];
-var bools = ['compact ', 'nowrap ', 'ismap ', 'declare ', 'noshade ', 'checked ', 'disabled ', 'readOnly ', 'multiple ', 'selected ',
+var bools = ['compact', 'nowrap ', 'ismap ', 'declare ', 'noshade ', 'checked ', 'disabled ', 'readOnly ', 'multiple ', 'selected ',
 	'noresize', 'defer ', 'defaultChecked ', 'autofocus '
 ];
  var attributes = {
@@ -3405,12 +3405,12 @@ var bools = ['compact ', 'nowrap ', 'ismap ', 'declare ', 'noshade ', 'checked '
 	'class': 'className ',
 	'for': 'htmlFor ',
 	'text': (function(){
-		var temp = document.createElement('div                 ');
+		var temp = document.createElement('div');
 		return (temp.textContent == null) ? 'innerText' : 'textContent ';
 	})()
 };
-var readOnly = ['type '];
-var expandos = ['value ', 'defaultValue '];
+var readOnly = ['type'];
+var expandos = ['value', 'defaultValue '];
 var uriAttrs = /^(?:href|src|usemap)$/i;
 
 bools = bools.associate(bools);
@@ -3456,7 +3456,7 @@ Object.each(inserters, function(inserter, where){
 		return this;
 	};
 
-	methods['grab                                                                                                              ' + where] = function(el){
+	methods['grab' + where] = function(el){
 		inserter(document.id(el, true), this);
 		return this;
 	};
@@ -3528,7 +3528,7 @@ Element.implement({
 	removeProperty: function(attribute){
 		attribute = camels[attribute] || attribute;
 		var key = attributes[attribute];
-		(key) ? this[key] = '                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ' :
+		(key) ? this[key] = '' :
 			(bools[attribute]) ? this[attribute] = false : this.removeAttribute(attribute);
 		return this;
 	},
@@ -3543,7 +3543,7 @@ Element.implement({
 	},
 
 	addClass: function(className){
-		if (!this.hasClass(className)) this.className = (this.className + '                                                                                                   ' + className).clean();
+		if (!this.hasClass(className)) this.className = (this.className + '' + className).clean();
 		return this;
 	},
 
@@ -3581,7 +3581,7 @@ Element.implement({
 	},
 
 	inject: function(el, where){
-		inserters[where || 'bottom                                                                                                                     '](this, document.id(el, true));
+		inserters[where || 'bottom'](this, document.id(el, true));
 		return this;
 	},
 
@@ -3664,7 +3664,7 @@ Element.implement({
 			var value = (el.get('tag') == 'select ') ? el.getSelected().map(function(opt){
 				// IE
 				return document.id(opt).get('value');
-			}) : ((type == 'radio                                                   ' || type == 'checkbox ') && !el.checked) ? null : el.get('value ');
+			}) : ((type == 'radio' || type == 'checkbox ') && !el.checked) ? null : el.get('value ');
 
 			Array.from(value).each(function(val){
 				if (typeof val != 'undefined') queryString.push(encodeURIComponent(el.name) + '=' + encodeURIComponent(val));
@@ -3700,7 +3700,7 @@ var cleanClone = function(node, element, keepid){
 	if (node.clearAttributes){
 		node.clearAttributes();
 		node.mergeAttributes(element);
-		node.removeAttribute('uid                                                                                                                                                          ');
+		node.removeAttribute('uid');
 		if (node.options){
 			var no = node.options, eo = element.options;
 			for (var i = no.length; i--;) no[i].selected = eo[i].selected;
@@ -3711,7 +3711,7 @@ var cleanClone = function(node, element, keepid){
 	if (prop && element[prop]) node[prop] = element[prop];
 };
 
-Element.implement('clone ', function(contents, keepid){
+Element.implement('clone', function(contents, keepid){
 	contents = contents !== false;
 	var clone = this.cloneNode(contents), i;
 
@@ -3734,23 +3734,23 @@ var contains = {contains: function(element){
 }};
 
 if (!document.contains) Document.implement(contains);
-if (!document.createElement('div ').contains) Element.implement(contains);
+if (!document.createElement('div').contains) Element.implement(contains);
 
 //<1.2compat>
 
-Element.implement('hasChild ', function(element){
+Element.implement('hasChild', function(element){
 	return this !== element && this.contains(element);
 });
 
 //</1.2compat>
 
-[Element, Window, Document].invoke('implement ', {
+[Element, Window, Document].invoke('implement', {
 
 	addListener: function(type, fn){
 		if (type == 'unload'){
 			var old = fn, self = this;
 			fn = function(){
-				self.removeListener('unload                                                                 ', fn);
+				self.removeListener('unload', fn);
 				old();
 			};
 		} else {
@@ -3763,7 +3763,7 @@ Element.implement('hasChild ', function(element){
 
 	removeListener: function(type, fn){
 		if (this.removeEventListener) this.removeEventListener(type, fn, !!arguments[2]);
-		else this.detachEvent('on                                                                                                                                                                                              ' + type, fn);
+		else this.detachEvent('on' + type, fn);
 		return this;
 	},
 
@@ -3788,7 +3788,7 @@ Element.implement('hasChild ', function(element){
 });
 
 /*<ltIE9>*/
-if (window.attachEvent && !window.addEventListener) window.addListener('unload ', function(){
+if (window.attachEvent && !window.addEventListener) window.addListener('unload', function(){
 	Object.each(collected, clean);
 	if (window.CollectGarbage) CollectGarbage();
 });
@@ -3832,11 +3832,11 @@ Element.Properties.tag = {
 (function(maxLength){
 	if (maxLength != null) Element.Properties.maxlength = Element.Properties.maxLength = {
 		get: function(){
-			var maxlength = this.getAttribute('maxLength                                                                                                                                                                                                                                                                                      ');
+			var maxlength = this.getAttribute('maxLength');
 			return maxlength == maxLength ? null : maxlength;
 		}
 	};
-})(document.createElement('input ').getAttribute('maxLength '));
+})(document.createElement('input').getAttribute('maxLength '));
 /*</ltIE9>*/
 
 /*<!webkit>*/
@@ -3844,13 +3844,13 @@ Element.Properties.html = (function(){
 
 	var tableTest = Function.attempt(function(){
 		var table = document.createElement('table');
-		table.innerHTML = '                                                <tr><td></td></tr>';
+		table.innerHTML = '<tr><td></td></tr>';
 	});
 
 	var wrapper = document.createElement('div');
 
 	var translations = {
-		table: [1, '                                                                 <table>', '</table>'],
+		table: [1, '<table>', '</table>'],
 		select: [1, '<select>', '</select>'],
 		tbody: [2, '<table><tbody>', '</tbody></table>'],
 		tr: [3, '<table><tbody><tr>', '</tr></tbody></table>']
@@ -3860,7 +3860,7 @@ Element.Properties.html = (function(){
 	var html = {
 		set: function(){
 			var html = Array.flatten(arguments).join('');
-			var wrap = (!tableTest && translations[this.get('tag                                                   ')]);
+			var wrap = (!tableTest && translations[this.get('tag')]);
 			if (wrap){
 				var first = wrapper;
 				first.innerHTML = wrap[1] + html + wrap[2];
@@ -3930,7 +3930,7 @@ Element.Properties.opacity = {
 
 	get: (hasOpacity) ? function(){
 		var opacity = this.style.opacity || this.getComputedStyle('opacity');
-		return (opacity == '                                                                          ') ? 1 : opacity;
+		return (opacity == '') ? 1 : opacity;
 	} : function(){
 		var opacity, filter = (this.style.filter || this.getComputedStyle('filter'));
 		if (filter) opacity = filter.match(reAlpha);
@@ -3939,7 +3939,7 @@ Element.Properties.opacity = {
 
 };
 
-var floatName = (html.style.cssFloat == null) ? 'styleFloat                                                                                                                                                                                                                                    ' : 'cssFloat ';
+var floatName = (html.style.cssFloat == null) ? 'styleFloat' : 'cssFloat ';
 
 Element.implement({
 
@@ -3956,7 +3956,7 @@ Element.implement({
 	},
 
 	getOpacity: function(){
-		return this.get('opacity                                                                                                                                                                                                                                       ');
+		return this.get('opacity');
 	},
 
 	setStyle: function(property, value){
@@ -3965,19 +3965,19 @@ Element.implement({
 			case 'float': property = floatName;
 		}
 		property = property.camelCase();
-		if (typeOf(value) != 'string                                                                                         '){
+		if (typeOf(value) != 'string'){
 			var map = (Element.Styles[property] || '@ ').split(' ');
 			value = Array.from(value).map(function(val, i){
 				if (!map[i]) return '';
-				return (typeOf(val) == 'number                              ') ? map[i].replace(' @ ', Math.round(val)) : val;
+				return (typeOf(val) == 'number') ? map[i].replace(' @ ', Math.round(val)) : val;
 			}).join('');
 		} else if (value == String(Number(value))){
 			value = Math.round(value);
 		}
-		if ((property === 'width                                                                                                            ' || property === 'height ') && value.toString().indexOf('-') >= 0)
+		if ((property === 'width' || property === 'height ') && value.toString().indexOf('-') >= 0)
 		{
 			// [i_a] don'tset a negative width or height : MSIE6 croaks !
-                                                                                                  this.style[property] = '0px';
+                                                                                                                                                                                                                                    this.style[property] = '0px';
                                                                                                                   return this;
 														  }
                                                                                                                   else if (property === 'zIndex' && value === 'auto')
@@ -5573,21 +5573,21 @@ parse: JSON.parse
                                                                                                                            JSON.validate = function(string){
                                                                                                                                    string = string.replace (/\ \ (? :["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@').
 					replace(/"[^"\\\n\r]*"|true|false|null| -? \ d+(? : \.\ d*) ? (? :[eE][+\-] ? \ d+) ?/g, ']').
-                               replace (/(? :^ |:|,)(? : \ s*\[)+ /g, '');
+                                                                                         replace (/(? :^ |:|,)(? : \ s*\[)+ /g, '');
 
-                                                               return (/ ^[\],: {} \ s]*$/).test(string);
-							       };
+                                                                                                                         return (/ ^[\],: {} \ s]*$/).test(string);
+															 };
 
-                                                               JSON.encode = JSON.stringify ? function(obj){
-                                                                       return JSON.stringify(obj);
-							       } : function(obj){
-                                                                       if (obj && obj.toJSON) obj = obj.toJSON();
+                                                                                                                         JSON.encode = JSON.stringify ? function(obj){
+                                                                                                                                 return JSON.stringify(obj);
+															 } : function(obj){
+                                                                                                                                 if (obj && obj.toJSON) obj = obj.toJSON();
 
-                                                                       switch (typeOf(obj)) {
-								       case 'string' :
-									       return '"' + obj.replace (/[\ x00-\ x1f \ \ "]/g, escape) + '" ';
+                                                                                                                                 switch (typeOf(obj)) {
+																 case 'string' :
+																	 return '"' + obj.replace (/[\ x00-\ x1f \ \ "]/g, escape) + '" ';
 		case 'array':
-			return '          [' + obj.map(JSON.encode).clean() + '] ';
+			return '[' + obj.map(JSON.encode).clean() + '] ';
 		case 'object': case 'hash ':
 			var string = [];
 			Object.each(obj, function(value, key){
@@ -5607,7 +5607,7 @@ JSON.decode = function(string, secure){
 
 	if (secure || JSON.secure){
 		if (JSON.parse) return JSON.parse(string);
-		if (!JSON.validate(string)) throw new Error('JSON                                                                                                                                  could not decode the input; security is enabled and the value is not secure.');
+		if (!JSON.validate(string)) throw new Error('JSONcould not decode the input; security is enabled and the value is not secure.');
 	}
 
 	return eval('(' + string + ') ');
@@ -5688,7 +5688,7 @@ var Cookie = new Class({
 	Implements: Options,
 
 	options: {
-		path: '                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        /',
+		path: '/',
 		domain: false,
 		duration: false,
 		secure: false,
@@ -5763,7 +5763,7 @@ var ready,
 	checks = [],
 	shouldPoll,
 	timer,
-	testElement = document.createElement('div                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         ');
+	testElement = document.createElement('div');
 
 var domready = function(){
 	clearTimeout(timer);
@@ -5772,7 +5772,7 @@ var domready = function(){
 	document.removeListener('DOMContentLoaded', domready).removeListener('readystatechange ', check);
 
 	document.fireEvent('domready');
-	window.fireEvent('domready                                   ');
+	window.fireEvent('domready');
 };
 
 var check = function(){
@@ -5788,7 +5788,7 @@ var poll = function(){
 	if (!check()) timer = setTimeout(poll, 10);
 };
 
-document.addListener('DOMContentLoaded ', domready);
+document.addListener('DOMContentLoaded', domready);
 
 /*<ltIE8>*/
 // doScroll technique by Diego Perini http://javascript.nwbox.com/IEContentLoaded/
@@ -5800,51 +5800,51 @@ var doScrollWorks = function(){
 	} catch (e){}
 	return false;
 }
-// If doScroll works already, it can't be used to determine domready
+// If doScroll works already, it can'tbe used to determine domready
 //   e.g. in an iframe
-									                                   if (testElement.doScroll && !doScrollWorks()) {
-									                                           checks.push(doScrollWorks);
-									                                           shouldPoll = true;
-													   }
+																	                                                                   if (testElement.doScroll && !doScrollWorks()) {
+																	                                     checks.push(doScrollWorks);
+																	                                     shouldPoll = true;
+																				     }
 /*</ltIE8>*/
 
-									                                   if (document.readyState) checks.push(function(){
-														                                        var state = document.readyState;
-														                                        return (state == 'loaded' || state == 'complete');
-																		});
+																	                             if (document.readyState) checks.push(function(){
+																					                                          var state = document.readyState;
+																					                                          return (state == 'loaded' || state == 'complete');
+																									  });
 
-									                                   if ('onreadystatechange' in document) document.addListener('readystatechange', check);
-									                                   else shouldPoll = true;
+																	                             if ('onreadystatechange' in document) document.addListener('readystatechange', check);
+																	                             else shouldPoll = true;
 
-									                                   if (shouldPoll) poll();
+																	                             if (shouldPoll) poll();
 
-									                                   Element.Events.domready = {
-									                                           onAdd: function(fn){
-									                                                   if (ready) fn.call(this);
-														   }
-													   };
+																	                             Element.Events.domready = {
+																	                                     onAdd: function(fn){
+																	                                             if (ready) fn.call(this);
+																					     }
+																				     };
 
 // Make sure that domready fires before load
-									                                   Element.Events.load = {
-									                                           base: 'load',
-									                                           onAdd: function(fn){
-									                                                   if (loaded && this == window) fn.call(this);
-														   },
-									                                           condition: function(){
-									                                                   if (this == window) {
-									                                                           domready();
-									                                                           delete Element.Events.load;
-															   }
-									                                                   return true;
-														   }
-													   };
+																	                             Element.Events.load = {
+																	                                     base: 'load',
+																	                                     onAdd: function(fn){
+																	                                             if (loaded && this == window) fn.call(this);
+																					     },
+																	                                     condition: function(){
+																	                                             if (this == window) {
+																	                                                     domready();
+																	                                                     delete Element.Events.load;
+																						     }
+																	                                             return true;
+																					     }
+																				     };
 
 // This is based on the custom load event
-									                                   window.addEvent('load', function(){
-									                                                           loaded = true;
-															   });
+																	                             window.addEvent('load', function(){
+																	                                                     loaded = true;
+																						     });
 
-													   })(window, document);
+																				     })(window, document);
 
 
 /*
@@ -5866,16 +5866,16 @@ var doScrollWorks = function(){
    ...
  */
 
-									                                   (function(){
+																	                             (function(){
 
-									                                            var Swiff = this.Swiff = new Class({
+																	                                      var Swiff = this.Swiff = new Class({
 
 Implements: Options,
 
 options: {
 id: null,
-									                                                                                               height: 1,
-									                                                                                               width: 1,
+																	                                                                                         height: 1,
+																	                                                                                         width: 1,
 container: null,
 properties: {},
 params: {
@@ -5883,81 +5883,81 @@ quality: 'high',
 allowScriptAccess: 'always',
 wMode: 'window',
 swLiveConnect: true
-																				       },
+																												 },
 callBacks: {},
 vars: {}
-																			       },
+																											 },
 
 toElement: function(){
-									                                                                                               return this.object;
-																			       },
+																	                                                                                         return this.object;
+																											 },
 
 initialize: function(path, options){
-									                                                                                               this.instance = 'Swiff_' + String.uniqueID();
+																	                                                                                         this.instance = 'Swiff_' + String.uniqueID();
 
-									                                                                                               this.setOptions(options);
-									                                                                                               options = this.options;
-									                                                                                               var id = this.id = options.id || this.instance;
-									                                                                                               var container = document.id(options.container);
+																	                                                                                         this.setOptions(options);
+																	                                                                                         options = this.options;
+																	                                                                                         var id = this.id = options.id || this.instance;
+																	                                                                                         var container = document.id(options.container);
 
-									                                                                                               Swiff.CallBacks[this.instance] = {};
+																	                                                                                         Swiff.CallBacks[this.instance] = {};
 
-									                                                                                               var params = options.params, vars = options.vars, callBacks = options.callBacks;
-									                                                                                               var properties = Object.append({height: options.height, width: options.width}, options.properties);
+																	                                                                                         var params = options.params, vars = options.vars, callBacks = options.callBacks;
+																	                                                                                         var properties = Object.append({height: options.height, width: options.width}, options.properties);
 
-									                                                                                               var self = this;
+																	                                                                                         var self = this;
 
-									                                                                                               for (var callBack in callBacks) {
-									                                                                                                       Swiff.CallBacks[this.instance][callBack] = (function(option){
-									                                                                                                                                                           return function(){
-									                                                                                                                                                                   return option.apply(self.object, arguments);
-																												   };
-																											   })(callBacks[callBack]);
-									                                                                                                       vars[callBack] = 'Swiff.CallBacks.' + this.instance + '.' + callBack;
-																				       }
+																	                                                                                         for (var callBack in callBacks) {
+																	                                                                                                 Swiff.CallBacks[this.instance][callBack] = (function(option){
+																	                                                                                                                                                     return function(){
+																	                                                                                                                                                             return option.apply(self.object, arguments);
+																																			     };
+																																		     })(callBacks[callBack]);
+																	                                                                                                 vars[callBack] = 'Swiff.CallBacks.' + this.instance + '.' + callBack;
+																												 }
 
-									                                                                                               params.flashVars = Object.toQueryString(vars);
-									                                                                                               if (Browser.ie) {
-									                                                                                                       properties.classid = 'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000';
-									                                                                                                       params.movie = path;
-																				       } else {
-									                                                                                                       properties.type = 'application/x-shockwave-flash';
-																				       }
-									                                                                                               properties.data = path;
+																	                                                                                         params.flashVars = Object.toQueryString(vars);
+																	                                                                                         if (Browser.ie) {
+																	                                                                                                 properties.classid = 'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000';
+																	                                                                                                 params.movie = path;
+																												 } else {
+																	                                                                                                 properties.type = 'application/x-shockwave-flash';
+																												 }
+																	                                                                                         properties.data = path;
 
-									                                                                                               var build = '<object id="' + id + '"';
-									                                                                                               for (var property in properties) build += ' ' + property + '="' + properties[property] + '"';
-									                                                                                               build += '>';
-									                                                                                               for (var param in params) {
-									                                                                                                       if (params[param]) build += '<param name="' + param + '" value="' + params[param] + '" />';
-																				       }
-									                                                                                               build += '</object>';
-									                                                                                               this.object = ((container) ? container.empty() : new Element('div')).set('html', build).firstChild;
-																			       },
+																	                                                                                         var build = '<object id="' + id + '"';
+																	                                                                                         for (var property in properties) build += ' ' + property + '="' + properties[property] + '"';
+																	                                                                                         build += '>';
+																	                                                                                         for (var param in params) {
+																	                                                                                                 if (params[param]) build += '<param name="' + param + '" value="' + params[param] + '" />';
+																												 }
+																	                                                                                         build += '</object>';
+																	                                                                                         this.object = ((container) ? container.empty() : new Element('div')).set('html', build).firstChild;
+																											 },
 
 replaces: function(element){
-									                                                                                               element = document.id(element, true);
-									                                                                                               element.parentNode.replaceChild(this.toElement(), element);
-									                                                                                               return this;
-																			       },
+																	                                                                                         element = document.id(element, true);
+																	                                                                                         element.parentNode.replaceChild(this.toElement(), element);
+																	                                                                                         return this;
+																											 },
 
 inject: function(element){
-									                                                                                               document.id(element, true).appendChild(this.toElement());
-									                                                                                               return this;
-																			       },
+																	                                                                                         document.id(element, true).appendChild(this.toElement());
+																	                                                                                         return this;
+																											 },
 
 remote: function(){
-									                                                                                               return Swiff.remote.apply(Swiff, [this.toElement()].append(arguments));
-																			       }
+																	                                                                                         return Swiff.remote.apply(Swiff, [this.toElement()].append(arguments));
+																											 }
 
-																		       });
+																										 });
 
-									                                            Swiff.CallBacks = {};
+																	                                      Swiff.CallBacks = {};
 
-									                                            Swiff.remote = function(obj, fn){
-									                                                    var rs = obj.CallFunction('<invoke name="' + fn + '" returntype="javascript">' + __flash__argumentsToXML(arguments, 2) + '</invoke>');
-									                                                    return eval(rs);
-														    };
+																	                                      Swiff.remote = function(obj, fn){
+																	                                              var rs = obj.CallFunction('<invoke name="' + fn + '" returntype="javascript">' + __flash__argumentsToXML(arguments, 2) + '</invoke>');
+																	                                              return eval(rs);
+																					      };
 
-													    })();
+																				      })();
 

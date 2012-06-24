@@ -228,7 +228,7 @@ void reindent_line2(chunk_t *pc, int column, const char *fcn_name, int lineno)
            __func__, pc->orig_line, pc->column, pc->str.c_str(),
            get_token_name(pc->type), column, fcn_name, lineno);
 
-   if (column == pc->column)
+   if (column == pc->column || chunk_is_newline(pc))
    {
       return;
    }

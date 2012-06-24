@@ -1,7 +1,7 @@
 
 #pragma do not change anything in this pragma!
 
-// This next bit should parse as '#', pragma, preproc-body, nl-cont, 
+// This next bit should parse as '#', pragma, preproc-body, nl-cont,
 //   preproc-body, nl-cont, preproc-body
 #pragma multi \
    line \
@@ -11,10 +11,12 @@
 
 #pragma some comment follows    // comment
 
+// This next bit should parse as '#', pp_error, preproc-body (multiline)
 #error Define EVERYTHING_OK if you would like to compile your code \
   or not if you would like to stop!
 
 #if !defined(EVERYTHING_OK)
+// This next bit should parse as '#', pp_error, preproc-body (multiline)
 #error Define EVERYTHING_OK if you would like to compile your code \
   or not if you would like to stop!
 #endif

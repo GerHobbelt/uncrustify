@@ -142,7 +142,6 @@ enum uncrustify_options
    UO_indent_switch_case,        // spaces to indent case from switch
    UO_indent_case_shift,         // spaces to shift the line with the 'case'
    UO_indent_case_brace,         // spaces to indent '{' from case (usually 0 or indent_columns)
-
    UO_indent_brace,              // spaces to indent '{' from level (usually 0)
    UO_indent_braces,             // whether to indent the braces or not
    UO_indent_braces_no_func,     // whether to not indent the function braces (depends on UO_indent_braces)

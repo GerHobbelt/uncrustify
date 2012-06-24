@@ -16,3 +16,10 @@ int main(int argc, char *argv[])
     return(a+b);
 }
 
+
+/* nl_cont in a non-pp setting: */
+void b(int x) { \
+    do { \
+        (x+5); \
+    } while (0); \
+}

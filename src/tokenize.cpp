@@ -267,6 +267,101 @@ static bool d_parse_string(tok_ctx& ctx, chunk_t& pc)
 
 
 /**
+ * Consume all input until we hit a non-continued (i.e. backslashed) EOL.
+ *
+ * @param pc   The structure to update, str is an input.
+ * @param all  TRUE: grab everything until the non-backslashed EOL; 
+ *             FALSE: grab until the first EOL or C++ comment, 
+ *                    return FALSE when it's a backslashed EOL
+ * @return     Whether anything was parsed
+ */
+static bool parse_until_nc_eol(tok_ctx& ctx, chunk_t& pc, bool all)
+{
+   int  ch;
+   int  bs_cnt;
+   tok_info ss;
+
+   if (!ctx.more())
+   {
+      return(false);
+   }
+
+   for(;;)
+   {
+	  ctx.save(ss);
+      bs_cnt = 0;
+	  ch = 0;
+      while (ctx.more())
+      {
+         ch = ctx.peek();
+         if ((ch == '\r') || (ch == '\n'))
+         {
+            break;
+         }
+
+		 /* Quit on a C++ comment start? */
+		 if (!all && (ch == '/') && (ctx.peek(1) == '/'))
+		 {
+			 break;
+		 }
+
+         if (ch == '\\')
+         {
+            bs_cnt++;
+         }
+         else
+         {
+            bs_cnt = 0;
+         }
+		 ctx.save(ss);
+         pc.str.append(ctx.get());
+      }
+
+      /* If we hit an odd number of backslashes right before the newline,
+       * then we keep going.
+       */
+      if (((bs_cnt & 1) == 0) || !ctx.more())
+      {
+         break;
+      }
+	  if (!all)
+	  {
+		 /* Back off if this is an escaped newline */
+		 if ((ch == '\r' || ch == '\n') && pc.str.back() == '\\')
+		 {
+		    ctx.restore(ss);
+			pc.str.pop_back();
+		 }
+		 break;  // backslashed EOL hit!
+	  }
+      ch = ctx.get();
+	  pc.str.append(ch);
+	  UNC_ASSERT(ch == '\r' || ch == '\n');
+      if (ch == '\r')
+      {
+         if (ctx.peek() == '\n')
+         {
+            cpd.le_counts[LE_CRLF]++;
+            pc.str.append(ctx.get());  /* store the '\n' */
+         }
+         else
+         {
+            cpd.le_counts[LE_CR]++;
+         }
+      }
+      else
+      {
+		 pc.str.append(ctx.get());
+         cpd.le_counts[LE_LF]++;
+      }
+      pc.nl_count++;
+      cpd.did_newline = true;
+   }
+   return(true);
+}
+
+
+/**
  * Figure of the length of the comment at text.
  * The next bit of text starts with a '/', so it might be a comment.
  * There are three types of comments:
@@ -282,7 +377,6 @@ static bool parse_comment(tok_ctx& ctx, chunk_t& pc)
    int  ch;
    bool is_d    = (cpd.lang_flags & LANG_D) != 0;
    int  d_level = 0;
-   int  bs_cnt;
 
    /* does this start with '/ /' or '/ *' or '/ +' (d) */
    if ((ctx.peek() != '/') ||
@@ -302,45 +396,7 @@ static bool parse_comment(tok_ctx& ctx, chunk_t& pc)
    {
       pc.str.append(ctx.get());  /* store the '/' */
       pc.type = CT_COMMENT_CPP;
-      while (true)
-      {
-         bs_cnt = 0;
-         while (ctx.more())
-         {
-            ch = ctx.peek();
-            if ((ch == '\r') || (ch == '\n'))
-            {
-               break;
-            }
-            if (ch == '\\')
-            {
-               bs_cnt++;
-            }
-            else
-            {
-               bs_cnt = 0;
-            }
-            pc.str.append(ctx.get());
-         }
-
-         /* If we hit an odd number of backslashes right before the newline,
-          * then we keep going.
-          */
-         if (((bs_cnt & 1) == 0) || !ctx.more())
-         {
-            break;
-         }
-         if (ctx.peek() == '\r')
-         {
-            pc.str.append(ctx.get());
-         }
-         if (ctx.peek() == '\n')
-         {
-            pc.str.append(ctx.get());
-         }
-         pc.nl_count++;
-         cpd.did_newline = true;
-      }
+	  parse_until_nc_eol(ctx, pc, true);
    }
    else if (!ctx.more())
    {
@@ -380,7 +436,7 @@ static bool parse_comment(tok_ctx& ctx, chunk_t& pc)
 
             if (ch == '\r')
             {
-               if (ctx.peek(1) == '\n')
+               if (ctx.peek() == '\n')
                {
                   cpd.le_counts[LE_CRLF]++;
                   pc.str.append(ctx.get());  /* store the '\n' */
@@ -756,19 +812,27 @@ static bool parse_string(tok_ctx& ctx, chunk_t& pc, int quote_idx, bool allow_es
    {
       int ch = ctx.get();
       pc.str.append(ch);
-      if (ch == '\n')
+      if (ch == '\r' || ch == '\n')
       {
-         pc.nl_count++;
-         pc.type = CT_STRING_MULTI;
-         escaped = 0;
-         continue;
-      }
-      if ((ch == '\r') && (ctx.peek() != '\n'))
-      {
-         pc.str.append(ctx.get());
-         pc.nl_count++;
-         pc.type = CT_STRING_MULTI;
-         escaped = 0;
+		 if (ch == '\r')
+		 {
+			if (ctx.peek() == '\n')
+			{
+			   cpd.le_counts[LE_CRLF]++;
+			   pc.str.append(ctx.get());  /* store the '\n' */
+			}
+			else
+			{
+			   cpd.le_counts[LE_CR]++;
+			}
+		 }
+		 else
+		 {
+			cpd.le_counts[LE_LF]++;
+		 }
+		 pc.nl_count++;
+		 pc.type = CT_STRING_MULTI;
+		 escaped = 0;
          continue;
       }
       if (!escaped)
@@ -883,7 +947,8 @@ static bool parse_cr_string(tok_ctx& ctx, chunk_t& pc, int q_idx)
    pc.type = CT_STRING;
    while (ctx.more())
    {
-      if ((ctx.peek() == ')') &&
+	  int ch = ctx.peek();
+      if ((ch == ')') &&
           (ctx.peek(tag_len + 1) == '"') &&
           tag_compare(ctx.data, tag_idx, ctx.c.idx + 1, tag_len))
       {
@@ -895,9 +960,25 @@ static bool parse_cr_string(tok_ctx& ctx, chunk_t& pc, int q_idx)
          parse_suffix(ctx, pc);
          return(true);
       }
-      if (ctx.peek() == '\n')
+      if (ch == '\r' || ch == '\n')
       {
          pc.str.append(ctx.get());
+		 if (ch == '\r')
+		 {
+			if (ctx.peek() == '\n')
+			{
+			   cpd.le_counts[LE_CRLF]++;
+			   pc.str.append(ctx.get());  /* store the '\n' */
+			}
+			else
+			{
+			   cpd.le_counts[LE_CR]++;
+			}
+		 }
+		 else
+		 {
+			cpd.le_counts[LE_LF]++;
+		 }
          pc.nl_count++;
          pc.type = CT_STRING_MULTI;
       }
@@ -1055,13 +1136,25 @@ static bool parse_bs_newline(tok_ctx& ctx, chunk_t& pc)
       ctx.get();
       if ((ch == '\r') || (ch == '\n'))
       {
-         if (ch == '\r')
-         {
-            ctx.expect('\n');
-         }
+	     if (ch == '\r')
+		 {
+			if (ctx.peek() == '\n')
+			{
+			   ctx.get();
+			   cpd.le_counts[LE_CRLF]++;
+			}
+			else
+			{
+			   cpd.le_counts[LE_CR]++;
+			}
+		 }
+		 else
+		 {
+		    cpd.le_counts[LE_LF]++;
+		 }
          pc.str      = "\\";
          pc.type     = CT_NL_CONT;
-         pc.nl_count = 1;
+         pc.nl_count++;
          return(true);
       }
    }
@@ -1079,6 +1172,8 @@ static bool parse_bs_newline(tok_ctx& ctx, chunk_t& pc)
  */
 static bool parse_newline(tok_ctx& ctx)
 {
+   int ch;
+
    ctx.save();
 
    /* Eat whitespace */
@@ -1086,20 +1181,26 @@ static bool parse_newline(tok_ctx& ctx)
    {
       ctx.get();
    }
-   if ((ctx.peek() == '\r') || (ctx.peek() == '\n'))
+   ch = ctx.peek();
+   if ((ch == '\r') || (ch == '\n'))
    {
-      if (ctx.peek() == '\n')
-      {
-         ctx.get();
-      }
-      else /* it is '\r' */
-      {
-         ctx.get();
-         if (ctx.peek() == '\n')
-         {
-            ctx.get();
-         }
-      }
+	  ctx.get();
+	  if (ch == '\r')
+	  {
+		 if (ctx.peek() == '\n')
+		 {
+			ctx.get();
+		    cpd.le_counts[LE_CRLF]++;
+		 }
+		 else
+		 {
+			cpd.le_counts[LE_CR]++;
+		 }
+	  }
+	  else
+	  {
+		 cpd.le_counts[LE_LF]++;
+	  }
       return(true);
    }
    ctx.restore();
@@ -1223,42 +1324,23 @@ static bool parse_next(tok_ctx& ctx, chunk_t& pc)
    }
 
    /**
-    * Handle unknown/unhandled preprocessors
+    * Handle #error statements: the error 'string' isn't a quoted string;
+	* we put everything following an #error in a CT_PREPROC_BODY chunk.
+	* #error continues until the end of line, no right-side comment allowed.
+	*
+    * Also handle unknown/unhandled preprocessors: those end at the first
+	* non-escaped EOL or C++ comment.
     */
-   if ((cpd.in_preproc > CT_PP_BODYCHUNK) &&
-       (cpd.in_preproc <= CT_PP_OTHER))
+   if (((cpd.in_preproc > CT_PP_BODYCHUNK) &&
+       (cpd.in_preproc <= CT_PP_OTHER)) ||
+	   cpd.in_preproc == CT_PP_ERROR)
    {
       pc.str.clear();
       tok_info ss;
       ctx.save(ss);
       /* Chunk to a newline or comment */
       pc.type = CT_PREPROC_BODY;
-      int last = 0;
-      while (ctx.more())
-      {
-         int ch = ctx.peek();
-
-         if ((ch == '\n') || (ch == '\r'))
-         {
-            /* Back off if this is an escaped newline */
-            if (last == '\\')
-            {
-               ctx.restore(ss);
-               pc.str.pop_back();
-            }
-            break;
-         }
-
-         /* Quit on a C++ comment start */
-         if ((ch == '/') && (ctx.peek(1) == '/'))
-         {
-            break;
-         }
-         last = ch;
-         ctx.save(ss);
-
-         pc.str.append(ctx.get());
-      }
+	  parse_until_nc_eol(ctx, pc, (cpd.in_preproc == CT_PP_ERROR));
       if (pc.str.size() > 0)
       {
          return(true);
@@ -1281,7 +1363,7 @@ static bool parse_next(tok_ctx& ctx, chunk_t& pc)
       return(true);
    }
 
-   /* Check for C# literal strings, ie @"hello" and identifiers @for*/
+   /* Check for C# literal strings, ie @"hello" and identifiers @for */
    if (((cpd.lang_flags & LANG_CS) != 0) && (ctx.peek() == '@'))
    {
       if (ctx.peek(1) == '"')
