@@ -645,6 +645,14 @@ sp_before_oc_colon                       { Ignore, Add, Remove, Force }
   Add or remove space before the colon in message specs
   '-(int) f: (int) x;' vs '-(int) f : (int) x;'
 
+sp_after_oc_dict_colon                   { Ignore, Add, Remove, Force }
+  Add or remove space after the colon in immutable dictionary expression
+  'NSDictionary *test = @{@"foo" :@"bar"};'
+
+sp_before_oc_dict_colon                  { Ignore, Add, Remove, Force }
+  Add or remove space before the colon in immutable dictionary expression
+  'NSDictionary *test = @{@"foo" :@"bar"};'
+
 sp_after_send_oc_colon                   { Ignore, Add, Remove, Force }
   Add or remove space after the colon in message specs
   '[object setValue:1];' vs. '[object setValue: 1];'
