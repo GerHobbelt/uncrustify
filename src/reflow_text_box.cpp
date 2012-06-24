@@ -59,33 +59,33 @@ Otherwise, return FALSE.
 */
 bool reflow_box::box_is_a_usual_piece_of_text(bool count_basic_punctuation_as_unusual) const
 {
-	if (this->m_is_bullet
-		|| this->m_is_cdata_xml_chunk
-		|| this->m_is_code
-		|| this->m_is_doxygen_tag
-		|| this->m_is_inline_javadoc_tag
-		|| this->m_is_escape_code
-		|| this->m_is_math
-		|| this->m_is_non_reflowable
-		|| this->m_is_part_of_boxed_txt
-		|| this->m_is_part_of_graphical_txt
-		//|| this->m_is_part_of_quoted_txt
-		|| this->m_is_path
-		|| (count_basic_punctuation_as_unusual && this->m_is_punctuation)
-		|| this->m_is_quote
-		|| this->m_is_unclosed_xhtml_start_tag
-		|| this->m_is_unmatched_xhtml_end_tag
-		|| this->m_is_uri_or_email
-		|| this->m_is_xhtml_end_tag
-		|| this->m_is_xhtml_entity
-		|| this->m_is_xhtml_start_tag
-		|| this->m_is_xhtml_tag_part
-		// || this->m_line_count > 0
-		)
-	{
-		return false;
-	}
-	return true;
+    if (this->m_is_bullet
+        || this->m_is_cdata_xml_chunk
+        || this->m_is_code
+        || this->m_is_doxygen_tag
+        || this->m_is_inline_javadoc_tag
+        || this->m_is_escape_code
+        || this->m_is_math
+        || this->m_is_non_reflowable
+        || this->m_is_part_of_boxed_txt
+        || this->m_is_part_of_graphical_txt
+        //|| this->m_is_part_of_quoted_txt
+        || this->m_is_path
+        || (count_basic_punctuation_as_unusual && this->m_is_punctuation)
+        || this->m_is_quote
+        || this->m_is_unclosed_xhtml_start_tag
+        || this->m_is_unmatched_xhtml_end_tag
+        || this->m_is_uri_or_email
+        || this->m_is_xhtml_end_tag
+        || this->m_is_xhtml_entity
+        || this->m_is_xhtml_start_tag
+        || this->m_is_xhtml_tag_part
+        // || this->m_line_count > 0
+        )
+    {
+        return false;
+    }
+    return true;
 }
 
 

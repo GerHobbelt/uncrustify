@@ -210,13 +210,13 @@ typedef enum
    CT_BIT_COLON,        /* a ':' in a variable declaration */
 
    /* TODO: */
-   CT_BASED,			// TODO: ~ CT_QUALIFIER,
-   CT_DECLSPEC,			// TODO: ~ CT_ATTRIBUTE,
-   CT_EXCEPT,			// TODO: ~ CT_CATCH,
-   CT_IF_EXISTS,		// TODO: ~ CT_FUNCTION,
-   CT_LEAVE,			// TODO: ~ CT_BREAK,
-   CT_INHERITANCE,		// TODO: ~ CT_QUALIFIER,
-   CT_UNALIGNED,		// TODO: ~ CT_QUALIFIER,
+   CT_BASED,            // TODO: ~ CT_QUALIFIER,
+   CT_DECLSPEC,         // TODO: ~ CT_ATTRIBUTE,
+   CT_EXCEPT,           // TODO: ~ CT_CATCH,
+   CT_IF_EXISTS,        // TODO: ~ CT_FUNCTION,
+   CT_LEAVE,            // TODO: ~ CT_BREAK,
+   CT_INHERITANCE,      // TODO: ~ CT_QUALIFIER,
+   CT_UNALIGNED,        // TODO: ~ CT_QUALIFIER,
 
    CT_OC_DYNAMIC,
    CT_OC_END,           /* ObjC: @end */
@@ -298,32 +298,32 @@ typedef enum
    CT_CS_SQ_STMT,       /* '[assembly: xxx]' or '[Attribute()]' or '[Help()]', etc */
    CT_CS_SQ_COLON,      /* the colon in one of those [] thingys */
    CT_CS_PROPERTY,      /* word or ']' followed by '{' */
-   CT_CS_ARRAY,		    // TODO: ~ CT_CLASS,
+   CT_CS_ARRAY,         // TODO: ~ CT_CLASS,
 
    /* C-sharp and Managed C++ */
-   CT_AS_FRIEND,		// TODO: ~ CT_QUALIFIER,
-   CT_GCNEW,			// TODO: ~ CT_NEW,
-   CT_GENERIC,			// TODO: ~ CT_WORD,
-   CT_WHERE,			// TODO: ~ CT_WORD,
-   CT_INITONLY,			// TODO: ~ CT_WORD,
-   CT_INTERIOR_PTR,		// TODO: ~ CT_WORD,
-   CT_LITERAL,			// TODO: ~ CT_WORD,
-   CT_NULLPTR,			// TODO: ~ CT_WORD,
-   CT_BOX,				// TODO: ~ CT_FUNCTION,
-   CT_GC,				// TODO: ~ CT_QUALIFIER,
-   CT_IDENTIFIER,		// TODO: ~ CT_QUALIFIER,
-   CT_NOGC,				// TODO: ~ CT_QUALIFIER,
-   CT_PIN,				// TODO: ~ CT_QUALIFIER,
-   CT_PROPERTY,			// TODO: ~ CT_QUALIFIER,
-   CT_SEALED,			// TODO: ~ CT_QUALIFIER,
-   CT_VALUE,			// TODO: ~ CT_QUALIFIER,
+   CT_AS_FRIEND,        // TODO: ~ CT_QUALIFIER,
+   CT_GCNEW,            // TODO: ~ CT_NEW,
+   CT_GENERIC,          // TODO: ~ CT_WORD,
+   CT_WHERE,            // TODO: ~ CT_WORD,
+   CT_INITONLY,         // TODO: ~ CT_WORD,
+   CT_INTERIOR_PTR,     // TODO: ~ CT_WORD,
+   CT_LITERAL,          // TODO: ~ CT_WORD,
+   CT_NULLPTR,          // TODO: ~ CT_WORD,
+   CT_BOX,              // TODO: ~ CT_FUNCTION,
+   CT_GC,               // TODO: ~ CT_QUALIFIER,
+   CT_IDENTIFIER,       // TODO: ~ CT_QUALIFIER,
+   CT_NOGC,             // TODO: ~ CT_QUALIFIER,
+   CT_PIN,              // TODO: ~ CT_QUALIFIER,
+   CT_PROPERTY,         // TODO: ~ CT_QUALIFIER,
+   CT_SEALED,           // TODO: ~ CT_QUALIFIER,
+   CT_VALUE,            // TODO: ~ CT_QUALIFIER,
 
-   CT_EVENT,			// TODO: ~ CT_QUALIFIER,
-   CT_HOOK,				// TODO: ~ CT_QUALIFIER,
-   CT_INTERFACE,		// TODO: ~ CT_FUNCTION,
-   CT_RAISE,			// TODO: ~ CT_QUALIFIER,
-   CT_UNHOOK,			// TODO: ~ CT_QUALIFIER,
-   CT_UUIDOF,			// TODO: ~ CT_FUNCTION,
+   CT_EVENT,            // TODO: ~ CT_QUALIFIER,
+   CT_HOOK,             // TODO: ~ CT_QUALIFIER,
+   CT_INTERFACE,        // TODO: ~ CT_FUNCTION,
+   CT_RAISE,            // TODO: ~ CT_QUALIFIER,
+   CT_UNHOOK,           // TODO: ~ CT_QUALIFIER,
+   CT_UUIDOF,           // TODO: ~ CT_FUNCTION,
 
    /* Embedded SQL - always terminated with a semicolon */
    CT_SQL_EXEC,         /* the 'EXEC' in 'EXEC SQL ...' */
@@ -339,26 +339,26 @@ typedef enum
    CT_ASSERT,           /* assert EXP1 [ : EXP2 ] ; */
 
    /* PHP */
-   CT_CONCATENATE,		/* . as in 'concatenate strings' */
-   CT_XML_OPSTART,		/* <?, <?php ... */
-   CT_XML_OPEND,		/* ... ?> */
-   CT_PHP_ARRAY,		// TODO: ~ CT_FUNCTION,
-   CT_CFUNCTION,		// TODO: ~ CT_FUNCTION,
-   CT_CLONE,			// TODO: ~ CT_OPERATOR,
-   CT_DECLARE,			// TODO: ~ CT_FUNCTION,
-   CT_ENDDECLARE,		// TODO: ~ CT_WORD,
-   CT_ENDFOR,			// TODO: ~ CT_WORD,
-   CT_ENDFOREACH,		// TODO: ~ CT_WORD,
-   CT_ENDIF,			// TODO: ~ CT_WORD,
-   CT_ENDSWITCH,		// TODO: ~ CT_WORD,
-   CT_ENDWHILE,			// TODO: ~ CT_WORD,
-   CT_GLOBAL,			// TODO: ~ CT_EXTERN,
-   CT_INCLUDE,			// TODO: ~ CT_FUNCTION,
-   CT_INCLUDE_ONCE,		// TODO: ~ CT_FUNCTION,
-   CT_OLD_FUNCTION,		// TODO: ~ CT_FUNCTION,
-   CT_REQUIRE,			// TODO: ~ CT_FUNCTION,
-   CT_REQUIRE_ONCE,		// TODO: ~ CT_FUNCTION,
-   CT_USE,				// TODO: ~ CT_USING,
+   CT_CONCATENATE,      /* . as in 'concatenate strings' */
+   CT_XML_OPSTART,      /* <?, <?php ... */
+   CT_XML_OPEND,        /* ... ?> */
+   CT_PHP_ARRAY,        // TODO: ~ CT_FUNCTION,
+   CT_CFUNCTION,        // TODO: ~ CT_FUNCTION,
+   CT_CLONE,            // TODO: ~ CT_OPERATOR,
+   CT_DECLARE,          // TODO: ~ CT_FUNCTION,
+   CT_ENDDECLARE,       // TODO: ~ CT_WORD,
+   CT_ENDFOR,           // TODO: ~ CT_WORD,
+   CT_ENDFOREACH,       // TODO: ~ CT_WORD,
+   CT_ENDIF,            // TODO: ~ CT_WORD,
+   CT_ENDSWITCH,        // TODO: ~ CT_WORD,
+   CT_ENDWHILE,         // TODO: ~ CT_WORD,
+   CT_GLOBAL,           // TODO: ~ CT_EXTERN,
+   CT_INCLUDE,          // TODO: ~ CT_FUNCTION,
+   CT_INCLUDE_ONCE,     // TODO: ~ CT_FUNCTION,
+   CT_OLD_FUNCTION,     // TODO: ~ CT_FUNCTION,
+   CT_REQUIRE,          // TODO: ~ CT_FUNCTION,
+   CT_REQUIRE_ONCE,     // TODO: ~ CT_FUNCTION,
+   CT_USE,              // TODO: ~ CT_USING,
 
 } c_token_t;
 

@@ -1772,8 +1772,8 @@ static void fix_typedef(chunk_t *start)
    {
       next->flags |= PCF_IN_TYPEDEF;
 
-	  /* TYPE_WRAP has to be handled here for parameters because "do_symbol_check" */
-	  /* has not done the job yet                                                  */
+      /* TYPE_WRAP has to be handled here for parameters because "do_symbol_check" */
+      /* has not done the job yet                                                  */
       if (next->type == CT_TYPE_WRAP)
       {
          handle_type_wrap(next);
@@ -2106,36 +2106,36 @@ static void mark_variable_stack(ChunkStack& cs, log_sev_t sev)
       if ((cs.Len() == 0) ||
           (var_name->type != CT_WORD) ||
           (var_name->flags & PCF_TYPE_WRAP))
-	  {
+      {
          /* Parameter name is missing */
          word_type = var_name;
          var_name  = NULL;
-	  }
-	  else
-	  {
+      }
+      else
+      {
          word_type = cs.Pop();
-	  }
+      }
 
       do
       {
          LOG_FMT(LFCNP, " <%s>", word_type->str.c_str());
-		 if ((word_type->flags & PCF_TYPE_WRAP) == 0)
-		 {
+         if ((word_type->flags & PCF_TYPE_WRAP) == 0)
+         {
             word_type->type = CT_TYPE;
-		 }
+         }
          word_type->flags |= PCF_VAR_TYPE;
       }
       while ((word_type = cs.Pop()) != NULL);
 
-	  if (var_name == NULL)
-	  {
+      if (var_name == NULL)
+      {
          LOG_FMT(LFCNP, " [no var name]\n");
-	  }
-	  else
-	  {
+      }
+      else
+      {
          LOG_FMT(LFCNP, " [%s]\n", var_name->str.c_str());
          var_name->flags |= PCF_VAR_DEF;
-	  }
+      }
    }
 }
 
@@ -2180,8 +2180,8 @@ static void fix_fcn_def_params(chunk_t *start)
          continue;
       }
 
-	  /* TYPE_WRAP has to be handled here for parameters because "do_symbol_check" */
-	  /* has not done the job yet                                                  */
+      /* TYPE_WRAP has to be handled here for parameters because "do_symbol_check" */
+      /* has not done the job yet                                                  */
       if (pc->type == CT_TYPE_WRAP)
       {
          handle_type_wrap(pc);
@@ -4634,7 +4634,7 @@ static void handle_type_wrap(chunk_t *pc)
    tmp  = chunk_get_next_ncnl(opp);
    while (tmp != clp)
    {
-	  tmp->flags |= PCF_TYPE_WRAP;
+      tmp->flags |= PCF_TYPE_WRAP;
 
       tmp = chunk_get_next_ncnl(tmp);
    }
@@ -4666,7 +4666,7 @@ static void handle_func_ptr_wrap(chunk_t *pc)
    tmp  = chunk_get_next_ncnl(opp);
    while (tmp != clp)
    {
-	  tmp->flags |= PCF_FUNC_PTR_WRAP;
+      tmp->flags |= PCF_FUNC_PTR_WRAP;
 
       tmp = chunk_get_next_ncnl(tmp);
    }

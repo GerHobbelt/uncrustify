@@ -159,32 +159,32 @@ static void usage_exit(const char *msg, const char *argv0, int code)
            "Errors are always dumped to stderr\n"
            "\n"
            "The '-f' and '-o' options may not be used with '-F', '--replace' or\n"
-		   "'--no-backup'.\n"
+           "'--no-backup'.\n"
            "The '--prefix' and '--suffix' options may not be used with '--replace' or\n"
-		   "'--no-backup'.\n"
+           "'--no-backup'.\n"
            "\n"
            "Basic Options:\n"
            " -c CFG\n"
            " --config CFG : use the config file CFG\n"
-		   " --file FILE,\n"
+           " --file FILE,\n"
            " -f FILE      : process the single file FILE (output to stdout, use with -o)\n"
            " -o FILE      : Redirect stdout to FILE\n"
-		   " --files FILE,\n"
+           " --files FILE,\n"
            " -F FILE      : read files to process from FILE, one filename per line\n"
            " files        : files to process (can be combined with -F)\n"
            " --suffix SFX : Append SFX to the output filename. The default is '.uncrustify'\n"
            " --prefix PFX : Prepend PFX to the output filename path.\n"
            " --replace    : replace source files (creates a backup)\n"
            " --no-backup  : replace files, no backup. Useful if files are under source\n"
-		   "                control\n"
+           "                control\n"
 #if defined(HAVE_UTIME)
            " --mtime      : preserve mtime on replaced files\n"
 #endif
            " -l           : language override: C, CPP, D, CS, JAVA, PAWN, OC, OC+\n"
            " -t FILE      : load a FILE with types (usually not needed)\n"
-		   " --type T     : define one user defined type T\n"
-		   " -d FILE      : load a FILE with defines (usually not needed)\n"
-		   " --define DEF : define one user defined define DEF\n"
+           " --type T     : define one user defined type T\n"
+           " -d FILE      : load a FILE with defines (usually not needed)\n"
+           " --define DEF : define one user defined define DEF\n"
            " -q           : quiet mode - no output on stderr (-L will override)\n"
            " --frag       : code fragment, assume the first line is indented correctly\n"
            "\n"
@@ -196,13 +196,13 @@ static void usage_exit(const char *msg, const char *argv0, int code)
            " --update-config-with-doc : Output a new config file. Use with -o FILE\n"
            " --universalindent        : Output a config file for Universal Indent GUI\n"
            " --detect                 : detects the config from a source file. Use with\n"
-		   "                            '-f FILE'\n"
+           "                            '-f FILE'\n"
            "                            Detection is fairly limited.\n"
            "\n"
            "Debug Options:\n"
            " --parsed FILE, -p FILE : dump debug info to a file\n"
            " --log SEV, -L SEV      : Set the log severity (see log_levels.h, 'A' for all,\n"
-		   "                          N-M is range N..M, commas separate levels)\n"
+           "                          N-M is range N..M, commas separate levels)\n"
            " --show, -s             : Show the log severity in the logs\n"
            " --decode FLAG          : Print FLAG (chunk flags) as text and exit\n"
            "\n"
@@ -237,33 +237,33 @@ static void version_exit(void)
 
 FILE *unc_fopen(const char *path, const char *mode)
 {
-	if (path == NULL || strcmp(path, "-") == 0)
-	{
-		if (strchr(mode, 'w') || strchr(mode, 'a'))
-		{
-			return stdout;
-		}
-		else
-		{
-			return stdin;
-		}
-	}
+    if (path == NULL || strcmp(path, "-") == 0)
+    {
+        if (strchr(mode, 'w') || strchr(mode, 'a'))
+        {
+            return stdout;
+        }
+        else
+        {
+            return stdin;
+        }
+    }
 
-	if (strchr(mode, 'w'))
-	{
-		make_folders(path);
-	}
+    if (strchr(mode, 'w'))
+    {
+        make_folders(path);
+    }
 
-	return fopen(path, mode);
+    return fopen(path, mode);
 }
 
 int unc_fclose(FILE *fh)
 {
-	if (fh && fh != stdin && fh != stderr && fh != stdout)
-	{
-		return fclose(fh);
-	}
-	return 0;
+    if (fh && fh != stdin && fh != stderr && fh != stdout)
+    {
+        return fclose(fh);
+    }
+    return 0;
 }
 
 static void redir_stdout(const char *output_file)
@@ -305,82 +305,82 @@ int dump_linecounter = 0;
 static int
 bfc_dbg_report_function(int report_type, char *usermsg, int *retval)
 {
-	/*
-	* By setting retVal to zero, we are instructing _CrtDbgReport
-	* to continue with normal execution after generating the report.
-	* If we wanted _CrtDbgReport to start the debugger, we would set
-	* retVal to one.
-	*/
-	*retval = !!trigger_debugger;
+    /*
+    * By setting retVal to zero, we are instructing _CrtDbgReport
+    * to continue with normal execution after generating the report.
+    * If we wanted _CrtDbgReport to start the debugger, we would set
+    * retVal to one.
+    */
+    *retval = !!trigger_debugger;
 
-	/*
-	* When the report type is for an ASSERT,
-	* we'll report some information, but we also
-	* want _CrtDbgReport to get called -
-	* so we'll return TRUE.
-	*
-	* When the report type is a WARNing or ERROR,
-	* we'll take care of all of the reporting. We don't
-	* want _CrtDbgReport to get called -
-	* so we'll return FALSE.
-	*/
-	switch (report_type)
-	{
-	default:
-	case _CRT_WARN:
-	case _CRT_ERROR:
-	case _CRT_ERRCNT:
-		fwrite(usermsg, 1, strlen(usermsg), stderr);
-		fflush(stderr);
-		OutputDebugStringA(usermsg);
-		dump_linecounter++;
-		if (dump_linecounter % 10000 == 50)
-		{
-			fprintf(stderr, "press ENTER to continue dumping... ");
-			fflush(stderr);
-			(void)getc(stdin);
-		}
-		return 0;
+    /*
+    * When the report type is for an ASSERT,
+    * we'll report some information, but we also
+    * want _CrtDbgReport to get called -
+    * so we'll return TRUE.
+    *
+    * When the report type is a WARNing or ERROR,
+    * we'll take care of all of the reporting. We don't
+    * want _CrtDbgReport to get called -
+    * so we'll return FALSE.
+    */
+    switch (report_type)
+    {
+    default:
+    case _CRT_WARN:
+    case _CRT_ERROR:
+    case _CRT_ERRCNT:
+        fwrite(usermsg, 1, strlen(usermsg), stderr);
+        fflush(stderr);
+        OutputDebugStringA(usermsg);
+        dump_linecounter++;
+        if (dump_linecounter % 10000 == 50)
+        {
+            fprintf(stderr, "press ENTER to continue dumping... ");
+            fflush(stderr);
+            (void)getc(stdin);
+        }
+        return 0;
 
-	case _CRT_ASSERT:
-		fwrite(usermsg, 1, strlen(usermsg), stderr);
-		fflush(stderr);
-		OutputDebugStringA(usermsg);
-		break;
-	}
-	return 1;
+    case _CRT_ASSERT:
+        fwrite(usermsg, 1, strlen(usermsg), stderr);
+        fflush(stderr);
+        OutputDebugStringA(usermsg);
+        break;
+    }
+    return 1;
 }
 
 static void
 bfc_report_mem_analysis(void)
 {
-	_CrtMemState msNow;
+    _CrtMemState msNow;
 
-	if (!_CrtCheckMemory())
-	{
-		fprintf(stderr, ">>>Failed to validate memory heap<<<\n");
-	}
+    if (!_CrtCheckMemory())
+    {
+        fprintf(stderr, ">>>Failed to validate memory heap<<<\n");
+    }
 
-	/* only dump leaks when there are in fact leaks */
-	_CrtMemCheckpoint(&msNow);
+    /* only dump leaks when there are in fact leaks */
+    _CrtMemCheckpoint(&msNow);
 
-	if (msNow.lCounts[_CLIENT_BLOCK] != 0
-		|| msNow.lCounts[_NORMAL_BLOCK] != 0
-		|| (_crtDbgFlag & _CRTDBG_CHECK_CRT_DF
-		&& msNow.lCounts[_CRT_BLOCK] != 0)
-		)
-	{
-		/* difference detected: dump objects since start. */
-		_RPT0(_CRT_WARN, "============== Detected memory leaks! ====================\n");
+    if (msNow.lCounts[_CLIENT_BLOCK] != 0
+        || msNow.lCounts[_NORMAL_BLOCK] != 0
+        || (_crtDbgFlag & _CRTDBG_CHECK_CRT_DF
+        && msNow.lCounts[_CRT_BLOCK] != 0)
+        )
+    {
+        /* difference detected: dump objects since start. */
+        _RPT0(_CRT_WARN, "============== Detected memory leaks! ====================\n");
 
-		_CrtMemState diff;
-		if (_CrtMemDifference(&diff, &bfc_memdbg_state_snapshot1, &msNow))
-		{
-			//_CrtMemDumpAllObjectsSince(&bfc_memdbg_state_snapshot1);
+        _CrtMemState diff;
+        if (_CrtMemDifference(&diff, &bfc_memdbg_state_snapshot1, &msNow))
+        {
+            //_CrtMemDumpAllObjectsSince(&bfc_memdbg_state_snapshot1);
 
-			_CrtMemDumpStatistics(&diff);
-		}
-	}
+            _CrtMemDumpStatistics(&diff);
+        }
+    }
 }
 
 #else
@@ -393,13 +393,13 @@ bfc_report_mem_analysis(void)
 
 int report_assertion_failed(const char *expr, const char *function, const char *filepath, int lineno, assert_extended_reporter *rprtr)
 {
-	const char *msg = (rprtr ? rprtr->c_msg() : "");
+    const char *msg = (rprtr ? rprtr->c_msg() : "");
 
-	if (1 != _CrtDbgReport(_CRT_ASSERT, filepath, lineno, function, "'%s' %s\n", expr, msg))
-	{
-		_CrtDbgBreak();
-	}
-	exit(EXIT_FAILURE);
+    if (1 != _CrtDbgReport(_CRT_ASSERT, filepath, lineno, function, "'%s' %s\n", expr, msg))
+    {
+        _CrtDbgBreak();
+    }
+    exit(EXIT_FAILURE);
 }
 
 #endif
@@ -410,32 +410,32 @@ int report_assertion_failed(const char *expr, const char *function, const char *
 
 int report_assertion_failed(const char *expr, const char *function, const char *filepath, int lineno, assert_extended_reporter *rprtr)
 {
-	const char *msg = (rprtr ? rprtr->c_msg() : "");
-	if (!msg[0])
-		msg = NULL;
+    const char *msg = (rprtr ? rprtr->c_msg() : "");
+    if (!msg[0])
+        msg = NULL;
 
-	if (function && filepath && msg)
-	{
-		fprintf(stderr, "Assertion failed: '%s' (%s) at %s, line %d in %s\n", expr, msg, function, lineno, filepath);
-		exit(EXIT_FAILURE);
-	}
-	if (filepath && msg)
-	{
-		fprintf(stderr, "Assertion failed: '%s' (%s) at line %d in %s\n", expr, msg, lineno, filepath);
-		exit(EXIT_FAILURE);
-	}
-	if (function && filepath && !msg)
-	{
-		fprintf(stderr, "Assertion failed: '%s' at %s, line %d in %s\n", expr, function, lineno, filepath);
-		exit(EXIT_FAILURE);
-	}
-	if (filepath && !msg)
-	{
-		fprintf(stderr, "Assertion failed: '%s' at line %d in %s\n", expr, lineno, filepath);
-		exit(EXIT_FAILURE);
-	}
-	fprintf(stderr, "Assertion failed: '%s' %s\n", expr, msg);
-	exit(EXIT_FAILURE);
+    if (function && filepath && msg)
+    {
+        fprintf(stderr, "Assertion failed: '%s' (%s) at %s, line %d in %s\n", expr, msg, function, lineno, filepath);
+        exit(EXIT_FAILURE);
+    }
+    if (filepath && msg)
+    {
+        fprintf(stderr, "Assertion failed: '%s' (%s) at line %d in %s\n", expr, msg, lineno, filepath);
+        exit(EXIT_FAILURE);
+    }
+    if (function && filepath && !msg)
+    {
+        fprintf(stderr, "Assertion failed: '%s' at %s, line %d in %s\n", expr, function, lineno, filepath);
+        exit(EXIT_FAILURE);
+    }
+    if (filepath && !msg)
+    {
+        fprintf(stderr, "Assertion failed: '%s' at line %d in %s\n", expr, lineno, filepath);
+        exit(EXIT_FAILURE);
+    }
+    fprintf(stderr, "Assertion failed: '%s' %s\n", expr, msg);
+    exit(EXIT_FAILURE);
 }
 
 #endif
@@ -447,87 +447,87 @@ int report_assertion_failed(const char *expr, const char *function, const char *
 
 assert_extended_reporter::assert_extended_reporter()
 {
-	msgbuf = buf;
-	buf[0] = 0;
-	buflen = sizeof(buf);
+    msgbuf = buf;
+    buf[0] = 0;
+    buflen = sizeof(buf);
 }
 assert_extended_reporter::assert_extended_reporter(long int val)
 {
-	msgbuf = buf;
-	buf[0] = 0;
-	buflen = sizeof(buf);
+    msgbuf = buf;
+    buf[0] = 0;
+    buflen = sizeof(buf);
 
-	int suggested_buflen = buflen;
-	print(suggested_buflen, "value: %ld", val);
+    int suggested_buflen = buflen;
+    print(suggested_buflen, "value: %ld", val);
 }
 assert_extended_reporter::assert_extended_reporter(unsigned long int val)
 {
-	msgbuf = buf;
-	buf[0] = 0;
-	buflen = sizeof(buf);
+    msgbuf = buf;
+    buf[0] = 0;
+    buflen = sizeof(buf);
 
-	int suggested_buflen = buflen;
-	print(suggested_buflen, "value: %lu", val);
+    int suggested_buflen = buflen;
+    print(suggested_buflen, "value: %lu", val);
 }
 assert_extended_reporter::assert_extended_reporter(const char *msg, ...)
 {
-	msgbuf = buf;
-	buf[0] = 0;
-	buflen = sizeof(buf);
+    msgbuf = buf;
+    buf[0] = 0;
+    buflen = sizeof(buf);
 
-	for (int suggested_buflen = buflen; ; suggested_buflen *= 2)
-	{
-		va_list a;
+    for (int suggested_buflen = buflen; ; suggested_buflen *= 2)
+    {
+        va_list a;
 
-		va_start(a, msg);
-		int rv = vprint(suggested_buflen, msg, a);
-		va_end(a);
-		if (rv >= 0)
-			break;
-	}
+        va_start(a, msg);
+        int rv = vprint(suggested_buflen, msg, a);
+        va_end(a);
+        if (rv >= 0)
+            break;
+    }
 }
 assert_extended_reporter::~assert_extended_reporter()
 {
-	msgbuf = buf;
-	buf[0] = 0;
-	buflen = 0;
+    msgbuf = buf;
+    buf[0] = 0;
+    buflen = 0;
 }
 int assert_extended_reporter::print(int suggested_buflen, const char *msg, ...)
 {
-	va_list a;
+    va_list a;
 
-	va_start(a, msg);
-	int rv = this->vprint(suggested_buflen, msg, a);
-	va_end(a);
-	return rv;
+    va_start(a, msg);
+    int rv = this->vprint(suggested_buflen, msg, a);
+    va_end(a);
+    return rv;
 }
 int assert_extended_reporter::vprint(int suggested_buflen, const char *msg, va_list args)
 {
-	if (suggested_buflen > buflen)
-	{
-		if (buf == msgbuf)
-		{
-			msgbuf = (char *)malloc(suggested_buflen);
-		}
-		else
-		{
-			msgbuf = (char *)realloc((void *)msgbuf, suggested_buflen);
-		}
-		if (!msgbuf)
-			throw "Out of Memory!";
-		buflen = suggested_buflen;
-	}
-	else
-	{
-		suggested_buflen = buflen;
-	}
+    if (suggested_buflen > buflen)
+    {
+        if (buf == msgbuf)
+        {
+            msgbuf = (char *)malloc(suggested_buflen);
+        }
+        else
+        {
+            msgbuf = (char *)realloc((void *)msgbuf, suggested_buflen);
+        }
+        if (!msgbuf)
+            throw "Out of Memory!";
+        buflen = suggested_buflen;
+    }
+    else
+    {
+        suggested_buflen = buflen;
+    }
 
-	int rv = vsnprintf(msgbuf, suggested_buflen - 1, msg, args);
- 	msgbuf[suggested_buflen - 1] = 0;
+    int rv = vsnprintf(msgbuf, suggested_buflen - 1, msg, args);
+    msgbuf[suggested_buflen - 1] = 0;
 
-	if ((int)strlen(msgbuf) >= suggested_buflen - 2)
-		rv = -1;
-	return rv;
+    if ((int)strlen(msgbuf) >= suggested_buflen - 2)
+        rv = -1;
+    return rv;
 }
 
 #endif
@@ -558,14 +558,14 @@ int main(int argc, char *argv[])
    printf("argc = %d\n", argc);
    for (idx = 0; idx < argc; idx++)
    {
-	   printf("argv[%d] = '%s'\n", idx, argv[idx]);
+       printf("argv[%d] = '%s'\n", idx, argv[idx]);
    }
 
 {
    char buf[2048];
    if (!getcwd(buf, sizeof(buf)))
    {
-	   perror("failed to obtain current working directory: ");
+       perror("failed to obtain current working directory: ");
    }
    printf("PWD = '%s'\n", buf);
 }
@@ -606,10 +606,10 @@ int main(int argc, char *argv[])
    int i = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
 
    i &= 0x0000FFFF
-	   & ~(_CRTDBG_ALLOC_MEM_DF
-	   | _CRTDBG_DELAY_FREE_MEM_DF
-	   | _CRTDBG_LEAK_CHECK_DF
-	   | _CRTDBG_CHECK_ALWAYS_DF);
+       & ~(_CRTDBG_ALLOC_MEM_DF
+       | _CRTDBG_DELAY_FREE_MEM_DF
+       | _CRTDBG_LEAK_CHECK_DF
+       | _CRTDBG_CHECK_ALWAYS_DF);
 
    i |= _CRTDBG_ALLOC_MEM_DF;
 
@@ -992,8 +992,8 @@ int main(int argc, char *argv[])
    else if (source_file != NULL)
    {
       /* Doing a single file */
-	   if (output_file == NULL)
-		   output_file = "-";
+       if (output_file == NULL)
+           output_file = "-";
       do_source_file(source_file, output_file, parsed_file, no_backup, keep_mtime);
    }
    else
@@ -1073,21 +1073,21 @@ static void process_source_list(const char *source_list,
       else if (argc == 2)
       {
          do_source_file(args[0],
-                        args[1], 
+                        args[1],
                         NULL, no_backup, keep_mtime);
       }
       else if (argc == 3)
       {
          do_source_file(args[0],
-                        args[1], 
+                        args[1],
                         args[2], no_backup, keep_mtime);
       }
-	  else if (argc > 0)
-	  {
+      else if (argc > 0)
+      {
          LOG_FMT(LERR, "%s: Invalid source list format at line %d of file %s: too many arguments (%d)\n",
                  __func__, line, source_list, argc);
          cpd.error_count++;
-	  }
+      }
    }
    unc_fclose(p_file);
 }
@@ -1143,11 +1143,11 @@ static void make_folders(const string& filename)
          {
             //fprintf(stderr, "%s: %s\n", __func__, outname);
             int rv = mkdir(outname, 0750);
-			if (rv && errno != EEXIST)
-			{
-				fprintf(stderr, "failed to create directory '%s': ", outname);
-				perror("");
-			}
+            if (rv && errno != EEXIST)
+            {
+                fprintf(stderr, "failed to create directory '%s': ", outname);
+                perror("");
+            }
          }
          outname[idx] = PATH_SEP;
       }
@@ -1301,17 +1301,17 @@ static const char *make_output_filename(char *buf, int buf_size,
 
    if (strcmp(filename, "-") == 0)
    {
-	   strncpy(buf, "-", buf_size);
+       strncpy(buf, "-", buf_size);
    }
    else
    {
-	   if (prefix != NULL)
-	   {
-		  len = snprintf(buf, buf_size, "%s/", prefix);
-	   }
+       if (prefix != NULL)
+       {
+          len = snprintf(buf, buf_size, "%s/", prefix);
+       }
 
-	   snprintf(&buf[len], buf_size - len, "%s%s", filename,
-				(suffix != NULL) ? suffix : "");
+       snprintf(&buf[len], buf_size - len, "%s%s", filename,
+                (suffix != NULL) ? suffix : "");
    }
    buf[buf_size - 1] = 0;
    return(buf);
@@ -1717,14 +1717,14 @@ static void add_msg_header(c_token_t type, file_mem& fm, const char *parsed_file
 
 void dump_parsed_input(const char *fname, const char *parsed_file)
 {
-	static int first = 1;
+    static int first = 1;
 
    if (parsed_file != NULL)
    {
       FILE *p_file = unc_fopen(parsed_file, (first ? "w" : "a"));
       if (p_file != NULL)
       {
-		  first = 0;
+          first = 0;
          output_parsed(fname, p_file);
          unc_fclose(p_file);
       }

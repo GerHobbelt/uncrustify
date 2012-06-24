@@ -189,7 +189,7 @@ void chunk_move_after(chunk_t *pc_in, chunk_t *ref)
    //UNC_ASSERT(pc_in->orig_col_end >= 1); // do not juggle the orig_col settings for injected chunks, or we won't be able to recognize those any more
    if (pc_in->orig_col_end >= 1)
    {
-	  chunk_t *next = pc_in->next;
+      chunk_t *next = pc_in->next;
 
       pc_in->orig_col     = pc_in->column;
       pc_in->orig_col_end = pc_in->orig_col + pc_in->len();
@@ -667,12 +667,12 @@ chunk_t *chunk_get_prev_nisl(chunk_t *cur, chunk_nav_t nav)
    do
    {
       pc = chunk_get_prev(pc, nav);
-	  UNC_ASSERT(chunk_is_vbrace(pc) ? pc->orig_col_end < 1 : 1);
+      UNC_ASSERT(chunk_is_vbrace(pc) ? pc->orig_col_end < 1 : 1);
    } while (pc && pc->orig_col_end <= 1 && !chunk_is_newline(pc));
 
    if (chunk_is_newline(pc))
    {
-	  return NULL;
+      return NULL;
    }
    return(pc);
 }

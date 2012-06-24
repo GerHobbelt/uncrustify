@@ -226,7 +226,7 @@ struct chunk_t
       orig_line = 0;
       orig_col = 0;
       orig_col_end = 0;
-	  orig_ws_lead = 0;
+      orig_ws_lead = 0;
       flags = 0;
       column = 0;
       column_indent = 0;
@@ -279,7 +279,7 @@ enum
    LANG_PAWN    = 0x0080,
    LANG_ECMA    = 0x0100,
    LANG_PHP     = 0x0200,
-   LANG_CPPNET  = 0x4002,	  /*<< managed C++ */
+   LANG_CPPNET  = 0x4002,     /*<< managed C++ */
 
    LANG_ALLC    = 0x017f,
    LANG_ALL     = 0x0fff,
@@ -353,7 +353,7 @@ struct cp_data
 
    bool               unc_off;
    unsigned int       line_number;
-   int				  column;  /* column for parsing */
+   int                column;  /* column for parsing */
    unsigned int       spaces;  /* space count on output */
 
    bool               frag;

@@ -157,13 +157,13 @@ static void setup_newline_add(chunk_t *prev, chunk_t *nl, chunk_t *next)
    */
    if (prev->orig_col_end <= 0)
    {
-	   prev = chunk_get_prev_nisl(prev);
+       prev = chunk_get_prev_nisl(prev);
    }
    if (prev != NULL)
    {
-	  UNC_ASSERT(prev->orig_col_end > 0);
-	  nl->orig_col = prev->orig_col_end + 1;
-	  nl->orig_col_end = nl->orig_col + nl->len() - 1;
+      UNC_ASSERT(prev->orig_col_end > 0);
+      nl->orig_col = prev->orig_col_end + 1;
+      nl->orig_col_end = nl->orig_col + nl->len() - 1;
    }
 }
 
@@ -1893,7 +1893,7 @@ void newlines_cleanup_braces(bool first)
       }
       else if (pc->type == CT_ELSEIF)
       {
-		 argval_t arg = cpd.settings[UO_nl_elseif_brace].a; // [i_a]
+         argval_t arg = cpd.settings[UO_nl_elseif_brace].a; // [i_a]
          newlines_if_for_while_switch(
             pc, (arg != AV_IGNORE) ? arg : cpd.settings[UO_nl_if_brace].a);
       }
@@ -3085,7 +3085,7 @@ void do_blank_lines(void)
 
       /* Change blanks between a function comment and body */
       if ((cpd.settings[UO_nl_comment_func_def].n > 0) &&
-		  (cpd.settings[UO_nl_comment_func_def].n != pc->nl_count) &&
+          (cpd.settings[UO_nl_comment_func_def].n != pc->nl_count) &&
           (pcmt->type == CT_COMMENT_MULTI) &&
           (pcmt->parent_type == CT_COMMENT_WHOLE) &&
           (next != NULL) && ((next->parent_type == CT_FUNC_DEF) || (next->parent_type == CT_FUNC_CLASS)))

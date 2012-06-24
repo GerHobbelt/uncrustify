@@ -270,8 +270,8 @@ static bool d_parse_string(tok_ctx& ctx, chunk_t& pc)
  * Consume all input until we hit a non-continued (i.e. backslashed) EOL.
  *
  * @param pc   The structure to update, str is an input.
- * @param all  TRUE: grab everything until the non-backslashed EOL; 
- *             FALSE: grab until the first EOL or C++ comment, 
+ * @param all  TRUE: grab everything until the non-backslashed EOL;
+ *             FALSE: grab until the first EOL or C++ comment,
  *                    return FALSE when it's a backslashed EOL
  * @return     Whether anything was parsed
  */
@@ -288,9 +288,9 @@ static bool parse_until_nc_eol(tok_ctx& ctx, chunk_t& pc, bool all)
 
    for(;;)
    {
-	  ctx.save(ss);
+      ctx.save(ss);
       bs_cnt = 0;
-	  ch = 0;
+      ch = 0;
       while (ctx.more())
       {
          ch = ctx.peek();
@@ -299,11 +299,11 @@ static bool parse_until_nc_eol(tok_ctx& ctx, chunk_t& pc, bool all)
             break;
          }
 
-		 /* Quit on a C++ comment start? */
-		 if (!all && (ch == '/') && (ctx.peek(1) == '/'))
-		 {
-			 break;
-		 }
+         /* Quit on a C++ comment start? */
+         if (!all && (ch == '/') && (ctx.peek(1) == '/'))
+         {
+             break;
+         }
 
          if (ch == '\\')
          {
@@ -313,7 +313,7 @@ static bool parse_until_nc_eol(tok_ctx& ctx, chunk_t& pc, bool all)
          {
             bs_cnt = 0;
          }
-		 ctx.save(ss);
+         ctx.save(ss);
          pc.str.append(ctx.get());
       }
 
@@ -324,19 +324,19 @@ static bool parse_until_nc_eol(tok_ctx& ctx, chunk_t& pc, bool all)
       {
          break;
       }
-	  if (!all)
-	  {
-		 /* Back off if this is an escaped newline */
-		 if ((ch == '\r' || ch == '\n') && pc.str.back() == '\\')
-		 {
-		    ctx.restore(ss);
-			pc.str.pop_back();
-		 }
-		 break;  // backslashed EOL hit!
-	  }
+      if (!all)
+      {
+         /* Back off if this is an escaped newline */
+         if ((ch == '\r' || ch == '\n') && pc.str.back() == '\\')
+         {
+            ctx.restore(ss);
+            pc.str.pop_back();
+         }
+         break;  // backslashed EOL hit!
+      }
       ch = ctx.get();
-	  pc.str.append(ch);
-	  UNC_ASSERT(ch == '\r' || ch == '\n');
+      pc.str.append(ch);
+      UNC_ASSERT(ch == '\r' || ch == '\n');
       if (ch == '\r')
       {
          if (ctx.peek() == '\n')
@@ -351,7 +351,7 @@ static bool parse_until_nc_eol(tok_ctx& ctx, chunk_t& pc, bool all)
       }
       else
       {
-		 pc.str.append(ctx.get());
+         pc.str.append(ctx.get());
          cpd.le_counts[LE_LF]++;
       }
       pc.nl_count++;
@@ -396,7 +396,7 @@ static bool parse_comment(tok_ctx& ctx, chunk_t& pc)
    {
       pc.str.append(ctx.get());  /* store the '/' */
       pc.type = CT_COMMENT_CPP;
-	  parse_until_nc_eol(ctx, pc, true);
+      parse_until_nc_eol(ctx, pc, true);
    }
    else if (!ctx.more())
    {
@@ -814,25 +814,25 @@ static bool parse_string(tok_ctx& ctx, chunk_t& pc, int quote_idx, bool allow_es
       pc.str.append(ch);
       if (ch == '\r' || ch == '\n')
       {
-		 if (ch == '\r')
-		 {
-			if (ctx.peek() == '\n')
-			{
-			   cpd.le_counts[LE_CRLF]++;
-			   pc.str.append(ctx.get());  /* store the '\n' */
-			}
-			else
-			{
-			   cpd.le_counts[LE_CR]++;
-			}
-		 }
-		 else
-		 {
-			cpd.le_counts[LE_LF]++;
-		 }
-		 pc.nl_count++;
-		 pc.type = CT_STRING_MULTI;
-		 escaped = 0;
+         if (ch == '\r')
+         {
+            if (ctx.peek() == '\n')
+            {
+               cpd.le_counts[LE_CRLF]++;
+               pc.str.append(ctx.get());  /* store the '\n' */
+            }
+            else
+            {
+               cpd.le_counts[LE_CR]++;
+            }
+         }
+         else
+         {
+            cpd.le_counts[LE_LF]++;
+         }
+         pc.nl_count++;
+         pc.type = CT_STRING_MULTI;
+         escaped = 0;
          continue;
       }
       if (!escaped)
@@ -947,7 +947,7 @@ static bool parse_cr_string(tok_ctx& ctx, chunk_t& pc, int q_idx)
    pc.type = CT_STRING;
    while (ctx.more())
    {
-	  int ch = ctx.peek();
+      int ch = ctx.peek();
       if ((ch == ')') &&
           (ctx.peek(tag_len + 1) == '"') &&
           tag_compare(ctx.data, tag_idx, ctx.c.idx + 1, tag_len))
@@ -963,22 +963,22 @@ static bool parse_cr_string(tok_ctx& ctx, chunk_t& pc, int q_idx)
       if (ch == '\r' || ch == '\n')
       {
          pc.str.append(ctx.get());
-		 if (ch == '\r')
-		 {
-			if (ctx.peek() == '\n')
-			{
-			   cpd.le_counts[LE_CRLF]++;
-			   pc.str.append(ctx.get());  /* store the '\n' */
-			}
-			else
-			{
-			   cpd.le_counts[LE_CR]++;
-			}
-		 }
-		 else
-		 {
-			cpd.le_counts[LE_LF]++;
-		 }
+         if (ch == '\r')
+         {
+            if (ctx.peek() == '\n')
+            {
+               cpd.le_counts[LE_CRLF]++;
+               pc.str.append(ctx.get());  /* store the '\n' */
+            }
+            else
+            {
+               cpd.le_counts[LE_CR]++;
+            }
+         }
+         else
+         {
+            cpd.le_counts[LE_LF]++;
+         }
          pc.nl_count++;
          pc.type = CT_STRING_MULTI;
       }
@@ -1046,9 +1046,9 @@ bool parse_word(tok_ctx& ctx, chunk_t& pc, bool skipcheck)
      if (tag != NULL)
      {
        pc->type = tag->type;
-	   // adjust length to match the 'keyword' found - as those can be 'keyPHRASES' rather, this must be done.
+       // adjust length to match the 'keyword' found - as those can be 'keyPHRASES' rather, this must be done.
        cpd.column -= pc->len;
-	   pc->len     = (int)strlen(tag->tag);
+       pc->len     = (int)strlen(tag->tag);
        cpd.column += pc->len;
      }
 #endif
@@ -1056,7 +1056,7 @@ bool parse_word(tok_ctx& ctx, chunk_t& pc, bool skipcheck)
      const chunk_tag_t *tag = find_keyword(pc.str.c_str(), pc.str.size());
      if (tag)
      {
-	   pc.type = tag->type;
+       pc.type = tag->type;
      }
    }
    return(true);  // [i_a] is this really what you want???
@@ -1136,22 +1136,22 @@ static bool parse_bs_newline(tok_ctx& ctx, chunk_t& pc)
       ctx.get();
       if ((ch == '\r') || (ch == '\n'))
       {
-	     if (ch == '\r')
-		 {
-			if (ctx.peek() == '\n')
-			{
-			   ctx.get();
-			   cpd.le_counts[LE_CRLF]++;
-			}
-			else
-			{
-			   cpd.le_counts[LE_CR]++;
-			}
-		 }
-		 else
-		 {
-		    cpd.le_counts[LE_LF]++;
-		 }
+         if (ch == '\r')
+         {
+            if (ctx.peek() == '\n')
+            {
+               ctx.get();
+               cpd.le_counts[LE_CRLF]++;
+            }
+            else
+            {
+               cpd.le_counts[LE_CR]++;
+            }
+         }
+         else
+         {
+            cpd.le_counts[LE_LF]++;
+         }
          pc.str      = "\\";
          pc.type     = CT_NL_CONT;
          pc.nl_count++;
@@ -1184,23 +1184,23 @@ static bool parse_newline(tok_ctx& ctx)
    ch = ctx.peek();
    if ((ch == '\r') || (ch == '\n'))
    {
-	  ctx.get();
-	  if (ch == '\r')
-	  {
-		 if (ctx.peek() == '\n')
-		 {
-			ctx.get();
-		    cpd.le_counts[LE_CRLF]++;
-		 }
-		 else
-		 {
-			cpd.le_counts[LE_CR]++;
-		 }
-	  }
-	  else
-	  {
-		 cpd.le_counts[LE_LF]++;
-	  }
+      ctx.get();
+      if (ch == '\r')
+      {
+         if (ctx.peek() == '\n')
+         {
+            ctx.get();
+            cpd.le_counts[LE_CRLF]++;
+         }
+         else
+         {
+            cpd.le_counts[LE_CR]++;
+         }
+      }
+      else
+      {
+         cpd.le_counts[LE_LF]++;
+      }
       return(true);
    }
    ctx.restore();
@@ -1325,22 +1325,22 @@ static bool parse_next(tok_ctx& ctx, chunk_t& pc)
 
    /**
     * Handle #error statements: the error 'string' isn't a quoted string;
-	* we put everything following an #error in a CT_PREPROC_BODY chunk.
-	* #error continues until the end of line, no right-side comment allowed.
-	*
+    * we put everything following an #error in a CT_PREPROC_BODY chunk.
+    * #error continues until the end of line, no right-side comment allowed.
+    *
     * Also handle unknown/unhandled preprocessors: those end at the first
-	* non-escaped EOL or C++ comment.
+    * non-escaped EOL or C++ comment.
     */
    if (((cpd.in_preproc > CT_PP_BODYCHUNK) &&
        (cpd.in_preproc <= CT_PP_OTHER)) ||
-	   cpd.in_preproc == CT_PP_ERROR)
+       cpd.in_preproc == CT_PP_ERROR)
    {
       pc.str.clear();
       tok_info ss;
       ctx.save(ss);
       /* Chunk to a newline or comment */
       pc.type = CT_PREPROC_BODY;
-	  parse_until_nc_eol(ctx, pc, (cpd.in_preproc == CT_PP_ERROR));
+      parse_until_nc_eol(ctx, pc, (cpd.in_preproc == CT_PP_ERROR));
       if (pc.str.size() > 0)
       {
          return(true);
@@ -1552,7 +1552,7 @@ void tokenize(const deque<int>& data, chunk_t *ref, const char *parsed_file)
    chunk_t            *rprev = NULL;
    struct parse_frame frm;
    bool               last_was_tab = false;
-   int				  last_non_ws_end = 1;
+   int                last_non_ws_end = 1;
 
    memset(&frm, 0, sizeof(frm));
 
@@ -1574,32 +1574,32 @@ void tokenize(const deque<int>& data, chunk_t *ref, const char *parsed_file)
          continue;
       }
 
-	  if (last_non_ws_end > 1)
-	  {
-	     chunk.orig_ws_lead = chunk.orig_col - last_non_ws_end;
-	  }
-	  else
-	  {
-		 chunk.orig_ws_lead = -1;
-	  }
+      if (last_non_ws_end > 1)
+      {
+         chunk.orig_ws_lead = chunk.orig_col - last_non_ws_end;
+      }
+      else
+      {
+         chunk.orig_ws_lead = -1;
+      }
 
       if (chunk.type == CT_NEWLINE)
       {
-		 last_non_ws_end = 1;
+         last_non_ws_end = 1;
          last_was_tab    = chunk.after_tab;
          chunk.after_tab = false;
          chunk.str.clear();
       }
       else if (chunk.type == CT_NL_CONT)
       {
-		 last_non_ws_end = 1;
+         last_non_ws_end = 1;
          last_was_tab    = chunk.after_tab;
          chunk.after_tab = false;
          chunk.str       = "\\\n";
       }
       else
       {
-		 last_non_ws_end = ctx.c.col;
+         last_non_ws_end = ctx.c.col;
          chunk.after_tab = last_was_tab;
          last_was_tab    = false;
       }
@@ -1614,10 +1614,10 @@ void tokenize(const deque<int>& data, chunk_t *ref, const char *parsed_file)
 
       /* Store off the end column */
       chunk.orig_col_end = ctx.c.col;
-	  if (last_non_ws_end > 1)
-	  {
+      if (last_non_ws_end > 1)
+      {
          last_non_ws_end = chunk.orig_col_end = chunk.orig_col + chunk.len();
-	  }
+      }
 
       /* Add the chunk to the list */
       rprev = pc;

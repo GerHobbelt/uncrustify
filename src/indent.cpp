@@ -195,9 +195,9 @@ void align_to_column(chunk_t *pc, int column)
          {
             orig_delta = min_delta;
          }
-		  UNC_ASSERT(orig_delta >= 0);
+          UNC_ASSERT(orig_delta >= 0);
          pc->column = prev->column + orig_delta;
-		  UNC_ASSERT(pc->column >= 0);
+          UNC_ASSERT(pc->column >= 0);
       }
       else /* ALMODE_SHIFT */
       {
@@ -527,7 +527,7 @@ void indent_text(void)
 
             /* Indent one level except if the #if is a #include guard */
             if (has_include_guard &&
-				(pc->pp_level == 0))
+                (pc->pp_level == 0))
             {
                 frm.pse[frm.pse_tos].indent     = frm.pse[frm.pse_tos - 1].indent;
                 frm.pse[frm.pse_tos].indent_tab = frm.pse[frm.pse_tos - 1].indent_tab;

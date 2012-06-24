@@ -50,7 +50,7 @@ typedef uint64_t   UINT64;
 #define PRIx64             "llx"
 #endif
 
-#define unc_rename(a, b)	rename(a, b)
+#define unc_rename(a, b)    rename(a, b)
 
 #endif   /* ifdef WIN32 */
 
@@ -71,52 +71,52 @@ typedef uint64_t   UINT64;
 
 #if defined(NDEBUG)
 
-#define UNC_ASSERT(expr)				((void)0)
-#define UNC_ASSERT_EX(expr, msgcombo)	((void)0)
+#define UNC_ASSERT(expr)                ((void)0)
+#define UNC_ASSERT_EX(expr, msgcombo)   ((void)0)
 
 #else
 
 #include <stdarg.h>
 
-#define UNC_ASSERT(expr)														\
-		((void)(!(expr)	      													\
-		? report_assertion_failed(#expr, __func__, __FILE__, __LINE__, 0)		\
-		: 1))
+#define UNC_ASSERT(expr)                                                        \
+        ((void)(!(expr)                                                         \
+        ? report_assertion_failed(#expr, __func__, __FILE__, __LINE__, 0)       \
+        : 1))
 
-#define UNC_ASSERT_EX(expr, msgcombo)											\
-	do																			\
-	{																			\
-		if (!(expr))															\
-		{																		\
-			assert_extended_reporter __m msgcombo;								\
-			(void)report_assertion_failed(#expr, __func__, __FILE__, __LINE__,	\
-					&__m);														\
-		}																		\
-	} while (0)
+#define UNC_ASSERT_EX(expr, msgcombo)                                           \
+    do                                                                          \
+    {                                                                           \
+        if (!(expr))                                                            \
+        {                                                                       \
+            assert_extended_reporter __m msgcombo;                              \
+            (void)report_assertion_failed(#expr, __func__, __FILE__, __LINE__,  \
+                    &__m);                                                      \
+        }                                                                       \
+    } while (0)
 
 #define UNC_ASSERT_IMPLEMENT
 
 class assert_extended_reporter
 {
 public:
-	assert_extended_reporter();
-	assert_extended_reporter(long int val);
-	assert_extended_reporter(unsigned long int val);
-	assert_extended_reporter(const char *msg, ...);
-	virtual ~assert_extended_reporter();
+    assert_extended_reporter();
+    assert_extended_reporter(long int val);
+    assert_extended_reporter(unsigned long int val);
+    assert_extended_reporter(const char *msg, ...);
+    virtual ~assert_extended_reporter();
 
-	const char *c_msg() const
-	{
-		return msgbuf;
-	}
+    const char *c_msg() const
+    {
+        return msgbuf;
+    }
 
 protected:
-	char buf[1024];
-	char *msgbuf;
-	int buflen;
+    char buf[1024];
+    char *msgbuf;
+    int buflen;
 
-	int print(int suggested_buflen, const char *msg, ...);
-	int vprint(int suggested_buflen, const char *msg, va_list args);
+    int print(int suggested_buflen, const char *msg, ...);
+    int vprint(int suggested_buflen, const char *msg, va_list args);
 };
 
 int report_assertion_failed(const char *expr, const char *function, const char *filepath, int lineno, assert_extended_reporter *rprtr);

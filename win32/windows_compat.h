@@ -11,7 +11,7 @@
 
 
 #if (defined(WIN32) || defined(_WIN32) || defined(_WIN64) || defined(WIN64)) \
-	&& defined(_DEBUG)
+    && defined(_DEBUG)
 
 #ifndef _CRTDBG_MAP_ALLOC
 #define _CRTDBG_MAP_ALLOC 1
@@ -216,17 +216,17 @@ static inline int unc_rename(const char *srcfname, const char *dstfname)
      * or can't be renamed.
      */
     (void)unlink(filename_out);
-	return rename(srcfname, dstfname);
+    return rename(srcfname, dstfname);
 #else
-	BOOL rv = MoveFileExA(srcfname, dstfname, MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING);
+    BOOL rv = MoveFileExA(srcfname, dstfname, MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING);
 
-	if (!rv)
-	{
-		_set_errno(EACCES);
-		return EACCES;
-	}
+    if (!rv)
+    {
+        _set_errno(EACCES);
+        return EACCES;
+    }
 
-	return 0;
+    return 0;
 #endif
 }
 

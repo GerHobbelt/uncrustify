@@ -1262,8 +1262,8 @@ static argval_t do_space(chunk_t *first, chunk_t *second, int& min_sp, bool comp
    if ((second->type != CT_PTR_TYPE) &&
        ((first->type == CT_TYPEDEF) ||
         (first->type == CT_QUALIFIER) ||
-		(first->type == CT_TYPE) ||
-		(first->flags & PCF_TYPE_WRAP)))
+        (first->type == CT_TYPE) ||
+        (first->flags & PCF_TYPE_WRAP)))
    {
       arg = cpd.settings[UO_sp_after_type].a;
       log_rule("sp_after_type");
@@ -1460,7 +1460,7 @@ void space_text(void)
          }
          else
          {
-			UNC_ASSERT(pc->orig_col_end > 0);
+            UNC_ASSERT(pc->orig_col_end > 0);
             column = pc->orig_col_end;
          }
          prev_column = column;
@@ -1585,18 +1585,18 @@ void space_text(void)
             {
                if (cpd.settings[UO_indent_relative_single_line_comments].b)
                {
-				  tmp = pc;
-				  if (pc->orig_col_end < 1)
-				  {
-					 tmp = chunk_get_prev_nisl(pc);
-				  }
-				  UNC_ASSERT(tmp != NULL);
-				  if (tmp != NULL)
-				  {
-		             UNC_ASSERT(next->orig_col >= tmp->orig_col_end);                     // [i_a]
+                  tmp = pc;
+                  if (pc->orig_col_end < 1)
+                  {
+                     tmp = chunk_get_prev_nisl(pc);
+                  }
+                  UNC_ASSERT(tmp != NULL);
+                  if (tmp != NULL)
+                  {
+                     UNC_ASSERT(next->orig_col >= tmp->orig_col_end);                     // [i_a]
                      LOG_FMT(LSPACE, " <relative adj>");
                      column = tmp->column + (next->orig_col - tmp->orig_col_end);
-				  }
+                  }
                }
                else
                {

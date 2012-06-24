@@ -70,7 +70,7 @@ static const chunk_tag_t symbols2[] =
    { "<>", CT_COMPARE,      LANG_D                                         },
    { "<?", CT_XML_OPSTART,  LANG_PHP                                       },
    { "==", CT_COMPARE,      LANG_ALL                                       },
-   { "=>", CT_ASSIGN,       LANG_PHP									   },   /* TODO: should get its own token as only legal in initializations */
+   { "=>", CT_ASSIGN,       LANG_PHP                                       },   /* TODO: should get its own token as only legal in initializations */
    { "=>", CT_LAMBDA,       LANG_VALA | LANG_CS                            },
    { ">=", CT_COMPARE,      LANG_ALL                                       },
    { ">>", CT_ARITH,        LANG_ALL & ~LANG_CS                            },
@@ -98,7 +98,7 @@ static const chunk_tag_t symbols1[] =
    { "+", CT_PLUS,         LANG_ALL                                                   },
    { ",", CT_COMMA,        LANG_ALL                                                   },
    { "-", CT_MINUS,        LANG_ALL                                                   },
-   { ".", CT_CONCATENATE,  LANG_PHP													  },
+   { ".", CT_CONCATENATE,  LANG_PHP                                                   },
    { ".", CT_DOT,          LANG_ALL & ~LANG_PHP                                       },
    { "/", CT_ARITH,        LANG_ALL                                                   },
    { ":", CT_COLON,        LANG_ALL                                                   },

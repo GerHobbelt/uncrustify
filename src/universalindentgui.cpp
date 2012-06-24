@@ -164,9 +164,9 @@ void print_universal_indent_cfg(FILE *pfile)
             {
             case AT_TRISTATE_BOOL:
                fprintf(pfile, "EditorType=multiple\n");
-				fprintf(pfile, "Choices=\"%s=false|%s=true|%s=nochange\"\n", option->name, option->name, option->name);
-				fprintf(pfile, "ChoicesReadable=\"no|yes|keep as-is\"\n");
-				fprintf(pfile, "ValueDefault=%d\n", (int)cpd.settings[option->id].t);
+                fprintf(pfile, "Choices=\"%s=false|%s=true|%s=nochange\"\n", option->name, option->name, option->name);
+                fprintf(pfile, "ChoicesReadable=\"no|yes|keep as-is\"\n");
+                fprintf(pfile, "ValueDefault=%d\n", (int)cpd.settings[option->id].t);
                break;
 
             case AT_BOOL:

@@ -167,13 +167,13 @@ static bool next_word_exceeds_limit(const unc_text& text, int idx)
  */
 static void output_to_column(int column, bool allow_tabs, int max_tabbed_column = -1)
 {
-	if (allow_tabs)
-	   LOG_FMT(LOUTIND, " to_col:%d/%d/%d - ", cpd.column, max_tabbed_column, column);
+    if (allow_tabs)
+       LOG_FMT(LOUTIND, " to_col:%d/%d/%d - ", cpd.column, max_tabbed_column, column);
 
    if (max_tabbed_column < 0)
-	   max_tabbed_column = column;
+       max_tabbed_column = column;
    else if (max_tabbed_column > column)
-	   max_tabbed_column = column;
+       max_tabbed_column = column;
 
    cpd.did_newline = 0;
    if (allow_tabs)
@@ -375,11 +375,11 @@ void output_text(FILE *pfile)
 
                if ((prev != NULL) && (prev->nl_count == 0))
                {
-				  UNC_ASSERT(prev->orig_col_end > 0);
-				  UNC_ASSERT(pc->orig_col >= prev->orig_col_end);
+                  UNC_ASSERT(prev->orig_col_end > 0);
+                  UNC_ASSERT(pc->orig_col >= prev->orig_col_end);
                   int orig_sp = (pc->orig_col - prev->orig_col_end);
                   pc->column = cpd.column + orig_sp;
-				  UNC_ASSERT(pc->column >= 0);
+                  UNC_ASSERT(pc->column >= 0);
                   if ((cpd.settings[UO_sp_before_nl_cont].a != AV_IGNORE) &&
                       (pc->column < (int)(cpd.column + 1)))
                   {
@@ -457,7 +457,7 @@ void output_text(FILE *pfile)
                          (chunk_is_comment(pc) &&
                           (cpd.settings[UO_indent_with_tabs].n != 0));
 
-			LOG_FMT(LOUTIND, "  %d> col %d/%d/%d/%d lvl:%d/%d - ", pc->orig_line, pc->column, cpd.column, pc->column_indent, pc->brace_level, pc->pp_level, pc->level);
+            LOG_FMT(LOUTIND, "  %d> col %d/%d/%d/%d lvl:%d/%d - ", pc->orig_line, pc->column, cpd.column, pc->column_indent, pc->brace_level, pc->pp_level, pc->level);
          }
          else
          {
@@ -486,15 +486,15 @@ void output_text(FILE *pfile)
 
          output_to_column(pc->column, allow_tabs);
          add_text(pc->str);
-		 if (cpd.did_newline && !chunk_is_newline(pc))
-		 {
-			 /* anything that produces a newline but isn't a NL type token
-			  * is very probably throwing a stick in the works (such as when
-			  * it is a CT_STRING_MULTI) and we should re-indent the trailing
-			  * bits on the last line to make it look good.
-			  */
-			 reindent_line(chunk_get_next(pc), cpd.column);
-		 }
+         if (cpd.did_newline && !chunk_is_newline(pc))
+         {
+             /* anything that produces a newline but isn't a NL type token
+              * is very probably throwing a stick in the works (such as when
+              * it is a CT_STRING_MULTI) and we should re-indent the trailing
+              * bits on the last line to make it look good.
+              */
+             reindent_line(chunk_get_next(pc), cpd.column);
+         }
          cpd.did_newline = chunk_is_newline(pc);
       }
    }
@@ -1037,8 +1037,8 @@ static void output_cmt_start(cmt_reflow& cmt, chunk_t *pc)
    {
       /* Make sure we have at least one space past the last token */
       chunk_t *prev = chunk_get_prev_nisl(pc);
-	  int col_min;
-	  int space_min;
+      int col_min;
+      int space_min;
 
       if (prev != NULL)
       {
@@ -1048,13 +1048,13 @@ static void output_cmt_start(cmt_reflow& cmt, chunk_t *pc)
             cmt.column = col_min;
          }
       }
-	  space_min = 1;
-	  if (cpd.settings[UO_indent_relative_single_line_comments].b &&
-		  (pc->flags & (PCF_RIGHT_COMMENT | PCF_WAS_ALIGNED)) == PCF_RIGHT_COMMENT &&
-		  pc->orig_ws_lead > space_min)
-	  {
-		 space_min = pc->orig_ws_lead;
-	  }
+      space_min = 1;
+      if (cpd.settings[UO_indent_relative_single_line_comments].b &&
+          (pc->flags & (PCF_RIGHT_COMMENT | PCF_WAS_ALIGNED)) == PCF_RIGHT_COMMENT &&
+          pc->orig_ws_lead > space_min)
+      {
+         space_min = pc->orig_ws_lead;
+      }
       col_min = cpd.column + space_min;
       if (cmt.column < col_min)
       {
@@ -1126,9 +1126,9 @@ static chunk_t *output_comment(chunk_t *pc)
    /* See if we can combine this comment with the next comment */
    while (cmt.can_combine_comment(pc))
    {
-	  cmt.m_is_merged_comment = true;
+      cmt.m_is_merged_comment = true;
       cmt.push_chunk(pc);
-	  cmt.push("\n");
+      cmt.push("\n");
       pc = chunk_get_next(chunk_get_next(pc));
    }
    cmt.push_chunk(pc);
@@ -1148,12 +1148,12 @@ static chunk_t *output_comment(chunk_t *pc)
  */
 static chunk_t *output_comment_c(chunk_t *first)
 {
-	if (cpd.settings[UO_cmt_reflow_mode].n > 2)
-	{
-		return output_comment(first);
-	}
-	else
-	{
+    if (cpd.settings[UO_cmt_reflow_mode].n > 2)
+    {
+        return output_comment(first);
+    }
+    else
+    {
    cmt_reflow cmt;
 
    output_cmt_start(cmt, first);
@@ -1195,7 +1195,7 @@ static chunk_t *output_comment_c(chunk_t *first)
    }
    add_comment_text("*/", cmt, false);
    return(pc);
-	}
+    }
 }
 
 
@@ -1207,12 +1207,12 @@ static chunk_t *output_comment_c(chunk_t *first)
  */
 static chunk_t *output_comment_cpp(chunk_t *first)
 {
-	if (cpd.settings[UO_cmt_reflow_mode_cpp].n > 2)
-	{
-		return output_comment(first);
-	}
-	else
-	{
+    if (cpd.settings[UO_cmt_reflow_mode_cpp].n > 2)
+    {
+        return output_comment(first);
+    }
+    else
+    {
    cmt_reflow cmt;
    unc_text   tmp;
 
@@ -1310,7 +1310,7 @@ static chunk_t *output_comment_cpp(chunk_t *first)
    }
    add_comment_text(" */", cmt, false);
    return(pc);
-	}
+    }
 }
 
 
@@ -1354,12 +1354,12 @@ static void cmt_trim_whitespace(unc_text& line, bool in_preproc)
  */
 static void output_comment_multi(chunk_t *pc)
 {
-	if (cpd.settings[UO_cmt_reflow_mode].n > 2)
-	{
-		output_comment(pc);
-	}
-	else
-	{
+    if (cpd.settings[UO_cmt_reflow_mode].n > 2)
+    {
+        output_comment(pc);
+    }
+    else
+    {
    int        cmt_col;
    int        cmt_idx;
    int        ch;
@@ -1643,7 +1643,7 @@ static void output_comment_multi(chunk_t *pc)
          ccol = 1;
       }
    }
-	}
+    }
 }
 
 
@@ -1757,33 +1757,33 @@ static void output_comment_multi_simple(chunk_t *pc)
 
 void cmt_reflow_ex::write(char ch)
 {
-	UNC_ASSERT(ch);
-	if (ch == NONBREAKING_SPACE_CHAR)
-	{
-		ch = ' ';
-	}
-	::add_char(ch);
+    UNC_ASSERT(ch);
+    if (ch == NONBREAKING_SPACE_CHAR)
+    {
+        ch = ' ';
+    }
+    ::add_char(ch);
 }
 
 void cmt_reflow_ex::write(const char *str)
 {
-	UNC_ASSERT(str);
-	UNC_ASSERT(*str);
-	::add_text(str);
+    UNC_ASSERT(str);
+    UNC_ASSERT(*str);
+    ::add_text(str);
 }
 
 void cmt_reflow_ex::write(const char *str, size_t len)
 {
-	UNC_ASSERT(str);
-	UNC_ASSERT(len);
-	UNC_ASSERT(*str);
-	unc_text txt(str, len);
-	::add_text(txt);
+    UNC_ASSERT(str);
+    UNC_ASSERT(len);
+    UNC_ASSERT(*str);
+    unc_text txt(str, len);
+    ::add_text(txt);
 }
 
 void cmt_reflow_ex::output_to_column(int column, bool allow_tabs, int max_tabbed_column)
 {
-	::output_to_column(column, allow_tabs, max_tabbed_column);
+    ::output_to_column(column, allow_tabs, max_tabbed_column);
 }
 
 

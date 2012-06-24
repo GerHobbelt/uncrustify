@@ -217,10 +217,10 @@ int Args::SplitLine(char *text, const char *args[], int num_args, const char *se
    while ((*text != 0) && (argc <= num_args))
    {
       /* Detect the start of an arg */
-	  if (!in_arg && !strncmp(comment_marker, text, comment_marker_len))
-	  {
-		 break;
-	  }
+      if (!in_arg && !strncmp(comment_marker, text, comment_marker_len))
+      {
+         break;
+      }
       else if (!in_arg && (separators ? !strchr(separators, *text) : !unc_isspace(*text)))
       {
          in_arg     = true;
@@ -242,12 +242,12 @@ int Args::SplitLine(char *text, const char *args[], int num_args, const char *se
          }
          else if (*text == cur_quote && text[1] == cur_quote)
          {
-			// just another form of escaping quotes
+            // just another form of escaping quotes
             *dest++ = *text++;
          }
          else if (*text == cur_quote)
          {
-			// end of quoted argument
+            // end of quoted argument
             cur_quote = 0;
 
             *dest = 0;
@@ -257,11 +257,11 @@ int Args::SplitLine(char *text, const char *args[], int num_args, const char *se
             {
                break;
             }
-		 }
+         }
          else if (!cur_quote && args[argc - 1] == dest &&
-			      ((*text == '\'') || (*text == '"') || (*text == '`')))
+                  ((*text == '\'') || (*text == '"') || (*text == '`')))
          {
-			// only accept start of quoted string at argument start; any later quote is simply that: a character.
+            // only accept start of quoted string at argument start; any later quote is simply that: a character.
             cur_quote = *text;
          }
          else if (cur_quote != 0)

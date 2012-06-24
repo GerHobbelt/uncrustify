@@ -20,7 +20,7 @@ if [ -n "$1" ] ; then
             echo "$fn 30014      # show test failure 30014"
             echo "$fn '*' cpp    # show all CPP test failure"
             exit 1
-	    ;;
+        ;;
     esac
 fi
 

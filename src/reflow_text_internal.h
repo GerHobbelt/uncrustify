@@ -53,10 +53,10 @@
 
 
 #if (defined(WIN32) || defined(_WIN32) || defined(_WIN64) || defined(WIN64)) \
-	&& defined(_DEBUG) && defined(_MSC_VER) && defined(_CRTDBG_MAP_ALLOC)
+    && defined(_DEBUG) && defined(_MSC_VER) && defined(_CRTDBG_MAP_ALLOC)
 
-#define   new					new(_NORMAL_BLOCK, __FILE__, __LINE__)
-//#define   delete				delete(_NORMAL_BLOCK, __FILE__, __LINE__)
+#define   new                   new(_NORMAL_BLOCK, __FILE__, __LINE__)
+//#define   delete              delete(_NORMAL_BLOCK, __FILE__, __LINE__)
 
 #endif
 
@@ -76,12 +76,12 @@
 #undef max
 static_inline int max(int a, int b)
 {
-	return (a > b ? a : b);
+    return (a > b ? a : b);
 }
 #undef min
 static_inline int min(int a, int b)
 {
-	return (a < b ? a : b);
+    return (a < b ? a : b);
 }
 
 
@@ -91,20 +91,20 @@ static_inline int min(int a, int b)
 
 /**
 This is a bitfield representing the left/right-hand operator argument requirements:
-	0: this is not a math operator
-	1: requires left hand value
-	2: requires right hand value
+    0: this is not a math operator
+    1: requires left hand value
+    2: requires right hand value
 */
 typedef enum
 {
-	MO_NOT_AN_OP = 0,
-	MO_UNARY_PREFIX_OP = 2, /**< e.g. '++a', '-5' */
-	MO_UNARY_POSTFIX_OP = 1,  /**< e.g. 'b--' */
-	MO_BINARY_OP = 3, /**< e.g. 'a + b', '2^^10' */
+    MO_NOT_AN_OP = 0,
+    MO_UNARY_PREFIX_OP = 2, /**< e.g. '++a', '-5' */
+    MO_UNARY_POSTFIX_OP = 1,  /**< e.g. 'b--' */
+    MO_BINARY_OP = 3, /**< e.g. 'a + b', '2^^10' */
 
-	/* the bitmasks for tests: */
-	MO_TEST_LH_REQD = 1,
-	MO_TEST_RH_REQD = 2,
+    /* the bitmasks for tests: */
+    MO_TEST_LH_REQD = 1,
+    MO_TEST_RH_REQD = 2,
 } math_operator_t;
 
 /*
@@ -113,69 +113,69 @@ Note: All variables in this struct are named/used such that zero(0) is a sensibl
 struct reflow_box
 {
 public:
-	const char *m_text;
-	int m_word_length; /* number of characters occupied by non-breakable 'word' */
+    const char *m_text;
+    int m_word_length; /* number of characters occupied by non-breakable 'word' */
 
-	int m_leading_whitespace_length; /* number of chars of whitespace */
-	int m_trailing_whitespace_length; /* number of chars of whitespace */
+    int m_leading_whitespace_length; /* number of chars of whitespace */
+    int m_trailing_whitespace_length; /* number of chars of whitespace */
 
-	//int m_min_required_linebreak_before; /* minimum number of mandatory line breaks before this item */
-	//int m_min_required_linebreak_after; /* minimum number of mandatory line breaks after this item */
+    //int m_min_required_linebreak_before; /* minimum number of mandatory line breaks before this item */
+    //int m_min_required_linebreak_after; /* minimum number of mandatory line breaks after this item */
 
-	int m_left_priority; /* linebreak priority: 1000 = high (do not break), 1 = low (try to break here first) */
-	int m_right_priority; /* linebreak priority: 1000 = high, 1 = low */
+    int m_left_priority; /* linebreak priority: 1000 = high (do not break), 1 = low (try to break here first) */
+    int m_right_priority; /* linebreak priority: 1000 = high, 1 = low */
 
-	int m_keep_with_next; /* number of subsequent items to keep with this one: widow-like control */
-	int m_keep_with_prev; /* number of previous items to keep with this one: orphan-like control */
+    int m_keep_with_next; /* number of subsequent items to keep with this one: widow-like control */
+    int m_keep_with_prev; /* number of previous items to keep with this one: orphan-like control */
 
-	bool m_is_non_reflowable; /* is this ASCII art or another type of non-reflowable content? */
-	bool m_floodfill_non_reflow; /* this type of non-reflow must be expanded ('flood filled') across the entire paragraph */
-	bool m_is_first_on_line; /* helper: is this the first non-whitespace token on this line? */
-	bool m_is_punctuation;
-	bool m_is_part_of_quoted_txt;
-	bool m_suppress_quote_for_string_marking;
-	bool m_is_quote;
+    bool m_is_non_reflowable; /* is this ASCII art or another type of non-reflowable content? */
+    bool m_floodfill_non_reflow; /* this type of non-reflow must be expanded ('flood filled') across the entire paragraph */
+    bool m_is_first_on_line; /* helper: is this the first non-whitespace token on this line? */
+    bool m_is_punctuation;
+    bool m_is_part_of_quoted_txt;
+    bool m_suppress_quote_for_string_marking;
+    bool m_is_quote;
     int m_orig_hpos; /* position of the word on the current line; this is used with re-aligning [multiline] XML elements, tables and multiline doxygen formulas */
-	math_operator_t m_math_operator; /* whether the current operator requires either left- and/or right-hand values */
-	bool m_is_math;	/* is part of a math expression */
-	bool m_is_code;   /* is part of a programming expression */
-	bool m_is_path;   /* is (part of) a directory */
-	bool m_is_hyphenated; /* has a hyphen inside or at the end; in the latter case the remainder of the entire word is located on the next line of input text */
-	bool m_is_bullet; /* this text identifies the bullet itself (simple bullets are 1 char wide, but others are possible) */
-	bool m_is_doxygen_tag; /* is a doxygen/javadoc documentation tag */
-	bool m_is_inline_javadoc_tag; /* is an in-line doxygen/javadoc documentation tag */
-	bool m_is_escape_code; /* is a C escape code or regex marker. */
-	bool m_is_xhtml_entity; /* is a [X]HTML entity (named or numeric), e.g. '&#160;' */
-	bool m_is_emphasized; /* when the word/sequence is surrounded by '*' or '/' to emphasize the word(s) within */
-	bool m_is_part_of_boxed_txt; /* this chunk is part of (probably non-reflowable) boxed text */
-	bool m_is_part_of_graphical_txt; /* this chunk is part of (probably non-reflowable) graphical text (a.k.a. ASCII art) */
-	bool m_is_xhtml_start_tag; /* is a xml/html tag: start tag; another box will identify the (optional) end tag */
-	bool m_is_xhtml_end_tag; /* is a xml/html tag: (optional) end tag; another box will identify the start tag */
-	bool m_is_unclosed_xhtml_start_tag; /* is a start tag without a proper end tag; the end was assumed to exist before the @ref xhtml_matching_end_tag box */
-	bool m_is_unmatched_xhtml_end_tag; /* is an end tag without a related start tag in the text; this is an XML/XHTML error, but allowed for HTML content, where such tags are to be ignored :-( */
-	bool m_is_xhtml_tag_part; /* is a part of a xml/html tag; the tag end box also show up later on. The tag itself can be found in box 'xhtml_tag_begin' while the tag ends with the 'xhtml_tag_end' indexed box */
-	bool m_is_cdata_xml_chunk; /* is a <![CDATA[...]]> text */
-	bool m_is_uri_or_email; /* is probably an URI, with or without the xyz:// OR it is an email address */
-	int m_xhtml_matching_end_tag; /* -1 if not used; points at the matching end tag */
-	int m_xhtml_matching_start_tag; /* -1 if not used; points at the matching start tag */
-	int m_xhtml_tag_part_begin; /* -1 if not used; points to the start of the current tag; see 'is_xhtml_tag_part' above */
-	int m_xhtml_tag_part_end; /* -1 if not used; points to the last box of the current tag; see 'is_xhtml_tag_part' above */
+    math_operator_t m_math_operator; /* whether the current operator requires either left- and/or right-hand values */
+    bool m_is_math; /* is part of a math expression */
+    bool m_is_code;   /* is part of a programming expression */
+    bool m_is_path;   /* is (part of) a directory */
+    bool m_is_hyphenated; /* has a hyphen inside or at the end; in the latter case the remainder of the entire word is located on the next line of input text */
+    bool m_is_bullet; /* this text identifies the bullet itself (simple bullets are 1 char wide, but others are possible) */
+    bool m_is_doxygen_tag; /* is a doxygen/javadoc documentation tag */
+    bool m_is_inline_javadoc_tag; /* is an in-line doxygen/javadoc documentation tag */
+    bool m_is_escape_code; /* is a C escape code or regex marker. */
+    bool m_is_xhtml_entity; /* is a [X]HTML entity (named or numeric), e.g. '&#160;' */
+    bool m_is_emphasized; /* when the word/sequence is surrounded by '*' or '/' to emphasize the word(s) within */
+    bool m_is_part_of_boxed_txt; /* this chunk is part of (probably non-reflowable) boxed text */
+    bool m_is_part_of_graphical_txt; /* this chunk is part of (probably non-reflowable) graphical text (a.k.a. ASCII art) */
+    bool m_is_xhtml_start_tag; /* is a xml/html tag: start tag; another box will identify the (optional) end tag */
+    bool m_is_xhtml_end_tag; /* is a xml/html tag: (optional) end tag; another box will identify the start tag */
+    bool m_is_unclosed_xhtml_start_tag; /* is a start tag without a proper end tag; the end was assumed to exist before the @ref xhtml_matching_end_tag box */
+    bool m_is_unmatched_xhtml_end_tag; /* is an end tag without a related start tag in the text; this is an XML/XHTML error, but allowed for HTML content, where such tags are to be ignored :-( */
+    bool m_is_xhtml_tag_part; /* is a part of a xml/html tag; the tag end box also show up later on. The tag itself can be found in box 'xhtml_tag_begin' while the tag ends with the 'xhtml_tag_end' indexed box */
+    bool m_is_cdata_xml_chunk; /* is a <![CDATA[...]]> text */
+    bool m_is_uri_or_email; /* is probably an URI, with or without the xyz:// OR it is an email address */
+    int m_xhtml_matching_end_tag; /* -1 if not used; points at the matching end tag */
+    int m_xhtml_matching_start_tag; /* -1 if not used; points at the matching start tag */
+    int m_xhtml_tag_part_begin; /* -1 if not used; points to the start of the current tag; see 'is_xhtml_tag_part' above */
+    int m_xhtml_tag_part_end; /* -1 if not used; points to the last box of the current tag; see 'is_xhtml_tag_part' above */
 
-	bool m_do_not_print; /* special purpose: 'empty' boxes which identify old line breaks can be disabled in the output process this way */
+    bool m_do_not_print; /* special purpose: 'empty' boxes which identify old line breaks can be disabled in the output process this way */
 
-	/* number of newlines immediately preceding this word */
-	int m_line_count;
+    /* number of newlines immediately preceding this word */
+    int m_line_count;
 
-	/* only for 'boxed text' words: */
-	const char *m_left_edge_text;   /* the box 'left edge' used here. 0 when none was used. */
-	int m_left_edge_thickness;
-	//int m_left_edge_trailing_whitespace;
-	const char *m_right_edge_text;   /* the box 'right edge' used here. 0 when none was used. */
-	int m_right_edge_thickness;
-	//int m_right_edge_leading_whitespace;
+    /* only for 'boxed text' words: */
+    const char *m_left_edge_text;   /* the box 'left edge' used here. 0 when none was used. */
+    int m_left_edge_thickness;
+    //int m_left_edge_trailing_whitespace;
+    const char *m_right_edge_text;   /* the box 'right edge' used here. 0 when none was used. */
+    int m_right_edge_thickness;
+    //int m_right_edge_leading_whitespace;
 
 public:
-	bool box_is_a_usual_piece_of_text(bool count_basic_punctuation_as_unusual = false) const;
+    bool box_is_a_usual_piece_of_text(bool count_basic_punctuation_as_unusual = false) const;
 };
 
 
@@ -184,233 +184,233 @@ Note: All variables in this struct are named/used such that zero(0) is a sensibl
 */
 struct paragraph_box
 {
-	int m_first_box; /* index to first reflow_box */
-	int m_last_box; /* index to last reflow_box */
+    int m_first_box; /* index to first reflow_box */
+    int m_last_box; /* index to last reflow_box */
 
-	paragraph_box *m_previous_sibling; /* 0: none */
-	paragraph_box *m_next_sibling; /* 0: none */
-	paragraph_box *m_first_child; /* 0: leaf node */
-	paragraph_box *m_parent; /* 0: root node */
+    paragraph_box *m_previous_sibling; /* 0: none */
+    paragraph_box *m_next_sibling; /* 0: none */
+    paragraph_box *m_first_child; /* 0: leaf node */
+    paragraph_box *m_parent; /* 0: root node */
 
-	int m_first_line_indent; /* number of indenting spaces for first line in paragraph. */
-	int m_hanging_indent; /* number of indenting spaces for second and further lines */
-	bool m_starts_on_new_line; /* helper: does this paragraph start on a new line? */
+    int m_first_line_indent; /* number of indenting spaces for first line in paragraph. */
+    int m_hanging_indent; /* number of indenting spaces for second and further lines */
+    bool m_starts_on_new_line; /* helper: does this paragraph start on a new line? */
 
-	int m_keep_with_next; /* number of subsequent items to keep with this one: widow-like control */
-	int m_keep_with_prev; /* number of previous items to keep with this one: orphan-like control */
+    int m_keep_with_next; /* number of subsequent items to keep with this one: widow-like control */
+    int m_keep_with_prev; /* number of previous items to keep with this one: orphan-like control */
 
-	bool m_is_non_reflowable; /* is this ASCII art or another type of non-reflowable content? */
-	bool m_is_boxed_txt; /* this chunk is a (probably non-reflowable) boxed text */
-	bool m_is_graphics;
-	int m_graphics_trigger_box;
-	int m_nonreflow_trigger_box;
+    bool m_is_non_reflowable; /* is this ASCII art or another type of non-reflowable content? */
+    bool m_is_boxed_txt; /* this chunk is a (probably non-reflowable) boxed text */
+    bool m_is_graphics;
+    int m_graphics_trigger_box;
+    int m_nonreflow_trigger_box;
 
-	bool m_indent_as_previous; /* follows the same indentation rules as the previous paragraph */
-	bool m_continue_from_previous; /* is a continuation from the previous paragraph, i.e. the previous 'hanging indent' setting is the indent setting for this entire paragraph, including its first line */
+    bool m_indent_as_previous; /* follows the same indentation rules as the previous paragraph */
+    bool m_continue_from_previous; /* is a continuation from the previous paragraph, i.e. the previous 'hanging indent' setting is the indent setting for this entire paragraph, including its first line */
 
-	bool m_is_bullet; /* is a bullet item within a bullet list */
-	bool m_is_bulletlist; /* part of a bullet list */
-	int m_bullet_box; /* index to the bullet itself */
-	int m_bulletlist_level; /* list hierarchy level: 1..N */
+    bool m_is_bullet; /* is a bullet item within a bullet list */
+    bool m_is_bulletlist; /* part of a bullet list */
+    int m_bullet_box; /* index to the bullet itself */
+    int m_bulletlist_level; /* list hierarchy level: 1..N */
 
-	bool m_is_doxygen_par; /* is a doxygen/javadoc documentation paragraph, i.e. one that starts with a doc tag */
-	int m_doxygen_tag_box; /* index pointing at the doxygen/javadoc tag which started this paragraph */
+    bool m_is_doxygen_par; /* is a doxygen/javadoc documentation paragraph, i.e. one that starts with a doc tag */
+    int m_doxygen_tag_box; /* index pointing at the doxygen/javadoc tag which started this paragraph */
 
-	bool m_is_xhtml; /* is a piece of xml/html formatted text: start tag + (optional) end tag */
-	bool m_is_unclosed_html_tag; /* is a piece of html formatted text with a start tag but NO END TAG */
-	bool m_is_dangling_xhtml_close_tag; /* is a unmatched xml/xhtml end tag. :-S */
-	int m_xhtml_start_tag_box; /* index pointing at the starting xml/html tag, e.g. '<p>' or '<pre>' */
-	int m_xhtml_end_tag_box; /* index pointing at the terminating xml/html tag, e.g. '</p>' or '</pre>'; points to the next closing 'parent' tag when 'is_unclosed_html_tag' */
-	paragraph_box *m_xhtml_start_tag_container; /* point at para which contains the start tag box */
-	paragraph_box *m_xhtml_end_tag_container; /* point at para which contains the end tag box */
+    bool m_is_xhtml; /* is a piece of xml/html formatted text: start tag + (optional) end tag */
+    bool m_is_unclosed_html_tag; /* is a piece of html formatted text with a start tag but NO END TAG */
+    bool m_is_dangling_xhtml_close_tag; /* is a unmatched xml/xhtml end tag. :-S */
+    int m_xhtml_start_tag_box; /* index pointing at the starting xml/html tag, e.g. '<p>' or '<pre>' */
+    int m_xhtml_end_tag_box; /* index pointing at the terminating xml/html tag, e.g. '</p>' or '</pre>'; points to the next closing 'parent' tag when 'is_unclosed_html_tag' */
+    paragraph_box *m_xhtml_start_tag_container; /* point at para which contains the start tag box */
+    paragraph_box *m_xhtml_end_tag_container; /* point at para which contains the end tag box */
 
-	int m_leading_whitespace_length; /* number of chars of whitespace */
-	int m_trailing_whitespace_length; /* number of chars of whitespace */
+    int m_leading_whitespace_length; /* number of chars of whitespace */
+    int m_trailing_whitespace_length; /* number of chars of whitespace */
 
-	int m_min_required_linebreak_before; /* minimum number of line breaks before this item */
-	int m_min_required_linebreak_after; /* minimum number of line breaks after this item */
+    int m_min_required_linebreak_before; /* minimum number of line breaks before this item */
+    int m_min_required_linebreak_after; /* minimum number of line breaks after this item */
 
-	//int m_forced_linebreak_before; /* number of mandatory line breaks before this item */
-	//int m_forced_linebreak_after; /* number of mandatory line breaks after this item */
+    //int m_forced_linebreak_before; /* number of mandatory line breaks before this item */
+    //int m_forced_linebreak_after; /* number of mandatory line breaks after this item */
 
-	bool m_is_math;	/* is part of a math expression */
-	bool m_is_code;   /* is part of a programming expression */
-	bool m_is_path;   /* is (part of) a directory */
-	bool m_is_intermission; /* is an intermission chunk, i.e. a chunk within a 'real' paragraph with some particular formatting demands. */
-	//bool m_is_reflow_par; /* is regular paragraph of text, i.e. is delimited by newlines, i.e. ** reflow break points **. Can be a bullet item or something else as well, just as long as this chunk is sharing it's lines with any explicit or implicit sibling paragraphs! */
+    bool m_is_math; /* is part of a math expression */
+    bool m_is_code;   /* is part of a programming expression */
+    bool m_is_path;   /* is (part of) a directory */
+    bool m_is_intermission; /* is an intermission chunk, i.e. a chunk within a 'real' paragraph with some particular formatting demands. */
+    //bool m_is_reflow_par; /* is regular paragraph of text, i.e. is delimited by newlines, i.e. ** reflow break points **. Can be a bullet item or something else as well, just as long as this chunk is sharing it's lines with any explicit or implicit sibling paragraphs! */
 
-	/* only for 'boxed text' words: */
-	char *m_left_edge_text;   /* the box 'left edge' used here. 0 when none was used. */
-	int m_left_edge_thickness;
-	int m_left_edge_trailing_whitespace;
-	char *m_right_edge_text;   /* the box 'right edge' used here. 0 when none was used. */
-	int m_right_edge_thickness;
-	int m_right_edge_leading_whitespace;
-
-public:
-	paragraph_box();
-	~paragraph_box();
+    /* only for 'boxed text' words: */
+    char *m_left_edge_text;   /* the box 'left edge' used here. 0 when none was used. */
+    int m_left_edge_thickness;
+    int m_left_edge_trailing_whitespace;
+    char *m_right_edge_text;   /* the box 'right edge' used here. 0 when none was used. */
+    int m_right_edge_thickness;
+    int m_right_edge_leading_whitespace;
 
 public:
-	bool para_is_a_usual_piece_of_text(void) const;
+    paragraph_box();
+    ~paragraph_box();
+
+public:
+    bool para_is_a_usual_piece_of_text(void) const;
 };
 
 
 
 template<class T> class items_collection
 {
-	//friend class cmt_reflow;
+    //friend class cmt_reflow;
 
 protected:
-	T *m_items;
-	size_t m_item_count;
-	size_t m_item_allocsize;
+    T *m_items;
+    size_t m_item_count;
+    size_t m_item_allocsize;
 
 private:
-	/* explicitly generate a non-accessible default constructor to shut up some compilers */
-	items_collection()
-		: m_item_count(0), m_item_allocsize(0), m_items(NULL)
-	{
-		UNC_ASSERT(!"Should never get here!");
-	}
+    /* explicitly generate a non-accessible default constructor to shut up some compilers */
+    items_collection()
+        : m_item_count(0), m_item_allocsize(0), m_items(NULL)
+    {
+        UNC_ASSERT(!"Should never get here!");
+    }
 
 protected:
-	items_collection(size_t prealloc_count)
-		: m_item_count(0)
-	{
-		m_item_allocsize = 1 + prealloc_count;
-		m_items = (T *)calloc(m_item_allocsize, sizeof(m_items[0]));
-		UNC_ASSERT(m_items);
-	}
-	items_collection(const items_collection &src)
-		: m_item_count(src.m_item_count),
-		  m_item_allocsize(src.m_item_allocsize)
-	{
-		if (&src != this)
-		{
-			UNC_ASSERT(m_item_allocsize > 0);
-			m_items = (T *)calloc(m_item_allocsize, sizeof(m_items[0]));
-			UNC_ASSERT(m_items);
+    items_collection(size_t prealloc_count)
+        : m_item_count(0)
+    {
+        m_item_allocsize = 1 + prealloc_count;
+        m_items = (T *)calloc(m_item_allocsize, sizeof(m_items[0]));
+        UNC_ASSERT(m_items);
+    }
+    items_collection(const items_collection &src)
+        : m_item_count(src.m_item_count),
+          m_item_allocsize(src.m_item_allocsize)
+    {
+        if (&src != this)
+        {
+            UNC_ASSERT(m_item_allocsize > 0);
+            m_items = (T *)calloc(m_item_allocsize, sizeof(m_items[0]));
+            UNC_ASSERT(m_items);
 
-			size_t i;
-			for (i = 0; i < m_item_count; i++)
-			{
-				m_items[i] = src.m_items[i];
-			}
-		}
-	}
+            size_t i;
+            for (i = 0; i < m_item_count; i++)
+            {
+                m_items[i] = src.m_items[i];
+            }
+        }
+    }
 public:
-	items_collection &operator =(const items_collection &src)
-	{
-		if (&src != this)
-		{
-			m_item_count = src.m_item_count;
-			m_item_allocsize = src.m_item_allocsize;
+    items_collection &operator =(const items_collection &src)
+    {
+        if (&src != this)
+        {
+            m_item_count = src.m_item_count;
+            m_item_allocsize = src.m_item_allocsize;
 
-			UNC_ASSERT(m_item_allocsize > 0);
-			m_items = (T *)calloc(m_item_allocsize, sizeof(m_items[0]));
-			UNC_ASSERT(m_items);
+            UNC_ASSERT(m_item_allocsize > 0);
+            m_items = (T *)calloc(m_item_allocsize, sizeof(m_items[0]));
+            UNC_ASSERT(m_items);
 
-			size_t i;
-			for (i = 0; i < m_item_count; i++)
-			{
-				m_items[i] = src.m_items[i];
-			}
-		}
-	}
+            size_t i;
+            for (i = 0; i < m_item_count; i++)
+            {
+                m_items[i] = src.m_items[i];
+            }
+        }
+    }
 public:
-	virtual ~items_collection()
-	{
-		if (m_items)
-		{
-			free(m_items);
-		}
-	}
+    virtual ~items_collection()
+    {
+        if (m_items)
+        {
+            free(m_items);
+        }
+    }
 
-	/* make sure there space for at least N items in the collection */
-	void reserve(size_t n)
-	{
-		if (n > m_item_allocsize)
-		{
-			/* grow at a steady pace; prevent reallocing for every single reserve(+1) */
-			if (n < 256)
-			{
-				size_t m = n;
-				for (n = m_item_allocsize; n < m; n *= 2)
-					;
-			}
-			else
-			{
-				size_t m = n;
-				for (n = m_item_allocsize; n < m; n = (n * 3)/2)
-					;
-			}
-			m_items = (T *)realloc(m_items, n * sizeof(m_items[0]));
-			UNC_ASSERT(m_items);
-			memset(m_items + m_item_allocsize, 0, (n - m_item_allocsize) * sizeof(m_items[0]));
-			m_item_allocsize = n;
-		}
-	}
+    /* make sure there space for at least N items in the collection */
+    void reserve(size_t n)
+    {
+        if (n > m_item_allocsize)
+        {
+            /* grow at a steady pace; prevent reallocing for every single reserve(+1) */
+            if (n < 256)
+            {
+                size_t m = n;
+                for (n = m_item_allocsize; n < m; n *= 2)
+                    ;
+            }
+            else
+            {
+                size_t m = n;
+                for (n = m_item_allocsize; n < m; n = (n * 3)/2)
+                    ;
+            }
+            m_items = (T *)realloc(m_items, n * sizeof(m_items[0]));
+            UNC_ASSERT(m_items);
+            memset(m_items + m_item_allocsize, 0, (n - m_item_allocsize) * sizeof(m_items[0]));
+            m_item_allocsize = n;
+        }
+    }
 
-	T *prep_next(int &item_idx)
-	{
-		UNC_ASSERT(item_idx >= -1);
-		item_idx++;
-		reserve(item_idx + 1);
-		if (m_item_count <= (size_t)item_idx)
-		{
-			m_item_count = item_idx + 1;
-		}
+    T *prep_next(int &item_idx)
+    {
+        UNC_ASSERT(item_idx >= -1);
+        item_idx++;
+        reserve(item_idx + 1);
+        if (m_item_count <= (size_t)item_idx)
+        {
+            m_item_count = item_idx + 1;
+        }
 
-		return &m_items[item_idx]; // won't be part of the 'item_count' yet!
-	}
+        return &m_items[item_idx]; // won't be part of the 'item_count' yet!
+    }
 
-	T *get_printable_prev(int &item_idx, int lowest_allowed_idx = 0)
-	{
-		UNC_ASSERT(lowest_allowed_idx >= 0);
-		while (--item_idx >= lowest_allowed_idx)
-		{
-			UNC_ASSERT(item_idx >= 0);
-			UNC_ASSERT(item_idx < (int)m_item_count);
-			if (!m_items[item_idx].m_do_not_print)
-				return &m_items[item_idx];
-		}
-		return NULL;
-	}
+    T *get_printable_prev(int &item_idx, int lowest_allowed_idx = 0)
+    {
+        UNC_ASSERT(lowest_allowed_idx >= 0);
+        while (--item_idx >= lowest_allowed_idx)
+        {
+            UNC_ASSERT(item_idx >= 0);
+            UNC_ASSERT(item_idx < (int)m_item_count);
+            if (!m_items[item_idx].m_do_not_print)
+                return &m_items[item_idx];
+        }
+        return NULL;
+    }
 
-	T *get_printable_next(int &item_idx, int highest_allowed_idx = INT_MAX)
-	{
-		UNC_ASSERT(highest_allowed_idx >= 0);
-		if (highest_allowed_idx >= (int)m_item_count)
-		{
-			highest_allowed_idx = (int)m_item_count - 1;
-		}
-		while (++item_idx <= highest_allowed_idx)
-		{
-			UNC_ASSERT(item_idx >= 0);
-			UNC_ASSERT(item_idx < (int)m_item_count);
-			if (!m_items[item_idx].m_do_not_print)
-				return &m_items[item_idx];
-		}
-		return NULL;
-	}
+    T *get_printable_next(int &item_idx, int highest_allowed_idx = INT_MAX)
+    {
+        UNC_ASSERT(highest_allowed_idx >= 0);
+        if (highest_allowed_idx >= (int)m_item_count)
+        {
+            highest_allowed_idx = (int)m_item_count - 1;
+        }
+        while (++item_idx <= highest_allowed_idx)
+        {
+            UNC_ASSERT(item_idx >= 0);
+            UNC_ASSERT(item_idx < (int)m_item_count);
+            if (!m_items[item_idx].m_do_not_print)
+                return &m_items[item_idx];
+        }
+        return NULL;
+    }
 
-	size_t count(void) const
-	{
-		return m_item_count;
-	}
-	T &operator[](size_t idx)
-	{
-		// UNC_ASSERT(idx >= 0); -- always true
-		UNC_ASSERT(idx < m_item_count);
-		return m_items[idx];
-	}
-	const T &operator[](size_t idx) const
-	{
-		// UNC_ASSERT(idx >= 0); -- always true
-		UNC_ASSERT(idx < m_item_count);
-		return m_items[idx];
-	}
+    size_t count(void) const
+    {
+        return m_item_count;
+    }
+    T &operator[](size_t idx)
+    {
+        // UNC_ASSERT(idx >= 0); -- always true
+        UNC_ASSERT(idx < m_item_count);
+        return m_items[idx];
+    }
+    const T &operator[](size_t idx) const
+    {
+        // UNC_ASSERT(idx >= 0); -- always true
+        UNC_ASSERT(idx < m_item_count);
+        return m_items[idx];
+    }
 };
 
 
@@ -419,17 +419,17 @@ public:
 
 class words_collection : public items_collection<reflow_box>
 {
-	friend class paragraph_collection;
+    friend class paragraph_collection;
 
 public:
-	words_collection(cmt_reflow_ex &cmt)
-		: items_collection<reflow_box>(4 + cmt.m_comment_len / 4 /* heuristic (test cases average a ratio of 0.227) */)
-	{
-	}
-	words_collection(const words_collection &src)
-		: items_collection<reflow_box>(src)
-	{
-	}
+    words_collection(cmt_reflow_ex &cmt)
+        : items_collection<reflow_box>(4 + cmt.m_comment_len / 4 /* heuristic (test cases average a ratio of 0.227) */)
+    {
+    }
+    words_collection(const words_collection &src)
+        : items_collection<reflow_box>(src)
+    {
+    }
 };
 
 

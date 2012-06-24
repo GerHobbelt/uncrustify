@@ -97,27 +97,27 @@ in @a haystack.
 */
 int str_in_set(const char **haystack, const char *needle, size_t len)
 {
-	int idx = 0;
+    int idx = 0;
 
-	UNC_ASSERT(haystack);
-	UNC_ASSERT(needle);
+    UNC_ASSERT(haystack);
+    UNC_ASSERT(needle);
 
-	while (*haystack)
-	{
-		size_t l = strlen(*haystack);
-		if (len >= l)
-		{
-			if (!memcmp(*haystack, needle, l))
-			{
-				return idx; // *haystack;
-			}
-		}
+    while (*haystack)
+    {
+        size_t l = strlen(*haystack);
+        if (len >= l)
+        {
+            if (!memcmp(*haystack, needle, l))
+            {
+                return idx; // *haystack;
+            }
+        }
 
-		idx++;
-		haystack++;
-	}
+        idx++;
+        haystack++;
+    }
 
-	return -1; // NULL;
+    return -1; // NULL;
 }
 
 
@@ -132,29 +132,29 @@ Note that 'A' will only match capitals, while 'a' will only match lower case alp
 */
 bool in_RE_set(const char *haystack, int needle)
 {
-	UNC_ASSERT(haystack);
-	UNC_ASSERT(needle);
+    UNC_ASSERT(haystack);
+    UNC_ASSERT(needle);
 
-	if (in_set(haystack, needle))
-	{
-		return true;
-	}
-	for ( ; *haystack; haystack++)
-	{
-		if (unc_isupper(*haystack) && unc_isupper(needle))
-		{
-			return true;
-		}
-		if (unc_islower(*haystack) && unc_islower(needle))
-		{
-			return true;
-		}
-		if (unc_isdigit(*haystack) && unc_isdigit(needle))
-		{
-			return true;
-		}
-	}
-	return false;
+    if (in_set(haystack, needle))
+    {
+        return true;
+    }
+    for ( ; *haystack; haystack++)
+    {
+        if (unc_isupper(*haystack) && unc_isupper(needle))
+        {
+            return true;
+        }
+        if (unc_islower(*haystack) && unc_islower(needle))
+        {
+            return true;
+        }
+        if (unc_isdigit(*haystack) && unc_isdigit(needle))
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 
@@ -168,14 +168,14 @@ Return NULL if no match could be found.
 */
 const char *strnchr_any(const char *src, const char *set, size_t len)
 {
-	for ( ; len > 0; len--)
-	{
-		UNC_ASSERT(*src);
-		const char *f = strchr(set, *src++);
-		if (f)
-			return src - 1;
-	}
-	return NULL;
+    for ( ; len > 0; len--)
+    {
+        UNC_ASSERT(*src);
+        const char *f = strchr(set, *src++);
+        if (f)
+            return src - 1;
+    }
+    return NULL;
 }
 
 
@@ -188,13 +188,13 @@ Return NULL if no match could be found.
 */
 const char *strnchr(const char *src, const char ch, size_t len)
 {
-	UNC_ASSERT(src);
-	for ( ; len > 0 && *src; len--)
-	{
-		if (ch == *src)
-			return src;
-	}
-	return NULL;
+    UNC_ASSERT(src);
+    for ( ; len > 0 && *src; len--)
+    {
+        if (ch == *src)
+            return src;
+    }
+    return NULL;
 }
 
 #endif
@@ -207,13 +207,13 @@ return the number of occurrences of 'c' in 'str'.
 */
 int strccnt(const char *str, int c)
 {
-	int rv = 0;
+    int rv = 0;
 
-	for ( ; *str; str++)
-	{
-		rv += (*str == c);
-	}
-	return rv;
+    for ( ; *str; str++)
+    {
+        rv += (*str == c);
+    }
+    return rv;
 }
 
 /*
@@ -223,11 +223,11 @@ This is is equivalent to strspn(str, c) but here c is a character argument inste
 */
 int strleadlen(const char *str, int c)
 {
-	const char *s;
+    const char *s;
 
-	for (s = str; *s == c; s++)
-		;
-	return (int)(s - str);
+    for (s = str; *s == c; s++)
+        ;
+    return (int)(s - str);
 }
 
 /*
@@ -238,11 +238,11 @@ when inspecting non-NUL-terminated strings.
 */
 int strtaillen(const char *str, const char *one_past_end_of_str, int c)
 {
-	const char *s;
+    const char *s;
 
-	for (s = one_past_end_of_str; s > str && s[-1] == c; s--)
-		;
-	return (int)(one_past_end_of_str - s);
+    for (s = one_past_end_of_str; s > str && s[-1] == c; s--)
+        ;
+    return (int)(one_past_end_of_str - s);
 }
 
 
@@ -254,11 +254,11 @@ when inspecting non-NUl-terminated strings.
 */
 int strrspn(const char *str, const char *one_past_end_of_str, const char *set)
 {
-	const char *s;
+    const char *s;
 
-	for (s = one_past_end_of_str; s > str && strchr(set, s[-1]); s--)
-		;
-	return (int)(one_past_end_of_str - s);
+    for (s = one_past_end_of_str; s > str && strchr(set, s[-1]); s--)
+        ;
+    return (int)(one_past_end_of_str - s);
 }
 
 
@@ -268,9 +268,9 @@ to the NUL sentinel (end of string).
 */
 const char *strchrnn(const char *str, int c)
 {
-	const char *s = strchr(str, c);
+    const char *s = strchr(str, c);
 
-	return (s ? s: str + strlen(str));
+    return (s ? s: str + strlen(str));
 }
 
 /*
@@ -279,9 +279,9 @@ to the NUL sentinel (end of string).
 */
 char *strchrnn(char *str, int c)
 {
-	char *s = strchr(str, c);
+    char *s = strchr(str, c);
 
-	return (s ? s: str + strlen(str));
+    return (s ? s: str + strlen(str));
 }
 
 
@@ -292,14 +292,14 @@ NOTE: replacement is done 'in line', i.e. the @a src string will be modified!
 */
 char *strrepllead(char *str, int old, int replacement)
 {
-	char *s = str;
+    char *s = str;
 
-	UNC_ASSERT(s);
-	while (*s == old)
-	{
-		*s++ = (char)replacement;
-	}
-	return str;
+    UNC_ASSERT(s);
+    while (*s == old)
+    {
+        *s++ = (char)replacement;
+    }
+    return str;
 }
 
 
@@ -309,10 +309,10 @@ Act like strdup() is 'src' is a valid string, otherwise 'strdup(default_str)'.
 */
 char *strdupdflt(const char *src, const char *default_str)
 {
-	UNC_ASSERT(default_str);
-	char *s = (src ? strdup(src) : strdup(default_str));
-	UNC_ASSERT(s);
-	return s;
+    UNC_ASSERT(default_str);
+    char *s = (src ? strdup(src) : strdup(default_str));
+    UNC_ASSERT(s);
+    return s;
 }
 
 
@@ -323,11 +323,11 @@ Return a malloc()ed copy of the given text string/chunk.
 */
 char *strndup(const char *src, size_t maxlen)
 {
-	char *s = (char *)malloc(maxlen + 1);
-	UNC_ASSERT(s);
-	strncpy(s, src, maxlen);
-	s[maxlen] = 0;
-	return s;
+    char *s = (char *)malloc(maxlen + 1);
+    UNC_ASSERT(s);
+    strncpy(s, src, maxlen);
+    s[maxlen] = 0;
+    return s;
 }
 
 #endif
@@ -339,15 +339,15 @@ Report the number of TABs in the input.
 */
 int count_tabs(const char *text, size_t len)
 {
-	int count = 0;
+    int count = 0;
 
-	for ( ; len > 0; len--, text++)
-	{
-		if (*text == '\t')
-			count++;
-	}
+    for ( ; len > 0; len--, text++)
+    {
+        if (*text == '\t')
+            count++;
+    }
 
-	return count;
+    return count;
 }
 
 
@@ -366,27 +366,27 @@ Return the 0-based(!) column position of the text which should remain after clip
 */
 int calc_leading_whitespace4block(const char *text, int at_column)
 {
-	/*
-	find out how many leading spaces are shared among all lines.
-	*/
-	int theoretical_start_col = at_column;
-	int cur_min_idx = INT_MAX;
+    /*
+    find out how many leading spaces are shared among all lines.
+    */
+    int theoretical_start_col = at_column;
+    int cur_min_idx = INT_MAX;
 
-	while (text)
-	{
-		text += strleadlen(text, '\n');
-		int idx = strleadlen(text, ' ');
-		if ((idx < cur_min_idx)
-			&& unc_isprint(text[idx]))
-		{
-			cur_min_idx = idx;
-		}
-		text = strchr(text, '\n');
-	}
+    while (text)
+    {
+        text += strleadlen(text, '\n');
+        int idx = strleadlen(text, ' ');
+        if ((idx < cur_min_idx)
+            && unc_isprint(text[idx]))
+        {
+            cur_min_idx = idx;
+        }
+        text = strchr(text, '\n');
+    }
 
-	if (cur_min_idx < theoretical_start_col)
-		return cur_min_idx;
-	return theoretical_start_col;
+    if (cur_min_idx < theoretical_start_col)
+        return cur_min_idx;
+    return theoretical_start_col;
 }
 
 
@@ -403,44 +403,44 @@ NOTE: when this function returns FALSE, the *word_length value is untouched.
 bool is_html_numeric_entity(const char *text, int *word_length)
 {
 #if 0
-	if (word_length)
-	{
-		*word_length = 0;
-	}
+    if (word_length)
+    {
+        *word_length = 0;
+    }
 #endif
-	if (!text || text[0] != '&')
-		return false;
-	if (text[1] != '#')
-		return false;
+    if (!text || text[0] != '&')
+        return false;
+    if (text[1] != '#')
+        return false;
 
-	const char *accepted_set = "0123456789";
-	int max_allowed_len = 10+2;
-	int idx = 2;
+    const char *accepted_set = "0123456789";
+    int max_allowed_len = 10+2;
+    int idx = 2;
 
-	if (text[2] == 'x' || text[2] == 'X')
-	{
-		/* hex numeric constant */
-		accepted_set = "0123456789ABCDEFabcdef";
-		max_allowed_len = 8+3;
-		idx = 3;
-	}
+    if (text[2] == 'x' || text[2] == 'X')
+    {
+        /* hex numeric constant */
+        accepted_set = "0123456789ABCDEFabcdef";
+        max_allowed_len = 8+3;
+        idx = 3;
+    }
 
-	if (!strchr(accepted_set, text[idx++]))
-		return false;
+    if (!strchr(accepted_set, text[idx++]))
+        return false;
 
-	for ( ; idx < max_allowed_len; idx++)
-	{
-		if (!strchr(accepted_set, text[idx]))
-			break;
-	}
-	if (text[idx] != ';')
-		return false;
+    for ( ; idx < max_allowed_len; idx++)
+    {
+        if (!strchr(accepted_set, text[idx]))
+            break;
+    }
+    if (text[idx] != ';')
+        return false;
 
-	if (word_length)
-	{
-		*word_length = idx;
-	}
-	return true;
+    if (word_length)
+    {
+        *word_length = idx;
+    }
+    return true;
 }
 
 
@@ -459,35 +459,35 @@ NOTE: when this function returns FALSE, the *word_length value is untouched.
 bool is_html_entity_name(const char *text, int *word_length)
 {
 #if 0
-	if (word_length)
-	{
-		*word_length = 0;
-	}
+    if (word_length)
+    {
+        *word_length = 0;
+    }
 #endif
-	if (!text || text[0] != '&')
-		return false;
+    if (!text || text[0] != '&')
+        return false;
 
-	static const char *accepted_set1 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-	static const char *accepted_set2 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	const int max_allowed_len = 10+2;
-	int idx = 1;
+    static const char *accepted_set1 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    static const char *accepted_set2 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const int max_allowed_len = 10+2;
+    int idx = 1;
 
-	if (!strchr(accepted_set1, text[idx++]))
-		return false;
+    if (!strchr(accepted_set1, text[idx++]))
+        return false;
 
-	for ( ; idx < max_allowed_len; idx++)
-	{
-		if (!strchr(accepted_set2, text[idx]))
-			break;
-	}
-	if (text[idx] != ';')
-		return false;
+    for ( ; idx < max_allowed_len; idx++)
+    {
+        if (!strchr(accepted_set2, text[idx]))
+            break;
+    }
+    if (text[idx] != ';')
+        return false;
 
-	if (word_length)
-	{
-		*word_length = idx;
-	}
-	return true;
+    if (word_length)
+    {
+        *word_length = idx;
+    }
+    return true;
 }
 
 
@@ -499,17 +499,17 @@ bool is_html_entity_name(const char *text, int *word_length)
 
 bool cmt_reflow_ex::chunk_is_inline_comment(const chunk_t *pc)
 {
-	//bool is_inline_comment = ((pc->flags & PCF_RIGHT_COMMENT) != 0);
-	bool is_inline_comment = ((pc->parent_type == CT_COMMENT_END) || (pc->parent_type == CT_COMMENT_EMBED));
-	UNC_ASSERT(is_inline_comment ? pc->column > 1 : true);
-	return is_inline_comment;
+    //bool is_inline_comment = ((pc->flags & PCF_RIGHT_COMMENT) != 0);
+    bool is_inline_comment = ((pc->parent_type == CT_COMMENT_END) || (pc->parent_type == CT_COMMENT_EMBED));
+    UNC_ASSERT(is_inline_comment ? pc->column > 1 : true);
+    return is_inline_comment;
 }
 
 bool cmt_reflow_ex::is_doxygen_tagmarker(const char *text, char doxygen_tag_marker)
 {
-	return (doxygen_tag_marker
-					    ? *text == doxygen_tag_marker
-					    : in_set("@\\", *text));
+    return (doxygen_tag_marker
+                        ? *text == doxygen_tag_marker
+                        : in_set("@\\", *text));
 }
 
 /*
@@ -521,64 +521,64 @@ Nope, chapter numbering and that sort of stuff is not recognized as 'viable' bul
 */
 bool cmt_reflow_ex::is_viable_bullet_marker(const char *text, size_t len)
 {
-	const char *s = text;
-	if (unc_isdigit(*s))
-	{
-		/* all numbers, optionally followed by zero or one alphanumeric */
-		for (s++; unc_isdigit(*s); s++)
-			;
-		/* bullet order numbers larger than 99 are rediculous */
-		if (s - text > 2)
-			return false;
+    const char *s = text;
+    if (unc_isdigit(*s))
+    {
+        /* all numbers, optionally followed by zero or one alphanumeric */
+        for (s++; unc_isdigit(*s); s++)
+            ;
+        /* bullet order numbers larger than 99 are rediculous */
+        if (s - text > 2)
+            return false;
 
-		/* plus one optional alphanumeric */
-		if (unc_isalpha(*s))
-			s++;
+        /* plus one optional alphanumeric */
+        if (unc_isalpha(*s))
+            s++;
 
-		/* must be followed by a non-aphanumeric printable */
-		if (!unc_isprint(*s) || unc_isalnum(*s) || in_set("@$%^&*_-={[;\"'<>?/\\|~", *s))
-		{
-			return false;
-		}
-		s++;
-	}
-	else if (unc_isalpha(*s))
-	{
-		s++;
+        /* must be followed by a non-aphanumeric printable */
+        if (!unc_isprint(*s) || unc_isalnum(*s) || in_set("@$%^&*_-={[;\"'<>?/\\|~", *s))
+        {
+            return false;
+        }
+        s++;
+    }
+    else if (unc_isalpha(*s))
+    {
+        s++;
 
-		/* single alphanumeric must be followed by a non-aphanumeric printable */
-		if (!unc_isprint(*s) || unc_isalnum(*s) || in_set("@$%^&*_-={[;\"'<>?/\\|~", *s))
-		{
-			return false;
-		}
-		s++;
-	}
-	else
-	{
-		/* There may be at most 3 printable characters act together as a bullet. */
-		for ( ; unc_isprint(*s) && !unc_isalnum(*s); s++)
-			;
+        /* single alphanumeric must be followed by a non-aphanumeric printable */
+        if (!unc_isprint(*s) || unc_isalnum(*s) || in_set("@$%^&*_-={[;\"'<>?/\\|~", *s))
+        {
+            return false;
+        }
+        s++;
+    }
+    else
+    {
+        /* There may be at most 3 printable characters act together as a bullet. */
+        for ( ; unc_isprint(*s) && !unc_isalnum(*s); s++)
+            ;
 
-		if (s - text > 3)
-			return false;
-	}
+        if (s - text > 3)
+            return false;
+    }
 
-	/*
-	check against the specified bullet size: it's a FAIL when these don't match.
-	*/
-	if (len != (size_t)(s - text))
-		return false;
+    /*
+    check against the specified bullet size: it's a FAIL when these don't match.
+    */
+    if (len != (size_t)(s - text))
+        return false;
 
-	/* must be followed by at least one space */
-	if (*s != ' ')
-		return false;
-	s += strleadlen(s, ' ');
+    /* must be followed by at least one space */
+    if (*s != ' ')
+        return false;
+    s += strleadlen(s, ' ');
 
-	/* bullet must be followed on the same line by at least one more printable characters. */
-	if (!unc_isprint(*s))
-		return false;
+    /* bullet must be followed on the same line by at least one more printable characters. */
+    if (!unc_isprint(*s))
+        return false;
 
-	return true;
+    return true;
 }
 
 
@@ -587,38 +587,38 @@ bool cmt_reflow_ex::is_viable_bullet_marker(const char *text, size_t len)
 
 void cmt_reflow_ex::resize_buffer(size_t extralen)
 {
-	size_t newlen = m_comment_len + extralen;
-	if (newlen < m_comment_size && newlen > 0) /* makes sure the 'comment' pointer is always initialized, even for empty comments */
-		return;
+    size_t newlen = m_comment_len + extralen;
+    if (newlen < m_comment_size && newlen > 0) /* makes sure the 'comment' pointer is always initialized, even for empty comments */
+        return;
 
-	size_t n = (m_comment_size < 128 ? 128 : m_comment_size);
-	if (n < 4096)
-	{
-		for ( ; n < newlen + 1; n *= 2)
-			;
-	}
-	else
-	{
-		for ( ; n < newlen + 1; n = (n * 3)/2)
-			;
-	}
-	UNC_ASSERT(n > newlen);
-	newlen = n;
+    size_t n = (m_comment_size < 128 ? 128 : m_comment_size);
+    if (n < 4096)
+    {
+        for ( ; n < newlen + 1; n *= 2)
+            ;
+    }
+    else
+    {
+        for ( ; n < newlen + 1; n = (n * 3)/2)
+            ;
+    }
+    UNC_ASSERT(n > newlen);
+    newlen = n;
 
-	if (!m_comment)
-	{
-		m_comment = (char *)malloc(newlen);
-		m_comment_len = 0;
-		m_comment_size = newlen;
-	}
-	else
-	{
-		m_comment = (char *)realloc((void *)m_comment, newlen);
-		m_comment_size = newlen;
-	}
+    if (!m_comment)
+    {
+        m_comment = (char *)malloc(newlen);
+        m_comment_len = 0;
+        m_comment_size = newlen;
+    }
+    else
+    {
+        m_comment = (char *)realloc((void *)m_comment, newlen);
+        m_comment_size = newlen;
+    }
 
-	if (!m_comment)
-	{
+    if (!m_comment)
+    {
       LOG_FMT(LERR, "%s: buffer allocation failed: out of memory\n", __func__);
       cpd.error_count++;
    }
@@ -631,41 +631,41 @@ each input character was expected to be, at least visually.
 
 void cmt_reflow_ex::push(const char *text)
 {
-	size_t len = strlen(text);
+    size_t len = strlen(text);
 
-	push(text, len);
+    push(text, len);
 }
 
 void cmt_reflow_ex::push(const char *text, size_t len)
 {
-	resize_buffer(len);
+    resize_buffer(len);
 
-	char *dst = m_comment + m_comment_len;
-	while (len)
-	{
-		*dst++ = *text++;
-		len--;
-	}
-	UNC_ASSERT((size_t)(dst - m_comment) < m_comment_size);
-	*dst = 0;
+    char *dst = m_comment + m_comment_len;
+    while (len)
+    {
+        *dst++ = *text++;
+        len--;
+    }
+    UNC_ASSERT((size_t)(dst - m_comment) < m_comment_size);
+    *dst = 0;
 
-	m_comment_len = dst - m_comment;
+    m_comment_len = dst - m_comment;
 }
 
 void cmt_reflow_ex::push(char c, size_t len)
 {
-	resize_buffer(len);
+    resize_buffer(len);
 
-	char *dst = m_comment + m_comment_len;
-	while (len)
-	{
-		*dst++ = c;
-		len--;
-	}
-	UNC_ASSERT((size_t)(dst - m_comment) < m_comment_size);
-	*dst = 0;
+    char *dst = m_comment + m_comment_len;
+    while (len)
+    {
+        *dst++ = c;
+        len--;
+    }
+    UNC_ASSERT((size_t)(dst - m_comment) < m_comment_size);
+    *dst = 0;
 
-	m_comment_len = dst - m_comment;
+    m_comment_len = dst - m_comment;
 }
 
 
@@ -765,7 +765,7 @@ void cmt_reflow_ex::add_javaparam(chunk_t *pc)
  */
 int cmt_reflow_ex::add_kw(const char *text) /* [i_a] */
 {
-	/* [i_a] strncmp vs. memcmp + len - now we don't need to scan to the end of the keyword in the caller! */
+    /* [i_a] strncmp vs. memcmp + len - now we don't need to scan to the end of the keyword in the caller! */
    if (strncmp(text, "$(filename)", 11) == 0)
    {
       push(path_basename(cpd.filename));
@@ -850,89 +850,89 @@ int cmt_reflow_ex::add_kw(const char *text) /* [i_a] */
 
 bool cmt_reflow_ex::detect_as_javadoc_chunk(chunk_t *pc, bool setup)
 {
-	size_t marker_len = 0;
-	bool backref = false;
+    size_t marker_len = 0;
+    bool backref = false;
 
-	if (pc
-		&& ((pc->type == CT_COMMENT)
-			|| (pc->type == CT_COMMENT_MULTI)
-			|| (pc->type == CT_COMMENT_CPP)))
-	{
-		const char *text = pc->str.c_str() + 2;
-		int len = pc->len() - 4;
-		const char *eos = text + len;
+    if (pc
+        && ((pc->type == CT_COMMENT)
+            || (pc->type == CT_COMMENT_MULTI)
+            || (pc->type == CT_COMMENT_CPP)))
+    {
+        const char *text = pc->str.c_str() + 2;
+        int len = pc->len() - 4;
+        const char *eos = text + len;
 
-		const char *eojd_marker = text;
-		if (len > 0 && strchr("/*!<", *eojd_marker))
-		{
-			// if (pc->type == CT_COMMENT_MULTI || pc->type == CT_COMMENT)
-			do
-			{
-				eojd_marker++;
-			} while (strchr("/*!<", *eojd_marker));
+        const char *eojd_marker = text;
+        if (len > 0 && strchr("/*!<", *eojd_marker))
+        {
+            // if (pc->type == CT_COMMENT_MULTI || pc->type == CT_COMMENT)
+            do
+            {
+                eojd_marker++;
+            } while (strchr("/*!<", *eojd_marker));
 
-			if (eojd_marker[-1] == '<')
-			{
-				backref = true;
-			}
+            if (eojd_marker[-1] == '<')
+            {
+                backref = true;
+            }
 
-			bool has_content = false;
-			const char *s;
+            bool has_content = false;
+            const char *s;
 
-			for (s = eojd_marker; s < eos && !has_content; s++)
-			{
-				has_content = !!unc_isalpha(*s);
-			}
+            for (s = eojd_marker; s < eos && !has_content; s++)
+            {
+                has_content = !!unc_isalpha(*s);
+            }
 
-			if (pc->type == CT_COMMENT_CPP)
-			{
-				if (!has_content
-					|| !strchr("/!<", *text))
-				{
-					/* not a real doxy/javadoc marker but something else */
-					eojd_marker = text;
-				}
-			}
-			else
-			{
-				if (pc->type == CT_COMMENT
-					&& !has_content)
-				{
-					/* not a real doxy/javadoc marker but something else */
+            if (pc->type == CT_COMMENT_CPP)
+            {
+                if (!has_content
+                    || !strchr("/!<", *text))
+                {
+                    /* not a real doxy/javadoc marker but something else */
+                    eojd_marker = text;
+                }
+            }
+            else
+            {
+                if (pc->type == CT_COMMENT
+                    && !has_content)
+                {
+                    /* not a real doxy/javadoc marker but something else */
 
-					eojd_marker = text;
-				}
+                    eojd_marker = text;
+                }
 
-				if (!strchr("*!<", *text))
-				{
-					/* not a real doxy/javadoc marker but something else */
-					eojd_marker = text;
-				}
-			}
+                if (!strchr("*!<", *text))
+                {
+                    /* not a real doxy/javadoc marker but something else */
+                    eojd_marker = text;
+                }
+            }
 
-			if (eojd_marker - text > 2)
-			{
-				/* a doxygen/javadoc marker which is also part of a boxed comment! */
-				eojd_marker = text + 1 + backref;
-			}
-		}
+            if (eojd_marker - text > 2)
+            {
+                /* a doxygen/javadoc marker which is also part of a boxed comment! */
+                eojd_marker = text + 1 + backref;
+            }
+        }
 
-		marker_len = eojd_marker - text;
+        marker_len = eojd_marker - text;
 
-		if (marker_len > 0)
-		{
-			if (setup)
-			{
-				m_is_doxygen_comment = true;
-				m_is_backreferencing_doxygen_comment = backref;
+        if (marker_len > 0)
+        {
+            if (setup)
+            {
+                m_is_doxygen_comment = true;
+                m_is_backreferencing_doxygen_comment = backref;
 
-				set_doxygen_marker(text, marker_len);
-			}
-			return true;
-		}
-	}
+                set_doxygen_marker(text, marker_len);
+            }
+            return true;
+        }
+    }
 
-	return false;
+    return false;
 }
 
 
@@ -949,134 +949,134 @@ Be aware that 'first_column' is 1-based!
 */
 size_t cmt_reflow_ex::expand_tabs_and_clean(char **dst_ref, size_t *dstlen_ref, const char *src, size_t srclen, int first_column, bool part_of_preproc_continuation)
 {
-	int pos = 0;
-	const int tabsize = m_tab_width;
-	int t;
-	int tab_count = count_tabs(src, srclen);
-	size_t dstlen;
-	UNC_ASSERT(dst_ref);
-	UNC_ASSERT(dstlen_ref);
-	/* also make sure you've got enough space to 'expand' '/'+'*', etc. sequences: 2 chars turns into 3 then. */
-	*dstlen_ref = dstlen = (srclen * 3) / 2 + tab_count * (tabsize - 1) + first_column + 2;
-	char *dst;
-	*dst_ref = dst = (char *)malloc(dstlen);
-	char *last_nonwhite_idx = dst;
+    int pos = 0;
+    const int tabsize = m_tab_width;
+    int t;
+    int tab_count = count_tabs(src, srclen);
+    size_t dstlen;
+    UNC_ASSERT(dst_ref);
+    UNC_ASSERT(dstlen_ref);
+    /* also make sure you've got enough space to 'expand' '/'+'*', etc. sequences: 2 chars turns into 3 then. */
+    *dstlen_ref = dstlen = (srclen * 3) / 2 + tab_count * (tabsize - 1) + first_column + 2;
+    char *dst;
+    *dst_ref = dst = (char *)malloc(dstlen);
+    char *last_nonwhite_idx = dst;
 
-	for (; pos < first_column - 1; pos++)
-	{
-		UNC_ASSERT(dstlen > (size_t)(dst - *dst_ref));
-		*dst++ = ' ';
-		//dstlen--;
-	}
+    for (; pos < first_column - 1; pos++)
+    {
+        UNC_ASSERT(dstlen > (size_t)(dst - *dst_ref));
+        *dst++ = ' ';
+        //dstlen--;
+    }
 
-	for ( ; srclen > 0; srclen--, src++)
-	{
-		switch (*src)
-		{
-		case '\t':
-			/* expand to next input TAB position; 'pos' is 0-based... */
-			t = pos + tabsize;
-			t /= tabsize;
-			t *= tabsize;
-			for (; pos < t; pos++)
-			{
-				UNC_ASSERT(dstlen > (size_t)(dst - *dst_ref));
-				*dst++ = ' ';
-				//dstlen--;
-			}
-			break;
+    for ( ; srclen > 0; srclen--, src++)
+    {
+        switch (*src)
+        {
+        case '\t':
+            /* expand to next input TAB position; 'pos' is 0-based... */
+            t = pos + tabsize;
+            t /= tabsize;
+            t *= tabsize;
+            for (; pos < t; pos++)
+            {
+                UNC_ASSERT(dstlen > (size_t)(dst - *dst_ref));
+                *dst++ = ' ';
+                //dstlen--;
+            }
+            break;
 
-		case '\r':
-			/* skip */
-			break;
+        case '\r':
+            /* skip */
+            break;
 
-		case '\\':
-			/* continuation or regular character/escape? */
-			if (srclen > 1 && in_set("\r\n", src[1]) && part_of_preproc_continuation)
-			{
-				/* drop this one; it'll be regenerated on output anyway. */
-				break;
-			}
-			goto default_case;
+        case '\\':
+            /* continuation or regular character/escape? */
+            if (srclen > 1 && in_set("\r\n", src[1]) && part_of_preproc_continuation)
+            {
+                /* drop this one; it'll be regenerated on output anyway. */
+                break;
+            }
+            goto default_case;
 
-		case '\n':
-			/* trim trailing whitespace right now: */
-			if (last_nonwhite_idx != dst)
-				dst = last_nonwhite_idx;
-			pos = -1;
-			/* fall through */
-			goto default_case;
+        case '\n':
+            /* trim trailing whitespace right now: */
+            if (last_nonwhite_idx != dst)
+                dst = last_nonwhite_idx;
+            pos = -1;
+            /* fall through */
+            goto default_case;
 
-		case '/':
-			if (m_is_cpp_comment && cpd.settings[UO_cmt_cpp_to_c].b)
-			{
-				if (srclen > 1 && '*' == src[1])
-				{
-					/*
-					Inject another character so the '/'+'*' seqeunce gets broken.
+        case '/':
+            if (m_is_cpp_comment && cpd.settings[UO_cmt_cpp_to_c].b)
+            {
+                if (srclen > 1 && '*' == src[1])
+                {
+                    /*
+                    Inject another character so the '/'+'*' seqeunce gets broken.
 
-					As it is an inject, do NOT count it against POS? For now, we do NOT.
-					*/
-					UNC_ASSERT(dstlen > (size_t)(dst + 1 - *dst_ref));
-					*dst++ = *src;
-					pos++;
-					*dst++ = NONBREAKING_SPACE_CHAR;
-					last_nonwhite_idx = dst;
-					/*
-					do NOT fallthrough but run the loop on the next character so that
-					oddities like '/'+'*'+'/' don't screw us up when converting to C comments.
-					*/
-					continue;
-				}
-			}
-			goto default_case;
+                    As it is an inject, do NOT count it against POS? For now, we do NOT.
+                    */
+                    UNC_ASSERT(dstlen > (size_t)(dst + 1 - *dst_ref));
+                    *dst++ = *src;
+                    pos++;
+                    *dst++ = NONBREAKING_SPACE_CHAR;
+                    last_nonwhite_idx = dst;
+                    /*
+                    do NOT fallthrough but run the loop on the next character so that
+                    oddities like '/'+'*'+'/' don't screw us up when converting to C comments.
+                    */
+                    continue;
+                }
+            }
+            goto default_case;
 
-		case '*':
-			if (m_is_cpp_comment && cpd.settings[UO_cmt_cpp_to_c].b)
-			{
-				if (srclen > 1 && '/' == src[1])
-				{
-					/*
-					Inject another character so the '*'+'/' sequence gets broken.
+        case '*':
+            if (m_is_cpp_comment && cpd.settings[UO_cmt_cpp_to_c].b)
+            {
+                if (srclen > 1 && '/' == src[1])
+                {
+                    /*
+                    Inject another character so the '*'+'/' sequence gets broken.
 
-					As it is an inject, do NOT count it against POS? For now, we do NOT.
-					*/
-					UNC_ASSERT(dstlen > (size_t)(dst + 1 - *dst_ref));
-					*dst++ = *src;
-					pos++;
-					*dst++ = NONBREAKING_SPACE_CHAR;
-					last_nonwhite_idx = dst;
-					/*
-					do NOT fallthrough but run the loop on the next character so that
-					oddities like '*'+'/'+'*' don't screw us up when converting to C comments.
-					*/
-					continue;
-				}
-			}
-			goto default_case;
+                    As it is an inject, do NOT count it against POS? For now, we do NOT.
+                    */
+                    UNC_ASSERT(dstlen > (size_t)(dst + 1 - *dst_ref));
+                    *dst++ = *src;
+                    pos++;
+                    *dst++ = NONBREAKING_SPACE_CHAR;
+                    last_nonwhite_idx = dst;
+                    /*
+                    do NOT fallthrough but run the loop on the next character so that
+                    oddities like '*'+'/'+'*' don't screw us up when converting to C comments.
+                    */
+                    continue;
+                }
+            }
+            goto default_case;
 
-		default:
+        default:
 default_case:
-			UNC_ASSERT(dstlen > (size_t)(dst - *dst_ref));
-			*dst++ = *src;
-			//dstlen--;
-			pos++;
-			if (!in_set(" \t", *src))
-			{
-				last_nonwhite_idx = dst;
-			}
-			break;
-		}
-	}
+            UNC_ASSERT(dstlen > (size_t)(dst - *dst_ref));
+            *dst++ = *src;
+            //dstlen--;
+            pos++;
+            if (!in_set(" \t", *src))
+            {
+                last_nonwhite_idx = dst;
+            }
+            break;
+        }
+    }
 
-	/* trim trailing whitespace right now: */
-	if (last_nonwhite_idx != dst)
-		dst = last_nonwhite_idx;
+    /* trim trailing whitespace right now: */
+    if (last_nonwhite_idx != dst)
+        dst = last_nonwhite_idx;
 
-	UNC_ASSERT(dstlen > (size_t)(dst + 1 - *dst_ref));
-	*dst = 0;
+    UNC_ASSERT(dstlen > (size_t)(dst + 1 - *dst_ref));
+    *dst = 0;
 
-	return dst - *dst_ref;
+    return dst - *dst_ref;
 }
 
 /**
@@ -1085,61 +1085,61 @@ comment text.
 */
 void cmt_reflow_ex::strip_first_and_last_nl_from_text(void)
 {
-	char * const text = m_comment;
-	UNC_ASSERT_EX(strlen(text) <= m_comment_len, ("(%d != %d)", (int)strlen(text), (int)m_comment_len));
+    char * const text = m_comment;
+    UNC_ASSERT_EX(strlen(text) <= m_comment_len, ("(%d != %d)", (int)strlen(text), (int)m_comment_len));
 
-	if (*text)
-	{
-		char *s;
-		char *last_nl = NULL;
-		int nl_count = 0;
+    if (*text)
+    {
+        char *s;
+        char *last_nl = NULL;
+        int nl_count = 0;
 
-		// scan backward to strip trailing newlines + WS
-		for (s = text + m_comment_len - 1; s >= text && unc_isspace(*s); s--)
-		{
-			if (*s == '\n')
-			{
-				last_nl = s;
-				nl_count++;
-			}
-		}
+        // scan backward to strip trailing newlines + WS
+        for (s = text + m_comment_len - 1; s >= text && unc_isspace(*s); s--)
+        {
+            if (*s == '\n')
+            {
+                last_nl = s;
+                nl_count++;
+            }
+        }
 
-		if (last_nl)
-		{
-			if (nl_count >= 1)
-			{
-				m_has_trailing_nl = true;
-			}
-			/* clip to before NL */
-			*last_nl = 0;
-		}
+        if (last_nl)
+        {
+            if (nl_count >= 1)
+            {
+                m_has_trailing_nl = true;
+            }
+            /* clip to before NL */
+            *last_nl = 0;
+        }
 
-		// scan forward to strip leading newlines + WS
-		last_nl = NULL;
-		nl_count = 0;
-		for (s = text; *s && unc_isspace(*s); s++)
-		{
-			if (*s == '\n')
-			{
-				last_nl = s;
-				nl_count++;
-			}
-		}
+        // scan forward to strip leading newlines + WS
+        last_nl = NULL;
+        nl_count = 0;
+        for (s = text; *s && unc_isspace(*s); s++)
+        {
+            if (*s == '\n')
+            {
+                last_nl = s;
+                nl_count++;
+            }
+        }
 
-		if (last_nl)
-		{
-			if (nl_count >= 1)
-			{
-				m_has_leading_nl = true;
-			}
-			/* strip leading NL */
-			memmove(text, last_nl + 1, text - last_nl - 1 + m_comment_len + 1);
-		}
+        if (last_nl)
+        {
+            if (nl_count >= 1)
+            {
+                m_has_leading_nl = true;
+            }
+            /* strip leading NL */
+            memmove(text, last_nl + 1, text - last_nl - 1 + m_comment_len + 1);
+        }
 
-		m_comment_len = strlen(text);
-	}
+        m_comment_len = strlen(text);
+    }
 
-	UNC_ASSERT(m_comment_len == strlen(text));
+    UNC_ASSERT(m_comment_len == strlen(text));
 }
 
 
@@ -1158,235 +1158,235 @@ entire comment!
 */
 int cmt_reflow_ex::strip_nonboxed_lead_markers(char *text, int at_column)
 {
-	char *second_line = strchrnn(text, '\n');
+    char *second_line = strchrnn(text, '\n');
     int lead_cnt = 0; /* number of '*' lead characters used for each comment line [0..2] */
-	bool determine_leadin = (m_lead_marker == NULL);
-	int min_cnt = 0;
-	int horizontal_lead_index = 0;
-	int pre_lead_ws_cnt = 0;
-	int past_lead_ws_cnt = INT_MAX;
-	char *last_nl = second_line;
+    bool determine_leadin = (m_lead_marker == NULL);
+    int min_cnt = 0;
+    int horizontal_lead_index = 0;
+    int pre_lead_ws_cnt = 0;
+    int past_lead_ws_cnt = INT_MAX;
+    char *last_nl = second_line;
 
-	if (!*second_line)
-		return 0;
+    if (!*second_line)
+        return 0;
 
-	while (*second_line)
-	{
-		last_nl++;
-		second_line++;
-		second_line += strleadlen(second_line, ' ');
+    while (*second_line)
+    {
+        last_nl++;
+        second_line++;
+        second_line += strleadlen(second_line, ' ');
 
-		int cnt = (int)strspn(second_line, m_defd_lead_markers);
-		second_line += cnt;
+        int cnt = (int)strspn(second_line, m_defd_lead_markers);
+        second_line += cnt;
 
-		if (cnt > 0)
-		{
-			/* heuristic: cnt>2 == a line of stars. Count the minimum NON-ZERO number of leader chars per line. */
-			if (min_cnt == 0 && cnt <= 2)
-			{
-				min_cnt = cnt;
-				horizontal_lead_index = (int)(second_line - last_nl);
-				pre_lead_ws_cnt = horizontal_lead_index - cnt;
-				int past_cnt = strleadlen(second_line, ' ');
-				if (past_lead_ws_cnt > past_cnt && unc_isprint(second_line[past_cnt]))
-				{
-					past_lead_ws_cnt = past_cnt;
-				}
-				if (determine_leadin)
-				{
-					m_lead_marker = strndup(second_line - cnt, cnt);
-				}
-			}
-			else if (min_cnt > cnt)
-			{
-				min_cnt = cnt;
-				horizontal_lead_index = (int)(second_line - last_nl);
-				int pre_cnt = horizontal_lead_index - cnt;
-				if (pre_lead_ws_cnt > pre_cnt)
-				{
-					pre_lead_ws_cnt = pre_cnt;
-				}
-				int past_cnt = strleadlen(second_line, ' ');
-				if (past_lead_ws_cnt > past_cnt && unc_isprint(second_line[past_cnt]))
-				{
-					past_lead_ws_cnt = past_cnt;
-				}
-				if (determine_leadin)
-				{
-					UNC_ASSERT(m_lead_marker);
-					UNC_ASSERT((int)strlen(m_lead_marker) > cnt);
-					memcpy(m_lead_marker, second_line - cnt, cnt);
-					m_lead_marker[cnt] = 0;
-				}
-			}
-			else if (min_cnt == cnt && horizontal_lead_index > second_line - last_nl)
-			{
-				/* when a leadin char is discovered at an earlier horizontal position... */
-				//min_cnt = cnt;
-				horizontal_lead_index = (int)(second_line - last_nl);
-				int pre_cnt = horizontal_lead_index - cnt;
-				if (pre_lead_ws_cnt > pre_cnt)
-				{
-					pre_lead_ws_cnt = pre_cnt;
-				}
-				int past_cnt = strleadlen(second_line, ' ');
-				if (past_lead_ws_cnt > past_cnt && unc_isprint(second_line[past_cnt]))
-				{
-					past_lead_ws_cnt = past_cnt;
-				}
-			}
-			else if (min_cnt == cnt)
-			{
-				/* like the other lines; just make sure we collect the minimum post-lead whitespace count */
-				int pre_cnt = horizontal_lead_index - cnt;
-				if (pre_lead_ws_cnt > pre_cnt)
-				{
-					pre_lead_ws_cnt = pre_cnt;
-				}
-				int past_cnt = strleadlen(second_line, ' ');
-				if (past_lead_ws_cnt > past_cnt && unc_isprint(second_line[past_cnt]))
-				{
-					past_lead_ws_cnt = past_cnt;
-				}
-			}
-		}
+        if (cnt > 0)
+        {
+            /* heuristic: cnt>2 == a line of stars. Count the minimum NON-ZERO number of leader chars per line. */
+            if (min_cnt == 0 && cnt <= 2)
+            {
+                min_cnt = cnt;
+                horizontal_lead_index = (int)(second_line - last_nl);
+                pre_lead_ws_cnt = horizontal_lead_index - cnt;
+                int past_cnt = strleadlen(second_line, ' ');
+                if (past_lead_ws_cnt > past_cnt && unc_isprint(second_line[past_cnt]))
+                {
+                    past_lead_ws_cnt = past_cnt;
+                }
+                if (determine_leadin)
+                {
+                    m_lead_marker = strndup(second_line - cnt, cnt);
+                }
+            }
+            else if (min_cnt > cnt)
+            {
+                min_cnt = cnt;
+                horizontal_lead_index = (int)(second_line - last_nl);
+                int pre_cnt = horizontal_lead_index - cnt;
+                if (pre_lead_ws_cnt > pre_cnt)
+                {
+                    pre_lead_ws_cnt = pre_cnt;
+                }
+                int past_cnt = strleadlen(second_line, ' ');
+                if (past_lead_ws_cnt > past_cnt && unc_isprint(second_line[past_cnt]))
+                {
+                    past_lead_ws_cnt = past_cnt;
+                }
+                if (determine_leadin)
+                {
+                    UNC_ASSERT(m_lead_marker);
+                    UNC_ASSERT((int)strlen(m_lead_marker) > cnt);
+                    memcpy(m_lead_marker, second_line - cnt, cnt);
+                    m_lead_marker[cnt] = 0;
+                }
+            }
+            else if (min_cnt == cnt && horizontal_lead_index > second_line - last_nl)
+            {
+                /* when a leadin char is discovered at an earlier horizontal position... */
+                //min_cnt = cnt;
+                horizontal_lead_index = (int)(second_line - last_nl);
+                int pre_cnt = horizontal_lead_index - cnt;
+                if (pre_lead_ws_cnt > pre_cnt)
+                {
+                    pre_lead_ws_cnt = pre_cnt;
+                }
+                int past_cnt = strleadlen(second_line, ' ');
+                if (past_lead_ws_cnt > past_cnt && unc_isprint(second_line[past_cnt]))
+                {
+                    past_lead_ws_cnt = past_cnt;
+                }
+            }
+            else if (min_cnt == cnt)
+            {
+                /* like the other lines; just make sure we collect the minimum post-lead whitespace count */
+                int pre_cnt = horizontal_lead_index - cnt;
+                if (pre_lead_ws_cnt > pre_cnt)
+                {
+                    pre_lead_ws_cnt = pre_cnt;
+                }
+                int past_cnt = strleadlen(second_line, ' ');
+                if (past_lead_ws_cnt > past_cnt && unc_isprint(second_line[past_cnt]))
+                {
+                    past_lead_ws_cnt = past_cnt;
+                }
+            }
+        }
 
-		second_line = strchrnn(second_line, '\n');
-		last_nl = second_line;
-	}
+        second_line = strchrnn(second_line, '\n');
+        last_nl = second_line;
+    }
 
-	if (lead_cnt == 0)
-		lead_cnt = min_cnt;
-	UNC_ASSERT(lead_cnt == (m_lead_marker ? (int)strlen(m_lead_marker) : 0));
+    if (lead_cnt == 0)
+        lead_cnt = min_cnt;
+    UNC_ASSERT(lead_cnt == (m_lead_marker ? (int)strlen(m_lead_marker) : 0));
 
-	if (min_cnt == 0)
-		return 0;
-	UNC_ASSERT(m_lead_marker != NULL);
+    if (min_cnt == 0)
+        return 0;
+    UNC_ASSERT(m_lead_marker != NULL);
 
-	/*
-	now we know how many leadin characters there are and which one is used:
-	those are stripped from the text: more correctly, they are replaced with spaces.
+    /*
+    now we know how many leadin characters there are and which one is used:
+    those are stripped from the text: more correctly, they are replaced with spaces.
 
-	The left margin cutoff code later on will do the rest (left-adjusting the content).
+    The left margin cutoff code later on will do the rest (left-adjusting the content).
 
-	NOTE ABOUT BOXED COMMENTS: the characteristic of boxed comments is that lines
-	which start with a character '*' also end with that same character '*'. This heuristic
-	knowledge is applied here to ensure boxed layouts remain as they are...
-	*/
-	second_line = strchrnn(text, '\n');
-	last_nl = second_line;
-	char *previous_sol = text;
-	bool previous_line_was_boxed = true;
-	while (*second_line)
-	{
-		second_line++;
-		second_line += strleadlen(second_line, ' ');
+    NOTE ABOUT BOXED COMMENTS: the characteristic of boxed comments is that lines
+    which start with a character '*' also end with that same character '*'. This heuristic
+    knowledge is applied here to ensure boxed layouts remain as they are...
+    */
+    second_line = strchrnn(text, '\n');
+    last_nl = second_line;
+    char *previous_sol = text;
+    bool previous_line_was_boxed = true;
+    while (*second_line)
+    {
+        second_line++;
+        second_line += strleadlen(second_line, ' ');
 
-		/* see if we've got a 'boxed' line: */
-		char *eol = strchrnn(second_line, '\n');
-		eol -= strtaillen(second_line, eol, ' ');
+        /* see if we've got a 'boxed' line: */
+        char *eol = strchrnn(second_line, '\n');
+        eol -= strtaillen(second_line, eol, ' ');
 
-		/*
-		boxes are at least 3 chars wide and span entire 'paragraphs' (which are separated by
-		empty lines).
-		    */
-		UNC_ASSERT(min_cnt > 0);
-		bool maybe_boxed = (eol > second_line + max(min_cnt, lead_cnt) && 0 == strncmp(eol - lead_cnt, m_lead_marker, lead_cnt));
+        /*
+        boxes are at least 3 chars wide and span entire 'paragraphs' (which are separated by
+        empty lines).
+            */
+        UNC_ASSERT(min_cnt > 0);
+        bool maybe_boxed = (eol > second_line + max(min_cnt, lead_cnt) && 0 == strncmp(eol - lead_cnt, m_lead_marker, lead_cnt));
 
-		if (maybe_boxed)
-		{
-			/* scan backwards to see whether the 'box' is a paragraph on its own. */
-			int llwscnt = strleadlen(previous_sol, ' ');
+        if (maybe_boxed)
+        {
+            /* scan backwards to see whether the 'box' is a paragraph on its own. */
+            int llwscnt = strleadlen(previous_sol, ' ');
 
-			if (llwscnt < last_nl - previous_sol)
-			{
-				/* previous line contains more than just whitespace: this line is not a boxed comment section! */
-				maybe_boxed = previous_line_was_boxed;
-			}
-		}
-		if (maybe_boxed)
-		{
-			/* scan forward to see whether the 'box' is a paragraph on its own. */
-			char *sl = strchrnn(second_line, '\n');
+            if (llwscnt < last_nl - previous_sol)
+            {
+                /* previous line contains more than just whitespace: this line is not a boxed comment section! */
+                maybe_boxed = previous_line_was_boxed;
+            }
+        }
+        if (maybe_boxed)
+        {
+            /* scan forward to see whether the 'box' is a paragraph on its own. */
+            char *sl = strchrnn(second_line, '\n');
 
-			while (*sl)
-			{
-				sl++;
-				sl += strleadlen(sl, ' ');
+            while (*sl)
+            {
+                sl++;
+                sl += strleadlen(sl, ' ');
 
-				/* see if we've got a 'boxed' line: */
-				char *el = strchrnn(sl, '\n');
-				char *eol2 = el - strtaillen(sl, el, ' ');
+                /* see if we've got a 'boxed' line: */
+                char *el = strchrnn(sl, '\n');
+                char *eol2 = el - strtaillen(sl, el, ' ');
 
-				bool maybe_boxed2 = (eol2 > sl + max(min_cnt, lead_cnt) && 0 == strncmp(eol2 - lead_cnt, m_lead_marker, lead_cnt));
+                bool maybe_boxed2 = (eol2 > sl + max(min_cnt, lead_cnt) && 0 == strncmp(eol2 - lead_cnt, m_lead_marker, lead_cnt));
 
-				if (eol2 == sl)
-				{
-					/* empty line or whitespace only: end of 'para' */
-					break;
-				}
-				if (!maybe_boxed2)
-				{
-					/* all lines in the current 'paragraph' must be boxed like that! */
-					maybe_boxed = false;
-					break;
-				}
+                if (eol2 == sl)
+                {
+                    /* empty line or whitespace only: end of 'para' */
+                    break;
+                }
+                if (!maybe_boxed2)
+                {
+                    /* all lines in the current 'paragraph' must be boxed like that! */
+                    maybe_boxed = false;
+                    break;
+                }
 
-				sl = el;
-			}
-		}
+                sl = el;
+            }
+        }
 
-		if (maybe_boxed)
-		{
-			/* a boxed line */
-		}
-		else
-		{
-			/* not a boxed line; strip lead markers from the starting horizontal position onward. */
-			int cnt = min_cnt;
-			if (second_line - last_nl > horizontal_lead_index)
-			{
-				cnt -= (int)(second_line - last_nl) - horizontal_lead_index;
-			}
-			for ( ; cnt > 0 && in_set(m_lead_marker, *second_line); cnt--)
-				*second_line++ = ' ';
-		}
+        if (maybe_boxed)
+        {
+            /* a boxed line */
+        }
+        else
+        {
+            /* not a boxed line; strip lead markers from the starting horizontal position onward. */
+            int cnt = min_cnt;
+            if (second_line - last_nl > horizontal_lead_index)
+            {
+                cnt -= (int)(second_line - last_nl) - horizontal_lead_index;
+            }
+            for ( ; cnt > 0 && in_set(m_lead_marker, *second_line); cnt--)
+                *second_line++ = ' ';
+        }
 
-		previous_sol = last_nl;
-		UNC_ASSERT(previous_sol != NULL);
-		previous_sol++;
-		previous_line_was_boxed = maybe_boxed;
+        previous_sol = last_nl;
+        UNC_ASSERT(previous_sol != NULL);
+        previous_sol++;
+        previous_line_was_boxed = maybe_boxed;
 
-		second_line = strchrnn(second_line, '\n');
-		last_nl = second_line;
-	}
+        second_line = strchrnn(second_line, '\n');
+        last_nl = second_line;
+    }
 
 
-	/*
-	SIDE EFFECT: set up the current star-prefix related settings according to the results acquired above.
-	*/
-	if (m_extra_pre_star_indent < 0)
-	{
-		int diff = pre_lead_ws_cnt - (at_column - 1);
-		m_extra_pre_star_indent = max(0, diff);
-	}
-	if (m_extra_post_star_indent < 0 && past_lead_ws_cnt != INT_MAX)
-	{
-		m_extra_post_star_indent = past_lead_ws_cnt;
-	}
+    /*
+    SIDE EFFECT: set up the current star-prefix related settings according to the results acquired above.
+    */
+    if (m_extra_pre_star_indent < 0)
+    {
+        int diff = pre_lead_ws_cnt - (at_column - 1);
+        m_extra_pre_star_indent = max(0, diff);
+    }
+    if (m_extra_post_star_indent < 0 && past_lead_ws_cnt != INT_MAX)
+    {
+        m_extra_post_star_indent = past_lead_ws_cnt;
+    }
 
-	return min_cnt;
+    return min_cnt;
 }
 
 
 void cmt_reflow_ex::set_doxygen_marker(const char *marker, size_t len)
 {
-	/* only set the the marker once per comment */
-	if (!m_doxygen_marker)
-	{
-		m_doxygen_marker = strndup(marker, len);
-		UNC_ASSERT(m_doxygen_marker);
-	}
+    /* only set the the marker once per comment */
+    if (!m_doxygen_marker)
+    {
+        m_doxygen_marker = strndup(marker, len);
+        UNC_ASSERT(m_doxygen_marker);
+    }
 }
 
 
@@ -1409,33 +1409,33 @@ void cmt_reflow_ex::set_doxygen_marker(const char *marker, size_t len)
 
 void cmt_reflow_ex::push_chunk(chunk_t *pc)
 {
-	if (!m_first_pc)
-	{
-	   output_start(pc);
-	   UNC_ASSERT(m_first_pc);
-	}
+    if (!m_first_pc)
+    {
+       output_start(pc);
+       UNC_ASSERT(m_first_pc);
+    }
 
    if (pc->type == CT_COMMENT_MULTI
-		  || pc->type == CT_COMMENT)
+          || pc->type == CT_COMMENT)
    {
-	   /*
-	   make sure we only strip the tail marker off when it actually exists:
+       /*
+       make sure we only strip the tail marker off when it actually exists:
 
-	   when the input is BAD/CORRUPTED (e.g. test sample C++/30011), the trailing
-	   '*'+'/' or '+'+'/' (in the case of LANG_D) may be absent. Thsi condition takes
-	   care of that matter for us.
-	   */
-	   bool walkback = (pc->str[pc->len() - 1] == pc->str[0]
-						&& pc->str[pc->len() - 2] == pc->str[1]);
-		push_text(pc->str + 2, pc->len() - (walkback ? 4 : 2), false, 2, pc->orig_col, pc);
+       when the input is BAD/CORRUPTED (e.g. test sample C++/30011), the trailing
+       '*'+'/' or '+'+'/' (in the case of LANG_D) may be absent. Thsi condition takes
+       care of that matter for us.
+       */
+       bool walkback = (pc->str[pc->len() - 1] == pc->str[0]
+                        && pc->str[pc->len() - 2] == pc->str[1]);
+        push_text(pc->str + 2, pc->len() - (walkback ? 4 : 2), false, 2, pc->orig_col, pc);
    }
    else
    {
-	   UNC_ASSERT(pc->type == CT_COMMENT_CPP);
-		push_text(pc->str.c_str() + 2, pc->len() - 2, true, 2, pc->orig_col, pc);
+       UNC_ASSERT(pc->type == CT_COMMENT_CPP);
+        push_text(pc->str.c_str() + 2, pc->len() - 2, true, 2, pc->orig_col, pc);
    }
 
-	m_last_pc = pc;
+    m_last_pc = pc;
 }
 
 
@@ -1459,12 +1459,12 @@ void cmt_reflow_ex::push_text(const char *text, int len, bool esc_close, int fir
    bool in_word    = false;
 
    if (len < 0)
-	   len = (int)strlen(text);
+       len = (int)strlen(text);
 
    /* apply initial indent: */
    if (at_column < 0)
    {
-	   at_column = pc->orig_col;
+       at_column = pc->orig_col;
    }
    UNC_ASSERT(at_column >= 1);
 
@@ -1477,38 +1477,38 @@ void cmt_reflow_ex::push_text(const char *text, int len, bool esc_close, int fir
    */
    if (m_first_pc == pc && detect_as_javadoc_chunk(pc, true))
    {
-	   /*
-	   next: blow away the marker by replacing it with whitespace.
+       /*
+       next: blow away the marker by replacing it with whitespace.
 
-	   Since 'text' is non-modifiable, we do it a different way: we shift the 'first_extra_offset' N spaces
-	   forward and so does 'text'; this will result in 'expand_tabs_and_clean()' dumping the
-	   desired whitespace in there.
-	   */
-	   UNC_ASSERT(m_doxygen_marker);
-	   int javadoc_marker_len = (int)strlen(m_doxygen_marker);
-	   first_extra_offset += javadoc_marker_len;
-	   len -= javadoc_marker_len;
-	   text += javadoc_marker_len;
+       Since 'text' is non-modifiable, we do it a different way: we shift the 'first_extra_offset' N spaces
+       forward and so does 'text'; this will result in 'expand_tabs_and_clean()' dumping the
+       desired whitespace in there.
+       */
+       UNC_ASSERT(m_doxygen_marker);
+       int javadoc_marker_len = (int)strlen(m_doxygen_marker);
+       first_extra_offset += javadoc_marker_len;
+       len -= javadoc_marker_len;
+       text += javadoc_marker_len;
    }
    else if (m_first_pc != pc
-			&& pc
-			&& pc->type == CT_COMMENT_CPP
-			&& m_doxygen_marker
-			&& !strncmp(m_doxygen_marker, text, strlen(m_doxygen_marker)))
+            && pc
+            && pc->type == CT_COMMENT_CPP
+            && m_doxygen_marker
+            && !strncmp(m_doxygen_marker, text, strlen(m_doxygen_marker)))
    {
-	   /*
-	   Extra: for merged C++ doxygen comments (i.e. '///' prefixed comments)
-	   blow away the marker by replacing it with whitespace.
+       /*
+       Extra: for merged C++ doxygen comments (i.e. '///' prefixed comments)
+       blow away the marker by replacing it with whitespace.
 
-	   Since 'text' is non-modifiable, we do it a different way: we shift the 'first_extra_offset' N spaces
-	   forward and so does 'text'; this will result in 'expand_tabs_and_clean()' dumping the
-	   desired whitespace in there.
-	   */
-	   UNC_ASSERT(m_doxygen_marker);
-	   int javadoc_marker_len = (int)strlen(m_doxygen_marker);
-	   first_extra_offset += javadoc_marker_len;
-	   len -= javadoc_marker_len;
-	   text += javadoc_marker_len;
+       Since 'text' is non-modifiable, we do it a different way: we shift the 'first_extra_offset' N spaces
+       forward and so does 'text'; this will result in 'expand_tabs_and_clean()' dumping the
+       desired whitespace in there.
+       */
+       UNC_ASSERT(m_doxygen_marker);
+       int javadoc_marker_len = (int)strlen(m_doxygen_marker);
+       first_extra_offset += javadoc_marker_len;
+       len -= javadoc_marker_len;
+       text += javadoc_marker_len;
    }
 
    /*
@@ -1574,27 +1574,27 @@ void cmt_reflow_ex::push_text(const char *text, int len, bool esc_close, int fir
    */
    if (pc->type == CT_COMMENT_CPP)
    {
-	   int diff = strip_column0 - (at_column + 2 - 1);
-	   if (m_extra_post_star_indent < 0 && diff >= 0)
-	   {
-		   m_extra_post_star_indent = diff;
-	   }
+       int diff = strip_column0 - (at_column + 2 - 1);
+       if (m_extra_post_star_indent < 0 && diff >= 0)
+       {
+           m_extra_post_star_indent = diff;
+       }
    }
    else if (pc->type == CT_COMMENT_MULTI)
    {
-	   int diff = strip_column0 - (at_column + 2 - 1);
-	   if (m_extra_post_star_indent < 0 && diff >= 0)
-	   {
-		   m_extra_post_star_indent = diff;
-	   }
+       int diff = strip_column0 - (at_column + 2 - 1);
+       if (m_extra_post_star_indent < 0 && diff >= 0)
+       {
+           m_extra_post_star_indent = diff;
+       }
    }
    else
    {
-	   int diff = strip_column0 - (at_column + 2 - 1);
-	   if (m_extra_post_star_indent < 0 && diff >= 0)
-	   {
-		   m_extra_post_star_indent = diff;
-	   }
+       int diff = strip_column0 - (at_column + 2 - 1);
+       if (m_extra_post_star_indent < 0 && diff >= 0)
+       {
+           m_extra_post_star_indent = diff;
+       }
    }
 
    /*
@@ -1605,29 +1605,29 @@ void cmt_reflow_ex::push_text(const char *text, int len, bool esc_close, int fir
 
    This stop gap was necessary to ensure the calc_leading_whitespace4block() code would be
    able to discover the global 'left edge' of the entire text being added here.
-	*/
+    */
    const char *s;
    int strip_ws_cnt = strip_column0 + first_extra_offset;
    for (s = dst; *s; s++)
    {
-	  UNC_ASSERT((int)strlen(dst) + 1 >= (int)(s - dst));
-	  for (; strip_ws_cnt > 0 && *s == ' '; s++)
-	  {
-		  strip_ws_cnt--;
-	  }
-	  UNC_ASSERT(strip_ws_cnt != 0 ? (*s == '\n' || *s == 0 || s <= dst + strip_column0 + first_extra_offset) : 1);
-	  strip_ws_cnt = 0;
+      UNC_ASSERT((int)strlen(dst) + 1 >= (int)(s - dst));
+      for (; strip_ws_cnt > 0 && *s == ' '; s++)
+      {
+          strip_ws_cnt--;
+      }
+      UNC_ASSERT(strip_ws_cnt != 0 ? (*s == '\n' || *s == 0 || s <= dst + strip_column0 + first_extra_offset) : 1);
+      strip_ws_cnt = 0;
 
       if (!was_dollar && m_kw_subst &&
           (*s == '$') && (s[1] == '('))
       {
          int kwlen = add_kw(s);
-		 if (kwlen > 0)
-		 {
-			 s += kwlen - 1;
-			UNC_ASSERT((int)strlen(dst) >= (int)(s - dst));
-			continue;
-		 }
+         if (kwlen > 0)
+         {
+             s += kwlen - 1;
+            UNC_ASSERT((int)strlen(dst) >= (int)(s - dst));
+            continue;
+         }
       }
 
       /* Split the comment */
@@ -1635,15 +1635,15 @@ void cmt_reflow_ex::push_text(const char *text, int len, bool esc_close, int fir
       {
          in_word = false;
          push("\n");
-		 strip_ws_cnt = strip_column0;
+         strip_ws_cnt = strip_column0;
       }
-	  else if (*s == 0)
-	  {
-         break;
-	  }
-	  else
+      else if (*s == 0)
       {
-		 if (!in_word && !unc_isspace(*s))
+         break;
+      }
+      else
+      {
+         if (!in_word && !unc_isspace(*s))
          {
             m_word_count++;
          }
@@ -1666,122 +1666,122 @@ void cmt_reflow_ex::push_text(const char *text, int len, bool esc_close, int fir
 
 void cmt_reflow_ex::write2output(const char *text, size_t len)
 {
-	UNC_ASSERT(text);
+    UNC_ASSERT(text);
 
-	if (m_write_to_initial_column_pending && len > 0 && text[0] != '\n')
-	{
-		write_line_to_initial_column();
-		m_write_to_initial_column_pending = false;
-	}
+    if (m_write_to_initial_column_pending && len > 0 && text[0] != '\n')
+    {
+        write_line_to_initial_column();
+        m_write_to_initial_column_pending = false;
+    }
 
-	while (len-- > 0)
-	{
-		write(*text);
-		if (*text == '\n')
-		{
-			/*
-			Prevent trailing whitespace from appearing the output:
+    while (len-- > 0)
+    {
+        write(*text);
+        if (*text == '\n')
+        {
+            /*
+            Prevent trailing whitespace from appearing the output:
 
-			Don't print leading whitespace block when this turns to be an empty line in the end. We will however only find out
-			by the time we receive the next call to write2output() with a non-empty text.
-			*/
-			if (len > 0)
-			{
-				if (text[1] && text[1] != '\n')
-				{
-					write_line_to_initial_column();
-				}
-			}
-			else
-			{
-				m_write_to_initial_column_pending = true;
-			}
-		}
-		text++;
-	}
+            Don't print leading whitespace block when this turns to be an empty line in the end. We will however only find out
+            by the time we receive the next call to write2output() with a non-empty text.
+            */
+            if (len > 0)
+            {
+                if (text[1] && text[1] != '\n')
+                {
+                    write_line_to_initial_column();
+                }
+            }
+            else
+            {
+                m_write_to_initial_column_pending = true;
+            }
+        }
+        text++;
+    }
 }
 
 void cmt_reflow_ex::write2output(const char *text)
 {
-	write2output(text, strlen(text));
+    write2output(text, strlen(text));
 }
 
 void cmt_reflow_ex::write_line_to_initial_column(void)
 {
-	int left_col = m_left_global_output_column;
-	int diff = left_col - get_global_block_left_column();
-	UNC_ASSERT(diff >= 0);
-	bool allow_tabs;
+    int left_col = m_left_global_output_column;
+    int diff = left_col - get_global_block_left_column();
+    UNC_ASSERT(diff >= 0);
+    bool allow_tabs;
     chunk_t *prev = chunk_get_prev(m_first_pc);
-	int max_tabbed_column = -1;
-	bool first_thing_on_this_line;
+    int max_tabbed_column = -1;
+    bool first_thing_on_this_line;
 
     /* if not the first item on a line */
-	if ((prev && prev->type != CT_NEWLINE) || chunk_is_inline_comment(m_first_pc))
-	{
-		first_thing_on_this_line = false;
+    if ((prev && prev->type != CT_NEWLINE) || chunk_is_inline_comment(m_first_pc))
+    {
+        first_thing_on_this_line = false;
 
-		if (cpd.settings[UO_align_keep_tabs].b)
-		{
-		   allow_tabs = m_first_pc->after_tab;
-		}
-		else
-		{
-		   allow_tabs = (cpd.settings[UO_align_with_tabs].b &&
-						 ((m_first_pc->flags & PCF_WAS_ALIGNED) != 0) &&
-						 prev && ((prev->column + prev->len() + 1) != m_first_pc->column));
-		}
-	}
-	else
-	{
-		first_thing_on_this_line = true;
+        if (cpd.settings[UO_align_keep_tabs].b)
+        {
+           allow_tabs = m_first_pc->after_tab;
+        }
+        else
+        {
+           allow_tabs = (cpd.settings[UO_align_with_tabs].b &&
+                         ((m_first_pc->flags & PCF_WAS_ALIGNED) != 0) &&
+                         prev && ((prev->column + prev->len() + 1) != m_first_pc->column));
+        }
+    }
+    else
+    {
+        first_thing_on_this_line = true;
 
-		allow_tabs = (cpd.settings[UO_indent_with_tabs].n != 0);
-	}
-	LOG_FMT(LOUTIND, " for comment: %d(%d)/%d -", m_first_pc->column, allow_tabs, m_first_pc->level);
+        allow_tabs = (cpd.settings[UO_indent_with_tabs].n != 0);
+    }
+    LOG_FMT(LOUTIND, " for comment: %d(%d)/%d -", m_first_pc->column, allow_tabs, m_first_pc->level);
 
-	if (diff > 0)
-	{
-		switch (cpd.settings[UO_indent_with_tabs].n)
-		{
-		default:
-		case 0:
-			diff = 0;
-			break;
+    if (diff > 0)
+    {
+        switch (cpd.settings[UO_indent_with_tabs].n)
+        {
+        default:
+        case 0:
+            diff = 0;
+            break;
 
-		case 1:
+        case 1:
 #if 0
-			diff = 1 + m_first_pc->brace_level * cpd.settings[UO_output_tab_size].n - get_global_block_left_column();
+            diff = 1 + m_first_pc->brace_level * cpd.settings[UO_output_tab_size].n - get_global_block_left_column();
 #else
-			diff = 1 + m_first_pc->column_indent - get_global_block_left_column();
+            diff = 1 + m_first_pc->column_indent - get_global_block_left_column();
 #endif
-			break;
+            break;
 
-		case 2:
-			if (!m_indent_cmt_with_tabs /* cpd.settings[UO_indent_cmt_with_tabs].b */)
-			{
-				diff = m_base_col - get_global_block_left_column();
-			}
-			break;
-		}
+        case 2:
+            if (!m_indent_cmt_with_tabs /* cpd.settings[UO_indent_cmt_with_tabs].b */)
+            {
+                diff = m_base_col - get_global_block_left_column();
+            }
+            break;
+        }
 
-		if (diff > 0)
-		{
-			max_tabbed_column = diff / cpd.settings[UO_output_tab_size].n;
-		}
-		else
-		{
-			max_tabbed_column = 0;
-		}
-	}
-	else
-	{
-		allow_tabs = false;
-	}
+        if (diff > 0)
+        {
+            max_tabbed_column = diff / cpd.settings[UO_output_tab_size].n;
+        }
+        else
+        {
+            max_tabbed_column = 0;
+        }
+    }
+    else
+    {
+        allow_tabs = false;
+    }
 
-	output_to_column(m_left_global_output_column, allow_tabs, 1 + max_tabbed_column * cpd.settings[UO_output_tab_size].n);
+    output_to_column(m_left_global_output_column, allow_tabs, 1 + max_tabbed_column * cpd.settings[UO_output_tab_size].n);
 
-	UNC_ASSERT(left_col >= get_global_block_left_column());
+    UNC_ASSERT(left_col >= get_global_block_left_column());
 }
 
 
@@ -1789,9 +1789,9 @@ void cmt_reflow_ex::write_line_to_initial_column(void)
 
 void cmt_reflow_ex::output_start(chunk_t *pc)
 {
-	m_first_pc = pc;
+    m_first_pc = pc;
 
-	set_deferred_cmt_config_params_phase1();
+    set_deferred_cmt_config_params_phase1();
 }
 
 
@@ -1805,28 +1805,28 @@ void cmt_reflow_ex::output_start(chunk_t *pc)
  */
 bool cmt_reflow_ex::can_combine_comment(chunk_t *pc)
 {
-	/*
-	Don't permit merging comment chunks when the first block is a
-	multiline comment block or when the relevant comment merge config flag
-	has been turned OFF.
-	*/
-	chunk_t *pc_1 = m_first_pc;
-	if (!pc_1) pc_1 = pc;
+    /*
+    Don't permit merging comment chunks when the first block is a
+    multiline comment block or when the relevant comment merge config flag
+    has been turned OFF.
+    */
+    chunk_t *pc_1 = m_first_pc;
+    if (!pc_1) pc_1 = pc;
 
-	if (pc_1->type == CT_COMMENT_MULTI)
-	{
-		return false;
-	}
-	else if (pc_1->type == CT_COMMENT_CPP
-		&& !cpd.settings[UO_cmt_cpp_group].b)
-	{
-		return false;
-	}
-	else if (pc_1->type == CT_COMMENT
-		&& !cpd.settings[UO_cmt_c_group].b)
-	{
-		return false;
-	}
+    if (pc_1->type == CT_COMMENT_MULTI)
+    {
+        return false;
+    }
+    else if (pc_1->type == CT_COMMENT_CPP
+        && !cpd.settings[UO_cmt_cpp_group].b)
+    {
+        return false;
+    }
+    else if (pc_1->type == CT_COMMENT
+        && !cpd.settings[UO_cmt_c_group].b)
+    {
+        return false;
+    }
 
    /* We can't combine if there is something other than a newline next */
    if (pc->parent_type == CT_COMMENT_START)
@@ -1836,32 +1836,32 @@ bool cmt_reflow_ex::can_combine_comment(chunk_t *pc)
 
    if (detect_as_javadoc_chunk(pc) || m_is_doxygen_comment)
    {
-	   /*
-	   one exception: when a series of C++ doxygen comment lines follow one another, those
-	   are to be treated as a single comment!
-	   */
-	   if (pc && pc->type == CT_COMMENT_CPP)
-	   {
-		   /* next is a newline for sure, make sure it is a single newline */
-		   chunk_t *next = chunk_get_next(pc);
-		   if ((next != NULL) && (next->nl_count == 1))
-		   {
-			   /* Make sure the comment is the same type at the same column */
-			   next = chunk_get_next(next);
-			   if ((next != NULL) &&
-				   (next->type == pc->type) &&
-				   chunk_is_inline_comment(pc) == chunk_is_inline_comment(next) &&
-				   detect_as_javadoc_chunk(next) /* && m_is_doxygen_comment */ &&
-				   ((next->column == pc->column) ||
-				    ((next->column > 1 + pc->level * m_tab_width /* cpd.settings[UO_input_tab_size].n */ ) &&
-		             (pc->parent_type == CT_COMMENT_END || pc->parent_type == CT_COMMENT_WHOLE)
-					)))
-			   {
-				   return true;
-			   }
-		   }
-	   }
-		return false;
+       /*
+       one exception: when a series of C++ doxygen comment lines follow one another, those
+       are to be treated as a single comment!
+       */
+       if (pc && pc->type == CT_COMMENT_CPP)
+       {
+           /* next is a newline for sure, make sure it is a single newline */
+           chunk_t *next = chunk_get_next(pc);
+           if ((next != NULL) && (next->nl_count == 1))
+           {
+               /* Make sure the comment is the same type at the same column */
+               next = chunk_get_next(next);
+               if ((next != NULL) &&
+                   (next->type == pc->type) &&
+                   chunk_is_inline_comment(pc) == chunk_is_inline_comment(next) &&
+                   detect_as_javadoc_chunk(next) /* && m_is_doxygen_comment */ &&
+                   ((next->column == pc->column) ||
+                    ((next->column > 1 + pc->level * m_tab_width /* cpd.settings[UO_input_tab_size].n */ ) &&
+                     (pc->parent_type == CT_COMMENT_END || pc->parent_type == CT_COMMENT_WHOLE)
+                    )))
+               {
+                   return true;
+               }
+           }
+       }
+        return false;
    }
 
    /* next is a newline for sure, make sure it is a single newline */
@@ -1872,12 +1872,12 @@ bool cmt_reflow_ex::can_combine_comment(chunk_t *pc)
       next = chunk_get_next(next);
       if ((next != NULL) &&
           (next->type == pc->type) &&
-		   // chunk_is_inline_comment(pc) == chunk_is_inline_comment(next) &&
-		  !detect_as_javadoc_chunk(pc) && !m_is_doxygen_comment &&
-		   ((next->column == pc->column) ||
+           // chunk_is_inline_comment(pc) == chunk_is_inline_comment(next) &&
+          !detect_as_javadoc_chunk(pc) && !m_is_doxygen_comment &&
+           ((next->column == pc->column) ||
            ((next->column > 1 + pc->level * m_tab_width /* cpd.settings[UO_input_tab_size].n */ ) &&
-		     (pc->parent_type == CT_COMMENT_END || pc->parent_type == CT_COMMENT_WHOLE)
-		   )))
+             (pc->parent_type == CT_COMMENT_END || pc->parent_type == CT_COMMENT_WHOLE)
+           )))
       {
          return true;
       }
@@ -1892,102 +1892,102 @@ bool cmt_reflow_ex::can_combine_comment(chunk_t *pc)
 
 int cmt_reflow_ex::write2out_comment_start(paragraph_box *para, words_collection &words)
 {
-	UNC_ASSERT(para);
+    UNC_ASSERT(para);
 
-	m_write_to_initial_column_pending = false;
-	write_line_to_initial_column();
+    m_write_to_initial_column_pending = false;
+    write_line_to_initial_column();
 
-	if (m_is_cpp_comment)
-	{
-		write2output("//");
-		if (m_is_doxygen_comment)
-		{
-			UNC_ASSERT(m_doxygen_marker);
-			strrepllead(m_doxygen_marker, '*', '/');
-			write2output(m_doxygen_marker);
-		}
-	}
-	else
-	{
-		write2output("/*");
-		if (m_is_doxygen_comment)
-		{
-			UNC_ASSERT(m_doxygen_marker);
-			strrepllead(m_doxygen_marker, '/', '*');
-			write2output(m_doxygen_marker);
-		}
-	}
+    if (m_is_cpp_comment)
+    {
+        write2output("//");
+        if (m_is_doxygen_comment)
+        {
+            UNC_ASSERT(m_doxygen_marker);
+            strrepllead(m_doxygen_marker, '*', '/');
+            write2output(m_doxygen_marker);
+        }
+    }
+    else
+    {
+        write2output("/*");
+        if (m_is_doxygen_comment)
+        {
+            UNC_ASSERT(m_doxygen_marker);
+            strrepllead(m_doxygen_marker, '/', '*');
+            write2output(m_doxygen_marker);
+        }
+    }
 
-	return m_extra_post_star_indent;
+    return m_extra_post_star_indent;
 }
 
 
 int cmt_reflow_ex::write2out_comment_next_line(void)
 {
-	write2output("\n");
+    write2output("\n");
 
-	if (m_is_cpp_comment)
-	{
-		write2output("//");
-		if (m_is_doxygen_comment)
-		{
-			UNC_ASSERT(m_doxygen_marker);
-			strrepllead(m_doxygen_marker, '*', '/');
-			write2output(m_doxygen_marker);
-		}
-	}
-	else
-	{
-		int i;
+    if (m_is_cpp_comment)
+    {
+        write2output("//");
+        if (m_is_doxygen_comment)
+        {
+            UNC_ASSERT(m_doxygen_marker);
+            strrepllead(m_doxygen_marker, '*', '/');
+            write2output(m_doxygen_marker);
+        }
+    }
+    else
+    {
+        int i;
 
-		for (i = 0; i < m_extra_pre_star_indent; i++)
-		{
-			write2output(" ");
-		}
-		write2output(m_lead_marker);
-	}
+        for (i = 0; i < m_extra_pre_star_indent; i++)
+        {
+            write2output(" ");
+        }
+        write2output(m_lead_marker);
+    }
 
-	return m_extra_post_star_indent;
+    return m_extra_post_star_indent;
 }
 
 
 void cmt_reflow_ex::write2out_comment_end(int deferred_whitespace, int deferred_nl)
 {
-	int j;
+    int j;
 
-	for (j = 1; j < deferred_nl; j++)
-	{
-		deferred_whitespace = write2out_comment_next_line();
-	}
-	if (deferred_nl > 0)
-	{
-		write2output("\n");
+    for (j = 1; j < deferred_nl; j++)
+    {
+        deferred_whitespace = write2out_comment_next_line();
+    }
+    if (deferred_nl > 0)
+    {
+        write2output("\n");
 
-		deferred_whitespace = m_extra_post_star_indent;
-	}
+        deferred_whitespace = m_extra_post_star_indent;
+    }
 
-	/*
-	when a comment has whitespace between per-line lead-in and the content itself, than it
-	should also have that same whitespace between content and comment end marker when the
-	end marker is printed on the same line as the last bit of content. */
-	if (deferred_nl == 0 && deferred_whitespace == 0)
-	{
-		deferred_whitespace = m_extra_post_star_indent;
-	}
-	else if (deferred_nl > 0)
-	{
-		deferred_whitespace = m_extra_pre_star_indent;
-	}
+    /*
+    when a comment has whitespace between per-line lead-in and the content itself, than it
+    should also have that same whitespace between content and comment end marker when the
+    end marker is printed on the same line as the last bit of content. */
+    if (deferred_nl == 0 && deferred_whitespace == 0)
+    {
+        deferred_whitespace = m_extra_post_star_indent;
+    }
+    else if (deferred_nl > 0)
+    {
+        deferred_whitespace = m_extra_pre_star_indent;
+    }
 
-	if (!m_is_cpp_comment)
-	{
-		for (j = deferred_whitespace; j > 0; j -= min(16, j))
-		{
-			write2output("                ", min(16, j));
-		}
+    if (!m_is_cpp_comment)
+    {
+        for (j = deferred_whitespace; j > 0; j -= min(16, j))
+        {
+            write2output("                ", min(16, j));
+        }
 
-		write2output("*/");
-	}
+        write2output("*/");
+    }
 }
 
 

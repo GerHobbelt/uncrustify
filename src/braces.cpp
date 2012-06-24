@@ -547,14 +547,14 @@ static void convert_vbrace(chunk_t *vbr)
    {
       vbr->type = CT_BRACE_OPEN;
       vbr->str  = "{";
-	  
-	  prev = chunk_get_prev_nisl(vbr);
-	  if (prev != NULL)
-	  {
-		 UNC_ASSERT(prev->orig_col_end > 0);
-	     vbr->orig_col = prev->orig_col_end;
-		 vbr->orig_col_end = vbr->orig_col + 1;
-	  }
+      
+      prev = chunk_get_prev_nisl(vbr);
+      if (prev != NULL)
+      {
+         UNC_ASSERT(prev->orig_col_end > 0);
+         vbr->orig_col = prev->orig_col_end;
+         vbr->orig_col_end = vbr->orig_col + 1;
+      }
 
       /* If the next chunk is a preprocessor, then move the open brace after the
        * preprocessor.
@@ -571,14 +571,14 @@ static void convert_vbrace(chunk_t *vbr)
    {
       vbr->type = CT_BRACE_CLOSE;
       vbr->str  = "}";
-	  
-	  prev = chunk_get_prev_nisl(vbr);
-	  if (prev != NULL)
-	  {
-		 UNC_ASSERT(prev->orig_col_end > 0);
-	     vbr->orig_col = prev->orig_col_end;
-		 vbr->orig_col_end = vbr->orig_col + 1;
-	  }
+      
+      prev = chunk_get_prev_nisl(vbr);
+      if (prev != NULL)
+      {
+         UNC_ASSERT(prev->orig_col_end > 0);
+         vbr->orig_col = prev->orig_col_end;
+         vbr->orig_col_end = vbr->orig_col + 1;
+      }
 
       /* If the next chunk is a comment, followed by a newline, then
        * move the brace after the newline and add another newline after

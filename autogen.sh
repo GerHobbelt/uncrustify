@@ -40,12 +40,12 @@
 PGM=uncrustify
 configure_ac="./configure.in"
 
-cvtver() 
+cvtver()
 {
   awk 'NR==1 { split($NF,A,"."); X=1000000*A[1]+1000*A[2]+A[3]; print X; exit 0; }'
 }
 
-check_version() 
+check_version()
 {
   if `("$1" --version) < /dev/null > /dev/null 2>&1` ; then
     if [ `("$1" --version || echo "0") | cvtver` -ge "$2" ]; then
@@ -86,14 +86,14 @@ fi
 
 
 # Grep the required versions from configure.ac
-autoconf_vers=`sed -n '/^AC_PREREQ(/ { 
+autoconf_vers=`sed -n '/^AC_PREREQ(/ {
 s/^.*(\(.*\))/\1/p
 q
 }' ${configure_ac}`
 autoconf_vers_num=`echo "$autoconf_vers" | cvtver`
 # echo "detected autoconf version: " $autoconf_vers
 
-automake_vers=`sed -n '/^AM_INIT_AUTOMAKE(/ { 
+automake_vers=`sed -n '/^AM_INIT_AUTOMAKE(/ {
 s/^.*(.*\([0-9]\+\.[0-9]\+\).*)/\1/p
 q
 }' ${configure_ac}`
@@ -120,7 +120,7 @@ fi
 if test "$DIE" = "yes"; then
   cat <<EOF
 
-Note that you may use alternative versions of the tools by setting 
+Note that you may use alternative versions of the tools by setting
 the corresponding environment variables; see README.maintainer for details.
 
 EOF

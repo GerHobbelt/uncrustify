@@ -620,39 +620,39 @@ enum uncrustify_options
     * Comment modifications
     */
 
-   UO_cmt_width,                // column to wrap comments
-   UO_cmt_inline_width,                // column to wrap inline comments
-   UO_cmt_reflow_mode,          // comment reflow style
-	UO_cmt_reflow_mode_cpp, // cmt_reflow_mode equivalent for C++ comments
-	UO_cmt_reflow_orphans,		// minimum number of words to keep on a first (any!) line
-	UO_cmt_reflow_widows,		// minimum number of words to keep on a last line
-    UO_cmt_reflow_minimum_words_per_line,			// minimum number of words per comment line (prevent odd line wrapping for comments positioned towards the right edge --> allow those to overshoot the configured right edge
-    UO_cmt_reflow_overshoot,		// number of characters that comment line may overshoot to prevent widows
-	UO_cmt_reflow_bullets,			// characters that start a bullet in a bullet list, use any numeric for all numerics, etc.
-	UO_cmt_reflow_bullet_terminators,		// bullet point are a series of bullet characters, terminated by one of these.
-	UO_cmt_reflow_EOL_markers,		// characters that signal end of line within a paragraph, so that next line is not folded up, when next line starts with an SOL marker. Our way to do a HTML <br>.
-	UO_cmt_reflow_SOL_markers,		// characters that signal start of a new line within a paragraph, so that this line is not folded up, when previous line ends with an EOL marker.
-	UO_cmt_reflow_no_line_reflow_markers_at_SOL,		// when any of these is found at SOL, this _line_ will not be reflown.
-	UO_cmt_reflow_no_par_reflow_markers_at_SOL,			// when any of these is found at SOL, this _paragraph_ will not be reflown.
-	UO_cmt_reflow_no_cmt_reflow_markers_at_SOL,			// when any of these is found at SOL, this _comment_ will not be reflown.
-	UO_cmt_reflow_graphics_markers,	// any sequence of these >= threshold characters will signal this paragraph to be ASCII graphics.
-	UO_cmt_reflow_graphics_threshold,		// the related threshold to detect 'ASCII art' and stop uncrustify from reflowing this paragraph
-	UO_cmt_reflow_box_markers,		// any sequence of these >= threshold characters indicates a (non?reflowable) box comment
-	UO_cmt_reflow_box_threshold,	// the related threshold to detect a (non?reflowable) box comment
-	UO_cmt_reflow_box,		// whether or not to reflow box comments
-	UO_cmt_reflow_no_reflow_start_tag,		// when this is found at SOL, do not reflow until end tag is found; multiple tags can be specified, separated by ','
-	UO_cmt_reflow_no_reflow_end_tag,		// when this is found at SOL, do not reflow until end tag is found; multiple tags can be specified, separated by ','. End tags must occur in the same order as the open tags.
-	UO_cmt_reflow_doxygen,		// recognize doxygen/javadoc documentation markers and keep line breaks when they occur at SOL
-	UO_cmt_lead_markers,		// comment lines starting with any of these have a 'lead'/prefix to align to; usually this is '*', but '*#\\|+' is the default set for uncrustify
-	UO_cmt_reflow_change_cpp_to_c, // Whether to change cpp-comments into c-comments on reflow when the C++ comment ends up spanning across multiple lines (this includes grouped multiple C++ comments)
-	UO_cmt_reflow_change_c_to_cpp, // Whether to change c-comments into cpp-comments on reflow)
-	UO_cmt_reflow_intermission_indent_threshold,	// the related threshold to detect an intermission, i.e. a separate piece of text which stands out from the surrounding text
+   UO_cmt_width,                                // column to wrap comments
+   UO_cmt_inline_width,                         // column to wrap inline comments
+   UO_cmt_reflow_mode,                          // comment reflow style
+   UO_cmt_reflow_mode_cpp,                      // cmt_reflow_mode equivalent for C++ comments
+   UO_cmt_reflow_orphans,                       // minimum number of words to keep on a first (any!) line
+   UO_cmt_reflow_widows,                        // minimum number of words to keep on a last line
+   UO_cmt_reflow_minimum_words_per_line,        // minimum number of words per comment line (prevent odd line wrapping for comments positioned towards the right edge --> allow those to overshoot the configured right edge
+   UO_cmt_reflow_overshoot,                     // number of characters that comment line may overshoot to prevent widows
+   UO_cmt_reflow_bullets,                       // characters that start a bullet in a bullet list, use any numeric for all numerics, etc.
+   UO_cmt_reflow_bullet_terminators,            // bullet point are a series of bullet characters, terminated by one of these.
+   UO_cmt_reflow_EOL_markers,                   // characters that signal end of line within a paragraph, so that next line is not folded up, when next line starts with an SOL marker. Our way to do a HTML <br>.
+   UO_cmt_reflow_SOL_markers,                   // characters that signal start of a new line within a paragraph, so that this line is not folded up, when previous line ends with an EOL marker.
+   UO_cmt_reflow_no_line_reflow_markers_at_SOL, // when any of these is found at SOL, this _line_ will not be reflown.
+   UO_cmt_reflow_no_par_reflow_markers_at_SOL,  // when any of these is found at SOL, this _paragraph_ will not be reflown.
+   UO_cmt_reflow_no_cmt_reflow_markers_at_SOL,  // when any of these is found at SOL, this _comment_ will not be reflown.
+   UO_cmt_reflow_graphics_markers,              // any sequence of these >= threshold characters will signal this paragraph to be ASCII graphics.
+   UO_cmt_reflow_graphics_threshold,            // the related threshold to detect 'ASCII art' and stop uncrustify from reflowing this paragraph
+   UO_cmt_reflow_box_markers,                   // any sequence of these >= threshold characters indicates a (non?reflowable) box comment
+   UO_cmt_reflow_box_threshold,                 // the related threshold to detect a (non?reflowable) box comment
+   UO_cmt_reflow_box,                           // whether or not to reflow box comments
+   UO_cmt_reflow_no_reflow_start_tag,           // when this is found at SOL, do not reflow until end tag is found; multiple tags can be specified, separated by ','
+   UO_cmt_reflow_no_reflow_end_tag,             // when this is found at SOL, do not reflow until end tag is found; multiple tags can be specified, separated by ','. End tags must occur in the same order as the open tags.
+   UO_cmt_reflow_doxygen,                       // recognize doxygen/javadoc documentation markers and keep line breaks when they occur at SOL
+   UO_cmt_lead_markers,                         // comment lines starting with any of these have a 'lead'/prefix to align to; usually this is '*', but '*#\\|+' is the default set for uncrustify
+   UO_cmt_reflow_change_cpp_to_c,               // Whether to change cpp-comments into c-comments on reflow when the C++ comment ends up spanning across multiple lines (this includes grouped multiple C++ comments)
+   UO_cmt_reflow_change_c_to_cpp,               // Whether to change c-comments into cpp-comments on reflow)
+   UO_cmt_reflow_intermission_indent_threshold, // the related threshold to detect an intermission, i.e. a separate piece of text which stands out from the surrounding text
 
    UO_cmt_indent_multi,         // change left indent of multiline comments
    UO_cmt_star_cont,            // put a star on subsequent comment lines
    UO_cmt_sp_before_star_cont,  // # of spaces for subsequent comment lines (before possible star)
    UO_cmt_sp_after_star_cont,   // # of spaces for subsequent comment lines (after star)
-   UO_cmt_sp_after_cpp_start,	// # of spaces after the //
+   UO_cmt_sp_after_cpp_start,   // # of spaces after the //
    UO_cmt_cpp_to_c,             // convert CPP comments to C comments
    UO_cmt_cpp_group,            // if UO_cmt_cpp_to_c, try to group in one big C comment
    UO_cmt_c_group,              // try to group neighboring C comments
@@ -660,7 +660,7 @@ enum uncrustify_options
    UO_cmt_c_nl_end,             // put a nl before the */ in a combined group
    UO_cmt_cpp_nl_start,         // put a blank /* at the start of a converted group
    UO_cmt_cpp_nl_end,           // put a nl before the */ in a converted group
-   UO_cmt_multi_check_last,		// no space after '*' prefix when comment start and end are of equal length
+   UO_cmt_multi_check_last,     // no space after '*' prefix when comment start and end are of equal length
 
    UO_cmt_insert_file_header,
    UO_cmt_insert_file_footer,

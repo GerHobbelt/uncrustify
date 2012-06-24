@@ -16,11 +16,11 @@
 
 static_inline bool in_set(const char *set, int chr)
 {
-	if (chr > 0)
-	{
-		return !!strchr(set, chr);
-	}
-	return false;
+    if (chr > 0)
+    {
+        return !!strchr(set, chr);
+    }
+    return false;
 }
 
 /**
@@ -61,8 +61,8 @@ static_inline int unc_isalnum(int ch)
 */
 static_inline int unc_isident(int ch)
 {
-	int c = unc_fix_ctype(ch);
-	return isalnum(c) || in_set("$_", c);
+    int c = unc_fix_ctype(ch);
+    return isalnum(c) || in_set("$_", c);
 }
 
 
