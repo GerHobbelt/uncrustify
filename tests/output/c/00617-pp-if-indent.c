@@ -1,7 +1,7 @@
 /* this is a comment */
 
 /* should be in a H file but put in this file to avoid multiplying the number of
- *test files */
+ * test files */
 #ifndef COMSTACK_TYPES_H
 #define COMSTACK_TYPES_H
 
@@ -50,6 +50,7 @@
 void COMINL_vidInit(void)
 {
    uint8 u8LocalMsgIdx;
+
 
    if (COMINL_kastrVarReceiveMsg[u8LocalMsgIdx].udtDeadlineMonTimer
        < COMINL_udtNB_MESSAGES_RX)

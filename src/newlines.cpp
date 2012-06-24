@@ -1512,6 +1512,7 @@ static void newline_iarf_pair(chunk_t *before, chunk_t *after, argval_t av)
          if (nl && (av == AV_FORCE) && (nl->nl_count > 1))
          {
             nl->nl_count = 1;
+            MARK_CHANGE();
          }
       }
       else if ((av & AV_REMOVE) != 0)
